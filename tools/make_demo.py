@@ -1,6 +1,6 @@
 """Erzeugt die Website-Fassung einer Demo-App.
 
-Aufruf: python3 tools/make_demo.py <quelle.html> <ziel.html>
+Aufruf: python3 tools/make_demo.py <quelle.html> <ziel.html> "<Seitentitel>" "<Beschreibung>"
 Die Quelle ist die App-Datei aus claude.ai (ohne <head>). Die Website-Fassung
 - läuft immer im Demo-Modus (Beispieldaten nur im Browser des Besuchers),
 - lädt Schriften und Bibliotheken von der eigenen Domain statt von Google oder cdnjs,
@@ -9,9 +9,10 @@ Die Quelle ist die App-Datei aus claude.ai (ohne <head>). Die Website-Fassung
 import re, sys
 
 src, dst = sys.argv[1], sys.argv[2]
+title = (sys.argv[3] if len(sys.argv) > 3 else "Demo: Reklamationen & Workflows") + " | Nexvio"
+desc = sys.argv[4] if len(sys.argv) > 4 else "Klickbare Demo: Kunden- und Lieferantenreklamationen nach 8D, Freigabe-Workflows, Aufgaben mit Erinnerungen und Stammdaten per Excel-Upload."
 s = open(src, encoding="utf-8").read()
 
-title = "Demo: Reklamationen & Workflows | Nexvio"
 s = re.sub(r"<title>.*?</title>\n?", "", s, count=1)
 s = re.sub(r'<link rel="preconnect"[^>]*>\n?', "", s)
 s = re.sub(r'<link rel="stylesheet" href="https://fonts\.googleapis\.com[^"]*">\n?', "", s)
@@ -42,7 +43,7 @@ head = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
-<meta name="description" content="Klickbare Demo: Kunden- und Lieferantenreklamationen nach 8D, Freigabe-Workflows, Aufgaben mit Erinnerungen und Stammdaten per Excel-Upload.">
+<meta name="description" content="{desc}">
 <meta name="robots" content="noindex, follow">
 <style>
 {fonts}{bar_css}</style>

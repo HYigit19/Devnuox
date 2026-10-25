@@ -7,13 +7,14 @@ from html import escape as e
 
 sys.path.insert(0, os.path.dirname(__file__))
 from legal import LEGAL, OPERATOR
+from demos import DEMOS_PAGE
 from content import SLUGS, UI, PROCESS, SERVICE_CARDS, HOME, SERVICES, CONTACT, EXAMPLES, BOOKING, BOOKING_URL
 
 BASE = "https://www.nexvio.de"   # placeholder until the domain is bought
 EMAIL = "hallo@nexvio.de"        # placeholder
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LANGS = ["de", "en"]
-KEYS = ["home", "ai", "web", "apps", "dash", "contact"]
+KEYS = ["home", "ai", "web", "apps", "dash", "demos", "contact"]
 SERVICE_KEYS = ["ai", "web", "apps", "dash"]
 FONTS = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
 
@@ -106,11 +107,11 @@ def header(L, lang, key):
     cur = ' aria-current="page"'
     links = "".join(
         f'<a href="{L.page(lang, lang, k)}"{cur if k == key else ""}>{e(ui["nav"][k])}</a>'
-        for k in ["home"] + SERVICE_KEYS)
+        for k in ["home"] + SERVICE_KEYS + ["demos"])
     langsw = "".join(
         f'<a href="{L.page(lang, l, key)}" hreflang="{l}" lang="{l}" aria-current="{str(l == lang).lower()}">{l.upper()}</a>'
         for l in LANGS)
-    mobile = "".join(f'<a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a>' for k in ["home"] + SERVICE_KEYS)
+    mobile = "".join(f'<a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a>' for k in ["home"] + SERVICE_KEYS + ["demos"])
     mobile += f'<a href="{L.page(lang, lang, "contact")}">{e(ui["cta"])}</a>'
     return f"""<header class="site-header">
   <div class="wrap nav">
@@ -276,7 +277,7 @@ def page_home(L, lang):
   <div class="wrap section-inner">
     <div class="section-head"><p class="eyebrow">{e(h['cases_eyebrow'])}</p><h2>{e(h['cases_h2'])}</h2></div>
     <div class="cases">{cases}</div>
-    <p class="note">{e(h['cases_note'])}</p>
+    <p class="note">{e(h['cases_note'])} <a href="{L.page(lang, lang, 'demos')}">{'Live-Demos ausprobieren' if lang == 'de' else 'Try the live demos'} →</a></p>
   </div>
 </section>
 {cta_band(L, lang)}"""
@@ -392,6 +393,40 @@ def page_contact(L, lang):
     return head(lang, "contact", c["title"], c["desc"], jsonld) + header(L, lang, "contact") + body + footer(L, lang)
 
 
+def page_demos(L, lang):
+    d = DEMOS_PAGE[lang]
+    jsonld = [{"@context": "https://schema.org", "@type": "WebPage", "name": d["title"], "url": url(lang, "demos"),
+               "description": d["desc"], "inLanguage": lang}]
+    jump = "".join(f'<li><a href="#{k}">{e(d["tabs"][k])}</a></li>' for k in ("assist", "portal", "dash"))
+    def sec(k, tint):
+        x = d[k]
+        return f"""<section class="band{' tint' if tint else ''}" id="{k}">
+  <div class="wrap section-inner">
+    <div class="section-head"><p class="eyebrow">{e(d['tabs'][k])} <span class="dx-badge">{e(d['badge'])}</span></p><h2>{e(x['h2'])}</h2><p>{e(x['p'])}</p></div>
+    <div class="dx-frame" id="demo-{k}"></div>
+  </div>
+</section>
+"""
+    data = json.dumps({"assist": d["assist"], "portal": d["portal"], "dash": d["dash"]}, ensure_ascii=False).replace("</", "<\\/")
+    body = f"""<section class="wrap page-hero demos-hero">
+  <p class="eyebrow">{e(d['eyebrow'])}</p>
+  <h1>{e(d['h1'])}</h1>
+  <p class="lead">{e(d['lead'])}</p>
+  <ul class="chips dx-jump">{jump}</ul>
+</section>
+{sec('assist', True)}{sec('portal', False)}{sec('dash', True)}
+<section class="cta-band">
+  <div class="wrap section-inner">
+    <div><h2>{e(d['cta_h'])}</h2><p>{e(d['cta_p'])}</p></div>
+    <a class="btn btn-primary" href="{contact_href(L, lang)}">{e(UI[lang]['band_btn'])}</a>
+  </div>
+</section>
+<script>window.NX_DEMO = {data};</script>
+<script src="{{ASSET}}demos.js?v={{VER}}" defer></script>
+"""
+    return head(lang, "demos", d["title"], d["desc"], jsonld) + header(L, lang, "demos") + body + footer(L, lang)
+
+
 def page_legal(L, lang, key):
     d = LEGAL[lang][key]
     vals = dict(OPERATOR, email=EMAIL)
@@ -437,18 +472,19 @@ def root_page(L, full):
 def build(outdir, clean):
     global VER
     import hashlib
-    VER = hashlib.sha1(b"".join(open(os.path.join(ROOT, "src", n), "rb").read() for n in ("styles.css", "main.js"))).hexdigest()[:8]
+    VER = hashlib.sha1(b"".join(open(os.path.join(ROOT, "src", n), "rb").read() for n in ("styles.css", "main.js", "demos.js"))).hexdigest()[:8]
     L = Linker(clean)
     if os.path.exists(outdir):
         shutil.rmtree(outdir)
     os.makedirs(os.path.join(outdir, "assets"))
-    for name in ("styles.css", "main.js"):
+    for name in ("styles.css", "main.js", "demos.js"):
         shutil.copy(os.path.join(ROOT, "src", name), os.path.join(outdir, "assets", name))
     shutil.copytree(os.path.join(ROOT, "src", "fonts"), os.path.join(outdir, "assets", "fonts"))
     for lang in LANGS:
         os.makedirs(os.path.join(outdir, lang))
         pages = {"home": page_home(L, lang), "contact": page_contact(L, lang),
-                 "imprint": page_legal(L, lang, "imprint"), "privacy": page_legal(L, lang, "privacy")}
+                 "imprint": page_legal(L, lang, "imprint"), "privacy": page_legal(L, lang, "privacy"),
+                 "demos": page_demos(L, lang)}
         for k in SERVICE_KEYS:
             pages[k] = page_service(L, lang, k)
         for k, html in pages.items():

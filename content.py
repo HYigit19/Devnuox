@@ -2,13 +2,13 @@
 # Page keys are shared across languages; slugs differ per language.
 
 SLUGS = {
-    "de": {"home": "", "ai": "ki-automatisierung", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "kontakt", "imprint": "impressum", "privacy": "datenschutz"},
-    "en": {"home": "", "ai": "ai-automation", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "contact", "imprint": "legal-notice", "privacy": "privacy"},
+    "de": {"home": "", "ai": "ki-automatisierung", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "kontakt", "demos": "demos", "imprint": "impressum", "privacy": "datenschutz"},
+    "en": {"home": "", "ai": "ai-automation", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "contact", "demos": "demos", "imprint": "legal-notice", "privacy": "privacy"},
 }
 
 UI = {
     "de": {
-        "nav": {"ai": "KI-Automatisierung", "web": "Websites", "apps": "Web-Apps", "dash": "Dashboards", "home": "Start"},
+        "nav": {"ai": "KI-Automatisierung", "web": "Websites", "apps": "Web-Apps", "dash": "Dashboards", "demos": "Demos", "home": "Start"},
         "cta": "Projekt anfragen",
         "menu": "Menü",
         "more": "Mehr erfahren",
@@ -27,7 +27,7 @@ UI = {
         "lang_label": "Sprache",
     },
     "en": {
-        "nav": {"ai": "AI automation", "web": "Websites", "apps": "Web apps", "dash": "Dashboards", "home": "Home"},
+        "nav": {"ai": "AI automation", "web": "Websites", "apps": "Web apps", "dash": "Dashboards", "demos": "Demos", "home": "Home"},
         "cta": "Start a project",
         "menu": "Menu",
         "more": "Learn more",

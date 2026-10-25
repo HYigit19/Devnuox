@@ -7,13 +7,13 @@ from html import escape as e
 
 sys.path.insert(0, os.path.dirname(__file__))
 from legal import LEGAL, OPERATOR
-from content import SLUGS, UI, PROCESS, SERVICE_CARDS, HOME, SERVICES, CONTACT, EXAMPLES, BOOKING, BOOKING_URL
+from content import SLUGS, UI, PROCESS, SERVICE_CARDS, HOME, SERVICES, CONTACT, EXAMPLES, BOOKING, BOOKING_URL, DEMOS
 
 BASE = "https://www.nexvio.de"   # placeholder until the domain is bought
 EMAIL = "hallo@nexvio.de"        # placeholder
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LANGS = ["de", "en"]
-KEYS = ["home", "ai", "web", "apps", "dash", "contact"]
+KEYS = ["home", "ai", "web", "apps", "dash", "demos", "contact"]
 SERVICE_KEYS = ["ai", "web", "apps", "dash"]
 FONTS = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
 
@@ -70,6 +70,9 @@ class Linker:
     def asset(self, name):
         return f"../assets/{name}"
 
+    def demo(self, name):
+        return f"../demos/{name}" + ("" if self.clean else ".html")
+
 
 def head(lang, key, title, desc, jsonld):
     alts = "".join(f'<link rel="alternate" hreflang="{l}" href="{url(l, key)}">' for l in LANGS)
@@ -106,11 +109,11 @@ def header(L, lang, key):
     cur = ' aria-current="page"'
     links = "".join(
         f'<a href="{L.page(lang, lang, k)}"{cur if k == key else ""}>{e(ui["nav"][k])}</a>'
-        for k in ["home"] + SERVICE_KEYS)
+        for k in ["home"] + SERVICE_KEYS + ["demos"])
     langsw = "".join(
         f'<a href="{L.page(lang, l, key)}" hreflang="{l}" lang="{l}" aria-current="{str(l == lang).lower()}">{l.upper()}</a>'
         for l in LANGS)
-    mobile = "".join(f'<a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a>' for k in ["home"] + SERVICE_KEYS)
+    mobile = "".join(f'<a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a>' for k in ["home"] + SERVICE_KEYS + ["demos"])
     mobile += f'<a href="{L.page(lang, lang, "contact")}">{e(ui["cta"])}</a>'
     return f"""<header class="site-header">
   <div class="wrap nav">
@@ -145,7 +148,7 @@ def cta_band(L, lang):
 
 def footer(L, lang):
     ui = UI[lang]
-    svc = "".join(f'<li><a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a></li>' for k in SERVICE_KEYS)
+    svc = "".join(f'<li><a href="{L.page(lang, lang, k)}">{e(ui["nav"][k])}</a></li>' for k in SERVICE_KEYS + ["demos"])
     contact = CONTACT[lang]
     return f"""</main>
 <footer>
@@ -271,6 +274,7 @@ def page_home(L, lang):
     <div class="services">{cards}</div>
   </div>
 </section>
+{demo_teaser(L, lang)}
 {process_section(lang)}
 <section class="band tint">
   <div class="wrap section-inner">
@@ -336,6 +340,60 @@ def page_service(L, lang, key):
 </section>
 {cta_band(L, lang)}"""
     return head(lang, key, s["title"], s["desc"], jsonld) + header(L, lang, key) + body + footer(L, lang)
+
+
+def demo_card(L, lang, x, big=False):
+    d = DEMOS[lang]
+    chips = "".join(f"<li>{e(c)}</li>" for c in x["chips"])
+    href = L.demo(x["file"])
+    tip = f'<p class="demo-tip"><b>{e(d["tip_label"])}:</b> {e(x["tip"])}</p>' if big and x.get("tip") else ""
+    return (f'<article class="demo-card{" big" if big else ""}">'
+            f'<a class="demo-shot" href="{href}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">'
+            f'<img src="../demos/assets/{x["file"]}.png" alt="" width="1280" height="800" loading="lazy"></a>'
+            f'<div class="demo-body"><span class="industry">{e(x["tag"])}</span><h3>{e(x["name"])}</h3><p>{e(x["text"])}</p>'
+            f'<ul class="chips">{chips}</ul>{tip}'
+            f'<div class="hero-cta"><a class="btn btn-primary" href="{href}" target="_blank" rel="noopener">{e(d["open"])} ↗</a></div></div></article>')
+
+
+def demo_teaser(L, lang):
+    d = DEMOS[lang]
+    return f"""<section class="band tint" id="demos">
+  <div class="wrap section-inner">
+    <div class="section-head"><p class="eyebrow">{e(d['home_eyebrow'])}</p><h2>{e(d['home_h2'])}</h2><p>{e(d['home_lead'])}</p></div>
+    {demo_card(L, lang, d['items'][0])}
+    <p><a class="more-link" href="{L.page(lang, lang, 'demos')}">{e(d['home_all'])} →</a></p>
+  </div>
+</section>
+"""
+
+
+def page_demos(L, lang):
+    d = DEMOS[lang]
+    home_name = "Start" if lang == "de" else "Home"
+    jsonld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": d["title"], "url": url(lang, "demos"),
+               "description": d["desc"], "inLanguage": lang},
+              {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+                  {"@type": "ListItem", "position": 1, "name": home_name, "item": url(lang, "home")},
+                  {"@type": "ListItem", "position": 2, "name": d["eyebrow"], "item": url(lang, "demos")}]}]
+    cards = "".join(demo_card(L, lang, x, big=True) for x in d["items"])
+    body = f"""<section class="hero sub">
+  <div class="wrap">
+    <div class="page-hero demos-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="{L.page(lang, lang, 'home')}">{home_name}</a> / <span>{e(d['eyebrow'])}</span></nav>
+      <p class="eyebrow">{e(d['eyebrow'])}</p>
+      <h1>{e(d['h1'])}</h1>
+      <p class="lead">{e(d['lead'])}</p>
+    </div>
+  </div>
+</section>
+<section class="band">
+  <div class="wrap section-inner">
+    <div class="demo-list">{cards}</div>
+    <article class="demo-soon"><h3>{e(d['soon_h'])}</h3><p>{e(d['soon_p'])}</p><a class="btn btn-ghost" href="{contact_href(L, lang)}">{e(d['soon_btn'])}</a></article>
+  </div>
+</section>
+{cta_band(L, lang)}"""
+    return head(lang, "demos", d["title"], d["desc"], jsonld) + header(L, lang, "demos") + body + footer(L, lang)
 
 
 def page_contact(L, lang):
@@ -445,9 +503,10 @@ def build(outdir, clean):
     for name in ("styles.css", "main.js"):
         shutil.copy(os.path.join(ROOT, "src", name), os.path.join(outdir, "assets", name))
     shutil.copytree(os.path.join(ROOT, "src", "fonts"), os.path.join(outdir, "assets", "fonts"))
+    shutil.copytree(os.path.join(ROOT, "src", "demos"), os.path.join(outdir, "demos"))
     for lang in LANGS:
         os.makedirs(os.path.join(outdir, lang))
-        pages = {"home": page_home(L, lang), "contact": page_contact(L, lang),
+        pages = {"home": page_home(L, lang), "contact": page_contact(L, lang), "demos": page_demos(L, lang),
                  "imprint": page_legal(L, lang, "imprint"), "privacy": page_legal(L, lang, "privacy")}
         for k in SERVICE_KEYS:
             pages[k] = page_service(L, lang, k)

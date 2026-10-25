@@ -2,13 +2,13 @@
 # Page keys are shared across languages; slugs differ per language.
 
 SLUGS = {
-    "de": {"home": "", "ai": "ki-automatisierung", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "kontakt", "imprint": "impressum", "privacy": "datenschutz"},
-    "en": {"home": "", "ai": "ai-automation", "web": "websites", "apps": "web-apps", "dash": "dashboards", "contact": "contact", "imprint": "legal-notice", "privacy": "privacy"},
+    "de": {"home": "", "ai": "ki-automatisierung", "web": "websites", "apps": "web-apps", "dash": "dashboards", "demos": "demos", "contact": "kontakt", "imprint": "impressum", "privacy": "datenschutz"},
+    "en": {"home": "", "ai": "ai-automation", "web": "websites", "apps": "web-apps", "dash": "dashboards", "demos": "demos", "contact": "contact", "imprint": "legal-notice", "privacy": "privacy"},
 }
 
 UI = {
     "de": {
-        "nav": {"ai": "KI-Automatisierung", "web": "Websites", "apps": "Web-Apps", "dash": "Dashboards", "home": "Start"},
+        "nav": {"ai": "KI-Automatisierung", "web": "Websites", "apps": "Web-Apps", "dash": "Dashboards", "demos": "Demos", "home": "Start"},
         "cta": "Projekt anfragen",
         "menu": "Menü",
         "more": "Mehr erfahren",
@@ -27,7 +27,7 @@ UI = {
         "lang_label": "Sprache",
     },
     "en": {
-        "nav": {"ai": "AI automation", "web": "Websites", "apps": "Web apps", "dash": "Dashboards", "home": "Home"},
+        "nav": {"ai": "AI automation", "web": "Websites", "apps": "Web apps", "dash": "Dashboards", "demos": "Demos", "home": "Home"},
         "cta": "Start a project",
         "menu": "Menu",
         "more": "Learn more",
@@ -450,5 +450,57 @@ BOOKING = {
         "load": "Load calendar",
         "open": "Open in new tab",
         "or_form": "Prefer to write? Use the form below.",
+    },
+}
+
+
+# Demos: clickable sample apps. Each entry needs a file src/demos/<file>.html and a preview image
+# src/demos/assets/<file>.png. New demos: add an entry here (DE and EN), the page builds itself.
+DEMOS = {
+    "de": {
+        "title": "Demos zum Ausprobieren | Nexvio",
+        "desc": "Klickbare Demos von Nexvio: echte Web-Apps mit Beispieldaten, direkt im Browser, ohne Anmeldung.",
+        "eyebrow": "Demos",
+        "h1": "Ausprobieren statt nur lesen",
+        "lead": "Echte Anwendungen mit Beispieldaten, direkt im Browser und ohne Anmeldung. Was Sie eintragen, bleibt in Ihrem Browser und wird nirgends gespeichert.",
+        "open": "Demo öffnen",
+        "tip_label": "Tipp",
+        "home_eyebrow": "Demos",
+        "home_h2": "Klicken Sie selbst durch",
+        "home_lead": "Statt Folien: eine fertige Web-App mit Beispieldaten. So sieht ein Ergebnis von uns aus.",
+        "home_all": "Alle Demos",
+        "soon_h": "Weitere Demos folgen",
+        "soon_p": "Wir bauen laufend neue Beispiele für weitere Branchen. Sie haben einen konkreten Ablauf im Kopf? Dann bauen wir die Demo mit Ihren Begriffen.",
+        "soon_btn": "Ablauf beschreiben",
+        "items": [
+            {"file": "qm-suite", "tag": "Web-App · Qualitätsmanagement",
+             "name": "Reklamationen & Workflows",
+             "text": "Kunden- und Lieferantenreklamationen nach 8D, Freigabe-Workflows, ein Aufgabenboard mit Erinnerungen und Stammdaten per Excel-Upload. Gebaut für den Mittelstand, am Rechner und am Handy.",
+             "chips": ["8D-Bericht als PDF", "Excel-Import und -Export", "Rollen und Freigaben", "Eigene Farben und Logo"],
+             "tip": "Unten links die Person wechseln, um Rollen zu testen, zum Beispiel die QM-Leitung für Freigaben."},
+        ],
+    },
+    "en": {
+        "title": "Demos to try | Nexvio",
+        "desc": "Clickable demos by Nexvio: real web apps with sample data, right in your browser, no sign-up.",
+        "eyebrow": "Demos",
+        "h1": "Try it instead of reading about it",
+        "lead": "Real applications with sample data, right in your browser and without sign-up. Whatever you enter stays in your browser and is not stored anywhere.",
+        "open": "Open demo",
+        "tip_label": "Tip",
+        "home_eyebrow": "Demos",
+        "home_h2": "Click through it yourself",
+        "home_lead": "Instead of slides: a finished web app with sample data. This is what a result from us looks like.",
+        "home_all": "All demos",
+        "soon_h": "More demos coming",
+        "soon_p": "We keep building examples for more industries. Have a specific process in mind? We will build the demo in your terms.",
+        "soon_btn": "Describe your process",
+        "items": [
+            {"file": "qm-suite", "tag": "Web app · Quality management",
+             "name": "Complaints & workflows",
+             "text": "Customer and supplier complaints following 8D, approval workflows, a task board with reminders and master data via Excel upload. Built for mid-sized companies, on desktop and mobile. The demo interface is in German.",
+             "chips": ["8D report as PDF", "Excel import and export", "Roles and approvals", "Your colors and logo"],
+             "tip": "Switch the person in the bottom left to test roles, for example the head of quality for approvals."},
+        ],
     },
 }

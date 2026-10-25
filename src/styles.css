@@ -353,3 +353,25 @@ mark.ph { background: #fff1b8; color: #6b4e00; border-radius: 4px; padding: 0 4p
 .booking-gate p { color: var(--muted); font-size: var(--step--1); }
 .booking-gate a:not(.btn) { color: var(--accent); }
 @media (max-width: 560px) { .booking-frame iframe { height: 760px; } .booking-gate { padding: 22px 18px; } }
+
+/* Demos */
+.demo-list { display: grid; gap: 24px; }
+.demo-card { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.demo-shot { display: block; background: var(--surface-2); border-right: 1px solid var(--line); overflow: hidden; }
+.demo-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; aspect-ratio: 16 / 10; transition: transform .4s; }
+.demo-card:hover .demo-shot img { transform: scale(1.015); }
+@media (prefers-reduced-motion: reduce) { .demo-shot img { transition: none; } .demo-card:hover .demo-shot img { transform: none; } }
+.demo-body { padding: clamp(22px, 3vw, 34px); display: grid; gap: 14px; align-content: center; }
+.demo-body .industry { font: 500 0.74rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.demo-body h3 { font-size: var(--step-2); font-weight: 700; }
+.demo-body p { color: var(--muted); }
+.demo-body .hero-cta { margin-top: 6px; }
+.demo-tip { font-size: var(--step--1); padding: 10px 12px; border-radius: 10px; background: var(--surface-2); }
+.demo-tip b { color: var(--fg); }
+.demo-soon { border: 1px dashed var(--line); border-radius: var(--radius); padding: 26px 28px; display: grid; gap: 10px; justify-items: start; }
+.demo-soon h3 { font-size: var(--step-1); font-weight: 700; }
+.demo-soon p { color: var(--muted); max-width: 46em; }
+.more-link { font-weight: 600; color: var(--accent); text-decoration: none; }
+.more-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.demos-hero { padding-block: 40px 8px; max-width: 46em; }
+@media (max-width: 860px) { .demo-card { grid-template-columns: 1fr; } .demo-shot { border-right: 0; border-bottom: 1px solid var(--line); } }

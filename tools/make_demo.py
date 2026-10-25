@@ -20,7 +20,7 @@ s = s.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', "")
 s = s.replace("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js", "assets/xlsx.full.min.js")
 s = s.replace("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", "assets/jspdf.umd.min.js")
 s = s.replace("const KEY = 'devunox-apps-demo-v1';", "const KEY = 'nexvio-demo-qm-v1';")
-s = s.replace("'Devunox'", "'Muster GmbH'")
+s = s.replace("'Devunox'", "'Muster GmbH'").replace("Devunox-Apps", "anderen Demos")
 assert "googleapis" not in s and "cdnjs" not in s, "externe Quelle übrig"
 
 fonts = "".join(

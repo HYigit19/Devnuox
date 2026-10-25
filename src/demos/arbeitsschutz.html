@@ -1,0 +1,1599 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demo: Arbeitsschutz – Unterweisungen, Audits, Behördenmappe | Nexvio</title>
+<meta name="description" content="Klickbare Demo: Unterweisungsmatrix, Online-Unterweisung mit Unterschrift am Handy, Begehungen mit Fotos und Maßnahmen, Behördenmappe als PDF.">
+<meta name="robots" content="noindex, follow">
+<style>
+@font-face{font-family:'Figtree';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/figtree-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/figtree-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/figtree-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/figtree-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-style:normal;font-weight:800;font-display:swap;src:url(assets/fonts/figtree-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Geist';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/geist-sans-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Geist';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/geist-sans-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Geist';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/geist-sans-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Geist';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/geist-sans-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(../assets/fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2')}
+.demo-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 14px;padding:8px max(16px,env(safe-area-inset-left,0px));background:#17181C;color:#E8EAF2;font:500 13px/1.4 'Figtree',system-ui,sans-serif;text-align:center}
+.demo-bar b{color:#fff}.demo-bar a{color:#C9BEFF;text-decoration:underline;text-underline-offset:2px}.demo-bar a:hover{color:#fff}
+@media (max-width:760px){.demo-bar .db-x{display:none}}
+</style>
+</head>
+<body>
+<style>
+/* Layout: Navigation links (farbige Kacheln), Inhalt in der Mitte; Startseite und Listen breit, Detail mit Seitenspalte.
+   Themes: data-skin (bunt | klar) × data-mode (auto | light | dark) × data-density (normal | kompakt); Firmenfarbe setzt --accent per Script. */
+:root {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --surface-2: #F4F5F8;
+  --line: #E4E6EC;
+  --ink: #17181C;
+  --ink-2: #5F616B;
+  --accent: #3450D1;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E7ECFC;
+  --wf: #5A4FCF; --wf-soft: #ECEBFB;
+  --kr: #0B7A71; --kr-soft: #DFF1EE;
+  --lr: #B4540A; --lr-soft: #FBEBDD;
+  --good: #1D7445; --good-soft: #DDF1E4;
+  --warn: #8F5300; --warn-soft: #FCEBCB;
+  --crit: #B42331; --crit-soft: #FBE3E5;
+  --info: #2459C4; --info-soft: #E2EAFA;
+  --muted-soft: #EEEFF3;
+  --bar: #A9B4C4;
+  --col-over: #D93644; --col-over-ink: #FFFFFF;
+  --col-today: #F4B23F; --col-today-ink: #3A2600;
+  --col-week: #2F6FD6; --col-week-ink: #FFFFFF;
+  --col-good: #1F8A55; --col-good-ink: #FFFFFF;
+  --col-info: #2F6FD6; --col-info-ink: #FFFFFF;
+  --col-warn: #F4B23F; --col-warn-ink: #3A2600;
+  --col-accent: var(--accent); --col-accent-ink: var(--accent-ink);
+  --col-crit: #D93644; --col-crit-ink: #FFFFFF;
+  --n-start: var(--accent); --n-wf: var(--wf); --n-kr: var(--kr); --n-lr: var(--lr); --n-aufg: #2F6FD6; --n-md: #7E8496; --n-up: #7E8496; --n-theme: #B8458C;
+  --nav-on: var(--surface);
+  --a0: #0B7A71; --a1: #5A4FCF; --a2: #B4540A; --a3: #8A3FAE; --a4: #2A6FB0; --a5: #B23355; --a6: #4E7A1E; --a7: #5D6470;
+  --card-border: 1px solid var(--line);
+  --card-shadow: none;
+  --radius: 12px;
+  --head-w: 650;
+  --scrim: rgba(13, 18, 28, .45);
+  --shadow: 0 12px 32px rgba(13, 25, 45, .16);
+  --font-d: 'Geist', 'Segoe UI', system-ui, sans-serif;
+  --font-b: 'Geist', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-m: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+:root[data-skin="bunt"] {
+  --bg: #F3F4FA;
+  --line: #E4E6F0;
+  --ink: #1C1D2B;
+  --ink-2: #5C5F74;
+  --accent: #6E4AF2;
+  --accent-soft: #EFEBFE;
+  --wf: #6E4AF2; --wf-soft: #EFEBFE;
+  --kr: #0B7A71; --kr-soft: #DDF1EE;
+  --lr: #B94F06; --lr-soft: #FBE8DA;
+  --muted-soft: #EEF0F7;
+  --nav-on: var(--accent-soft);
+  --card-border: 1px solid transparent;
+  --card-shadow: 0 1px 3px rgba(28, 29, 43, .08), 0 0 0 1px rgba(28, 29, 43, .03);
+  --radius: 16px;
+  --head-w: 800;
+  --font-d: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --font-b: 'Figtree', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+/* Dunkel: ausdrücklich gewählt, oder Automatisch und Gerät bzw. Viewer steht auf dunkel */
+:root[data-mode="dark"], :root[data-mode="auto"][data-theme="dark"] {
+  --bg: #0F1117; --surface: #181B24; --surface-2: #1F2330; --line: #2C3141; --ink: #E8EAF2; --ink-2: #A0A6B8;
+  --accent: #7D97F5; --accent-ink: #0B1020; --accent-soft: #1E2748;
+  --wf: #A59BF5; --wf-soft: #27244A; --kr: #45C2B4; --kr-soft: #123632; --lr: #F2A36A; --lr-soft: #3A2414;
+  --good: #5CCB8B; --good-soft: #15321F; --warn: #EBB25A; --warn-soft: #3A2A0F; --crit: #F47B85; --crit-soft: #3D1A1F; --info: #8DB0F6; --info-soft: #1A2744;
+  --muted-soft: #252A38; --bar: #47536A; --nav-on: var(--surface-2);
+  --card-border: 1px solid var(--line); --card-shadow: none;
+  --scrim: rgba(0, 0, 0, .62); --shadow: 0 12px 32px rgba(0, 0, 0, .55);
+  --a0: #1E8C84; --a1: #6F64DA; --a2: #C0601A; --a3: #9B55BE; --a4: #3A82C6; --a5: #C24966; --a6: #5E9128; --a7: #6C7480;
+  color-scheme: dark;
+}
+:root[data-mode="dark"][data-skin="bunt"], :root[data-mode="auto"][data-theme="dark"][data-skin="bunt"] { --accent: #A08BFF; --accent-soft: #2A2350; --wf: #A08BFF; --nav-on: var(--accent-soft); }
+@media (prefers-color-scheme: dark) {
+  :root[data-mode="auto"]:not([data-theme="light"]) {
+    --bg: #0F1117; --surface: #181B24; --surface-2: #1F2330; --line: #2C3141; --ink: #E8EAF2; --ink-2: #A0A6B8;
+    --accent: #7D97F5; --accent-ink: #0B1020; --accent-soft: #1E2748;
+    --wf: #A59BF5; --wf-soft: #27244A; --kr: #45C2B4; --kr-soft: #123632; --lr: #F2A36A; --lr-soft: #3A2414;
+    --good: #5CCB8B; --good-soft: #15321F; --warn: #EBB25A; --warn-soft: #3A2A0F; --crit: #F47B85; --crit-soft: #3D1A1F; --info: #8DB0F6; --info-soft: #1A2744;
+    --muted-soft: #252A38; --bar: #47536A; --nav-on: var(--surface-2);
+    --card-border: 1px solid var(--line); --card-shadow: none;
+    --scrim: rgba(0, 0, 0, .62); --shadow: 0 12px 32px rgba(0, 0, 0, .55);
+    --a0: #1E8C84; --a1: #6F64DA; --a2: #C0601A; --a3: #9B55BE; --a4: #3A82C6; --a5: #C24966; --a6: #5E9128; --a7: #6C7480;
+    color-scheme: dark;
+  }
+  :root[data-mode="auto"]:not([data-theme="light"])[data-skin="bunt"] { --accent: #A08BFF; --accent-soft: #2A2350; --wf: #A08BFF; --nav-on: var(--accent-soft); }
+}
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-b); font-size: 14px; line-height: 1.45; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--surface); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-d); text-wrap: balance; margin: 0; font-weight: var(--head-w); letter-spacing: -.01em; }
+p { margin: 0; }
+.muted { color: var(--ink-2); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.i { width: 20px; height: 20px; flex: none; }
+.i.s { width: 16px; height: 16px; }
+.mono { font-family: var(--font-m); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+/* Rahmen */
+.shell { display: grid; grid-template-columns: 236px minmax(0, 1040px); gap: 24px; justify-content: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; height: calc(100vh - env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: 3px; padding-block: 16px; overflow-y: auto; }
+.center { min-width: 0; padding-block: 18px 64px; display: flex; flex-direction: column; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 14px; }
+.logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-d); font-weight: 800; font-size: 18px; flex: none; }
+.brand-name { font-family: var(--font-d); font-weight: 800; font-size: 18px; line-height: 1.05; }
+.brand-sub { font-size: 11.5px; color: var(--ink-2); }
+.nav-i { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: none; padding: 9px 12px; border-radius: 12px; font-weight: 600; font-size: 14.5px; color: var(--ink); text-align: left; position: relative; }
+.nav-i:hover { background: var(--surface); }
+.nav-i.on { background: var(--nav-on); }
+.nav-i .ni { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--ni); color: #FFFFFF; flex: none; }
+.nav-i .ni .i { width: 16px; height: 16px; }
+.nav-i .lbl { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cnt { font-size: 11.5px; font-weight: 700; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--muted-soft); color: var(--ink-2); display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.cnt.crit { background: var(--crit); color: #fff; }
+.nav-sep { height: 1px; background: var(--line); margin: 8px 12px; }
+.rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
+.me-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.me-card select { border: 0; background: none; font-weight: 700; width: 100%; min-width: 0; padding: 0; }
+.me-card small { display: block; color: var(--ink-2); font-size: 12px; }
+.me-card > div { min-width: 0; flex: 1; }
+.linkbtn { background: none; border: 0; color: var(--accent); font-weight: 600; font-size: 13px; padding: 0; text-align: left; }
+.rail-foot .linkbtn { padding: 0 12px; font-size: 12px; }
+.badge { position: absolute; top: 4px; left: 26px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--crit); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.mtop { display: none; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 25; background: var(--surface); border-bottom: 1px solid var(--line); align-items: center; gap: 10px; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mtop .brand { padding: 0; margin-right: auto; }
+.icon-btn { position: relative; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; flex: none; padding: 0; }
+.icon-btn .badge { top: -5px; left: auto; right: -5px; }
+.tabbar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--surface); border-top: 1px solid var(--line); padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); justify-content: space-around; }
+.tab-i { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--ink-2); padding: 4px 6px; border-radius: 10px; flex: 1; position: relative; min-width: 0; }
+.tab-i.on { color: var(--accent); }
+.tab-i .cnt { position: absolute; top: -2px; right: calc(50% - 22px); min-width: 17px; height: 17px; font-size: 10.5px; }
+@media (max-width: 1180px) {
+  .shell { grid-template-columns: 68px minmax(0, 1fr); }
+  .rail .lbl, .rail .brand > div, .rail .cnt, .me-card > div, .rail-foot .linkbtn { display: none; }
+  .rail .nav-i { justify-content: center; padding: 10px; }
+  .rail .brand { justify-content: center; padding: 4px 0 14px; }
+  .me-card { justify-content: center; padding: 6px; }
+  .rail .badge { left: auto; right: 6px; }
+}
+@media (max-width: 760px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .mtop { display: flex; }
+  .tabbar { display: flex; }
+  .center { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Bausteine */
+.card { background: var(--surface); border: var(--card-border); box-shadow: var(--card-shadow); border-radius: var(--radius); min-width: 0; }
+.card-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.card-h h2 { font-size: 16px; }
+.card-h p { margin-top: 2px; font-size: 12.5px; color: var(--ink-2); }
+.card-b { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.page-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.page-h h1 { font-size: 27px; line-height: 1.15; letter-spacing: -.02em; }
+.page-h p { margin-top: 4px; color: var(--ink-2); max-width: 66ch; }
+.row-acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; padding: 8px 14px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 13.5px; white-space: nowrap; color: var(--ink); }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--crit); border-color: var(--crit); }
+.btn.good { color: var(--good); border-color: var(--good); }
+.btn.big { padding: 13px 20px; font-size: 15.5px; border-radius: 12px; font-weight: 800; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; filter: none; }
+.btn .i { width: 16px; height: 16px; }
+.mini { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 3px 9px; font-size: 12.5px; font-weight: 600; white-space: nowrap; color: var(--ink); }
+.mini:hover { background: var(--surface-2); }
+.mini.acc { color: var(--accent); border-color: var(--accent); }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.info { background: var(--info-soft); color: var(--info); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.crit { background: var(--crit-soft); color: var(--crit); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.accent { background: var(--accent-soft); color: var(--accent); }
+.pill.muted { background: var(--muted-soft); color: var(--ink-2); }
+.hint { font-size: 13px; color: var(--ink-2); }
+.empty { padding: 26px 16px; color: var(--ink-2); text-align: center; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.chip.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.tag { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 6px; background: var(--muted-soft); color: var(--ink-2); white-space: nowrap; }
+.sel { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 10px; font-size: 13px; max-width: 100%; }
+.search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; background: var(--surface); flex: 1 1 220px; min-width: 0; }
+.search input { border: 0; background: none; padding: 8px 0; width: 100%; min-width: 0; outline: none; }
+.search:focus-within { border-color: var(--accent); }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; color: #fff; flex: none; letter-spacing: .02em; }
+.av.s { width: 28px; height: 28px; font-size: 11px; }
+.av.xs { width: 22px; height: 22px; font-size: 9.5px; }
+.av.c0 { background: var(--a0); } .av.c1 { background: var(--a1); } .av.c2 { background: var(--a2); } .av.c3 { background: var(--a3); }
+.av.c4 { background: var(--a4); } .av.c5 { background: var(--a5); } .av.c6 { background: var(--a6); } .av.c7 { background: var(--a7); }
+.who { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.who b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Formulare, Tabellen */
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label, .field .lbl { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.field input, .field select, .field textarea { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); width: 100%; min-width: 0; }
+.field textarea { resize: vertical; min-height: 84px; line-height: 1.45; }
+.field .help { font-size: 12px; color: var(--ink-2); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.checks label { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.checks label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.checks input { margin: 0; accent-color: var(--accent); }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th:first-child, td:first-child { padding-left: 16px; }
+th:last-child, td:last-child { padding-right: 16px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.click { cursor: pointer; }
+tr.click:hover td { background: var(--surface-2); }
+.kpi-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { background: var(--surface); border: var(--card-border); box-shadow: var(--card-shadow); border-radius: var(--radius); padding: 12px 14px; text-align: left; color: var(--ink); width: 100%; }
+button.kpi:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--card-shadow); }
+.kpi-l { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.kpi-v { font-family: var(--font-d); font-weight: 800; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi-v.crit { color: var(--crit); } .kpi-v.warn { color: var(--warn); } .kpi-v.good { color: var(--good); }
+.kpi-s { font-size: 12px; color: var(--ink-2); }
+
+/* Start */
+.hello { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hello h1 { font-size: 29px; letter-spacing: -.02em; }
+.hello p { margin-top: 3px; color: var(--ink-2); }
+.quick { display: flex; gap: 8px; flex-wrap: wrap; }
+.qbtn { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; padding: 9px 14px; font-weight: 700; font-size: 13.5px; color: #FFFFFF; background: var(--qc); }
+.qbtn .i { width: 16px; height: 16px; }
+.qbtn.q1 { --qc: var(--wf); } .qbtn.q2 { --qc: var(--kr); } .qbtn.q3 { --qc: var(--lr); } .qbtn.q4 { --qc: var(--n-theme); }
+:root[data-mode="dark"] .qbtn, :root[data-mode="auto"][data-theme="dark"] .qbtn { color: #0F1117; }
+@media (prefers-color-scheme: dark) { :root[data-mode="auto"]:not([data-theme="light"]) .qbtn { color: #0F1117; } }
+.hero { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 16px; align-items: stretch; }
+@media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.ring-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16px; text-align: center; }
+.ring { position: relative; width: 150px; height: 150px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .rv { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; }
+.ring .rv b { font-family: var(--font-d); font-size: 36px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring .rv small { font-size: 11.5px; color: var(--ink-2); font-weight: 600; }
+.ring-l { font-weight: 800; font-family: var(--font-d); font-size: 15px; }
+.ring-s { font-size: 12px; color: var(--ink-2); }
+.hero-r { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.focus { background: var(--accent); color: var(--accent-ink); border-radius: calc(var(--radius) + 4px); padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.focus-n { width: 60px; height: 60px; border-radius: 50%; background: var(--accent-ink); color: var(--accent); display: grid; place-items: center; font-family: var(--font-d); font-size: 28px; font-weight: 800; flex: none; }
+.focus-t { flex: 1 1 220px; min-width: 0; }
+.focus-t b { display: block; font-family: var(--font-d); font-size: 21px; font-weight: 800; }
+.focus-t span { opacity: .92; font-weight: 600; }
+.focus .btn { background: var(--accent-ink); color: var(--accent); border: 0; padding: 11px 20px; font-size: 15px; font-weight: 800; }
+.focus.calm { background: var(--good-soft); color: var(--good); }
+.focus.calm .focus-n { background: var(--good); color: var(--surface); }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 980px) { .cols3 { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.col-h { margin: 0; border-radius: 12px; padding: 10px 14px; font-size: 15px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-d); }
+.col-h.over { background: var(--col-over); color: var(--col-over-ink); }
+.col-h.today { background: var(--col-today); color: var(--col-today-ink); }
+.col-h.week { background: var(--col-week); color: var(--col-week-ink); }
+.col-h.good { background: var(--col-good); color: var(--col-good-ink); }
+.col-h.muted { background: var(--muted-soft); color: var(--ink); }
+.col-empty { padding: 18px 12px; text-align: center; color: var(--ink-2); font-size: 13px; border: 1.5px dashed var(--line); border-radius: var(--radius); }
+.bcard { background: var(--surface); border: var(--card-border); box-shadow: var(--card-shadow); border-radius: var(--radius); padding: 13px 14px; display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; color: var(--ink); }
+button.bcard:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--card-shadow); }
+.bc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.bc-t { font-weight: 800; font-size: 15px; line-height: 1.3; font-family: var(--font-d); overflow-wrap: anywhere; }
+.bc-s { font-size: 12.5px; color: var(--ink-2); }
+.bc-b { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.apill { border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; color: #FFFFFF; white-space: nowrap; background: var(--qc); }
+.apill.t1 { --qc: var(--wf); } .apill.t2 { --qc: var(--kr); } .apill.t3 { --qc: var(--lr); } .apill.t4 { --qc: var(--n-theme); } .apill.t5 { --qc: var(--info); }
+:root[data-mode="dark"] .apill, :root[data-mode="auto"][data-theme="dark"] .apill { color: #0F1117; }
+@media (prefers-color-scheme: dark) { :root[data-mode="auto"]:not([data-theme="light"]) .apill { color: #0F1117; } }
+.dpill { border-radius: 999px; padding: 3px 10px; font-size: 12.5px; font-weight: 700; white-space: nowrap; background: var(--muted-soft); color: var(--ink-2); }
+.dpill.over { background: var(--crit-soft); color: var(--crit); }
+.dpill.soon { background: var(--warn-soft); color: var(--warn); }
+.dpill.week { background: var(--info-soft); color: var(--info); }
+.dpill.ok { background: var(--good-soft); color: var(--good); }
+.dpill.acc { background: var(--accent-soft); color: var(--accent); }
+.av-stack { display: flex; }
+.av-stack .av { border: 2px solid var(--surface); margin-left: -7px; }
+.av-stack .av:first-child { margin-left: 0; }
+.my-list { display: flex; flex-direction: column; }
+.my-i { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.my-i:last-child { border-bottom: 0; }
+.my-i .t { flex: 1; min-width: 0; }
+.my-i .t b { display: block; font-weight: 700; }
+.my-i .t small { color: var(--ink-2); }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex: none; display: inline-block; }
+.dot.ok { background: var(--col-good); } .dot.soon { background: var(--col-today); } .dot.over { background: var(--col-over); } .dot.nie { border: 2px solid var(--ink-2); } .dot.na { background: transparent; }
+
+/* Matrix */
+.mx-wrap { overflow: auto; max-height: min(72vh, 900px); border-radius: var(--radius); }
+.mx { border-collapse: separate; border-spacing: 0; font-size: 13px; width: max-content; min-width: 100%; }
+.mx th, .mx td { border-bottom: 1px solid var(--line); padding: 0; }
+.mx thead th { position: sticky; top: 0; z-index: 2; background: var(--surface); height: 132px; vertical-align: bottom; padding: 0 0 8px; text-transform: none; letter-spacing: 0; }
+.mx thead th.p { left: 0; z-index: 3; padding-left: 16px; vertical-align: bottom; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.mx .th-r { display: block; width: 44px; writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; margin: 0 auto; max-height: 124px; overflow: hidden; text-overflow: ellipsis; }
+.mx tbody th { position: sticky; left: 0; z-index: 1; background: var(--surface); text-align: left; padding: 6px 12px 6px 16px; text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink); min-width: 190px; border-right: 1px solid var(--line); }
+.mx tbody th small { display: block; color: var(--ink-2); font-weight: 500; font-size: 11.5px; }
+.mx td { text-align: center; padding: 4px 3px; }
+.cell { width: 38px; height: 30px; border-radius: 8px; border: 0; display: inline-grid; place-items: center; font-size: 10.5px; font-weight: 800; padding: 0; }
+.cell.ok { background: var(--col-good); color: var(--col-good-ink); }
+.cell.soon { background: var(--col-today); color: var(--col-today-ink); }
+.cell.over { background: var(--col-over); color: var(--col-over-ink); }
+.cell.nie { background: transparent; box-shadow: inset 0 0 0 2px var(--ink-2); color: var(--ink-2); }
+.cell.na { background: transparent; cursor: default; }
+@media (max-width: 760px) { .mx tbody th { min-width: 122px; max-width: 132px; padding-left: 12px; font-size: 12.5px; white-space: normal; } .mx thead th.p { padding-left: 12px; } .mx .th-r { width: 36px; } .cell { width: 32px; height: 28px; } .mx thead th { height: 118px; } }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); align-items: center; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+
+/* Online-Unterweisung */
+.lern { max-width: 620px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.lern-top { display: flex; align-items: center; gap: 10px; }
+.prog { flex: 1; height: 8px; border-radius: 4px; background: var(--muted-soft); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+@media (prefers-reduced-motion: reduce) { .prog i { transition: none; } }
+.lcard { padding: 26px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 280px; }
+.lcard .k { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: .07em; }
+.lcard h2 { font-size: 24px; line-height: 1.2; }
+.lcard p { font-size: 16px; line-height: 1.55; }
+.lcard .demo-note { font-size: 12px; color: var(--ink-2); margin-top: auto; }
+.l-nav { display: flex; justify-content: space-between; gap: 10px; }
+.q-opts { display: flex; flex-direction: column; gap: 8px; }
+.q-opt { border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--surface); text-align: left; font-weight: 600; font-size: 15px; color: var(--ink); }
+.q-opt:hover { border-color: var(--accent); }
+.q-opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.q-opt.right { border-color: var(--good); background: var(--good-soft); }
+.q-opt.wrong { border-color: var(--crit); background: var(--crit-soft); }
+.q-msg { font-weight: 700; }
+.q-msg.bad { color: var(--crit); } .q-msg.good { color: var(--good); }
+.sig { position: relative; border: 2px dashed var(--line); border-radius: 14px; background: var(--surface); touch-action: none; }
+.sig canvas { display: block; width: 100%; height: 190px; border-radius: 12px; cursor: crosshair; touch-action: none; background: #FFFFFF; }
+.sig .sig-ph { position: absolute; left: 16px; right: 16px; bottom: 34px; border-bottom: 1.5px solid var(--line); pointer-events: none; }
+.sig .sig-x { position: absolute; left: 16px; bottom: 40px; color: #8A8E9C; font-weight: 700; pointer-events: none; }
+.sig .sig-ph { border-bottom-color: #D5D8E0; }
+.sig.signed { border-style: solid; border-color: var(--accent); }
+.done-ic { width: 84px; height: 84px; border-radius: 50%; background: var(--good); color: #fff; display: grid; place-items: center; margin: 0 auto; }
+.done-ic .i { width: 44px; height: 44px; stroke-width: 2.4; }
+.sig-img { height: 48px; max-width: 160px; object-fit: contain; background: #fff; border-radius: 6px; border: 1px solid var(--line); }
+
+/* Audits */
+.a-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.score { font-family: var(--font-d); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 4px; background: var(--muted-soft); overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.bar .g { background: var(--col-good); } .bar .r { background: var(--col-over); } .bar .n { background: var(--bar); }
+.pp { display: flex; flex-direction: column; }
+.pp-i { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.pp-i:last-child { border-bottom: 0; }
+.pp-h { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.pp-h .t { flex: 1 1 260px; min-width: 0; font-weight: 600; }
+.pp-h .t small { display: block; font-weight: 500; color: var(--ink-2); }
+.seg3 { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; flex: none; }
+.seg3 button { border: 0; background: var(--surface); padding: 8px 12px; font-weight: 700; font-size: 13px; color: var(--ink-2); min-width: 54px; }
+.seg3 button + button { border-left: 1px solid var(--line); }
+.seg3 button.on.io { background: var(--col-good); color: var(--col-good-ink); }
+.seg3 button.on.nio { background: var(--col-over); color: var(--col-over-ink); }
+.seg3 button.on.na { background: var(--muted-soft); color: var(--ink); }
+.nio-box { border-left: 3px solid var(--crit); padding: 10px 12px; background: var(--crit-soft); border-radius: 0 10px 10px 0; display: flex; flex-direction: column; gap: 10px; }
+.nio-box .field input, .nio-box .field select, .nio-box .field textarea { background: var(--surface); }
+.foto { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: 14px; overflow-x: auto; padding-bottom: 6px; align-items: start; }
+.board .col-h.info { background: var(--col-info); color: var(--col-info-ink); }
+.board .col-h.warn { background: var(--col-warn); color: var(--col-warn-ink); }
+.board .col-h.good { background: var(--col-good); color: var(--col-good-ink); }
+.board .col-h.accent { background: var(--accent); color: var(--accent-ink); }
+.risk { font-size: 11.5px; font-weight: 800; border-radius: 6px; padding: 1px 7px; }
+.risk.hoch { background: var(--crit-soft); color: var(--crit); } .risk.mittel { background: var(--warn-soft); color: var(--warn); } .risk.gering { background: var(--info-soft); color: var(--info); }
+
+/* Behördenmappe */
+.ck { list-style: none; margin: 0; padding: 0; }
+.ck li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.ck li:last-child { border-bottom: 0; }
+.ck .st { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; }
+.ck .st .i { width: 16px; height: 16px; stroke-width: 2.6; }
+.ck .st.ok { background: var(--col-good); } .ck .st.warn { background: var(--col-today); color: var(--col-today-ink); } .ck .st.bad { background: var(--col-over); }
+.ck .t { flex: 1; min-width: 0; }
+.ck .t b { display: block; }
+.ck .t small { color: var(--ink-2); }
+.toc { counter-reset: toc; list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.toc li { counter-increment: toc; display: flex; gap: 10px; align-items: center; }
+.toc li::before { content: counter(toc); width: 24px; height: 24px; border-radius: 7px; background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 12px; display: grid; place-items: center; flex: none; }
+.two { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 980px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* Dialoge */
+.overlay { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-start; justify-content: center; overflow: auto; padding: calc(24px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { width: min(640px, 100%); background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); }
+.sheet.wide { width: min(820px, 100%); }
+.sheet-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sheet-h h2 { font-size: 19px; }
+.sheet-b { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.sheet-f { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.close { border: 0; background: none; width: 36px; height: 36px; border-radius: 10px; color: var(--ink-2); display: grid; place-items: center; }
+.close:hover { background: var(--surface-2); }
+.dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; margin: 0; }
+.dl dt { font-size: 11.5px; font-weight: 700; color: var(--ink-2); }
+.dl dd { margin: 0; font-weight: 600; }
+.more-list { display: flex; flex-direction: column; gap: 6px; }
+.more-list .nav-i { border: 1px solid var(--line); }
+.bell-panel { position: fixed; z-index: 45; top: calc(env(safe-area-inset-top, 0px) + 60px); right: max(16px, env(safe-area-inset-right, 0px)); width: min(400px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+@media (min-width: 761px) { .bell-panel { top: auto; bottom: 90px; left: max(16px, calc(50% - 620px + 250px)); right: auto; } }
+@media (min-width: 761px) and (max-width: 1180px) { .bell-panel { left: 96px; } }
+.bell-h { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); font-weight: 700; }
+.notes { list-style: none; margin: 0; padding: 0; max-height: min(60vh, 420px); overflow: auto; }
+.note { display: flex; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.note.unread { background: var(--accent-soft); }
+.note small { display: block; color: var(--ink-2); margin-top: 2px; font-size: 12px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; background: var(--ink); color: var(--surface); border-radius: 12px; padding: 10px 16px; font-weight: 600; box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
+@media (max-width: 760px) { .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); } }
+</style>
+
+<header class="mtop" id="mtop"></header>
+<div class="demo-bar" role="note"><span><b>Demo</b> mit Beispieldaten. <span class="db-x">Ihre Eingaben bleiben nur in Ihrem Browser.</span></span><a href="../de/kontakt">So etwas für Ihr Unternehmen? Projekt anfragen</a><a href="../de/demos">Alle Demos</a></div>
+<div class="shell" id="shell">
+  <aside class="rail" id="rail" aria-label="Navigation"></aside>
+  <main class="center" id="center"></main>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Navigation"></nav>
+<div class="bell-panel" id="bellPanel" role="region" aria-label="Benachrichtigungen" hidden></div>
+<div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="assets/xlsx.full.min.js"></script>
+<script>
+/* Arbeitsschutz: Unterweisungen, Audits und Nachweise. Demo mit Beispieldaten, gespeichert nur im Browser. */
+document.documentElement.dataset.skin = 'bunt';
+document.documentElement.dataset.mode = 'auto';
+const KEY = 'arbeitsschutz-demo-v1';
+const ORG = 'Muster GmbH';
+const ICONS = {
+  home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  clip: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11l2 2 4-4M9 17h6"/>',
+  kanban: '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M19 19v2H6"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a5 5 0 0 1 3.5 5.5"/>',
+  bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  download: '<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  alert: '<path d="M12 3l9 17H3z"/><path d="M12 10v4M12 17h.01"/>',
+  play: '<path d="M8 5l11 7-11 7z"/>',
+  back: '<path d="M15 6l-6 6 6 6"/>',
+  next: '<path d="M9 6l6 6-6 6"/>',
+  more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
+  sheet: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 4v16"/>',
+  send: '<path d="M4 12l16-8-6 16-3-7z"/>'
+};
+const ic = (n, cls) => `<svg class="i${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const TODAY = iso(new Date());
+const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); };
+const addMonths = (s, m) => { const d = new Date(s + 'T12:00:00'), day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + m); const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(day, last)); return iso(d); };
+const rel = n => addDays(TODAY, n);
+const daysBetween = (a, b) => Math.round((new Date(b.slice(0, 10) + 'T12:00:00') - new Date(a.slice(0, 10) + 'T12:00:00')) / 864e5);
+const fmt = s => s ? `${s.slice(8, 10)}.${s.slice(5, 7)}.${s.slice(0, 4)}` : '–';
+const fmtS = s => s ? `${s.slice(8, 10)}.${s.slice(5, 7)}.` : '–';
+const stamp = () => { const d = new Date(); return `${iso(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const tage = n => `${n} ${n === 1 ? 'Tag' : 'Tagen'}`;
+const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const fmtD = s => { const d = new Date(s + 'T12:00:00'); return `${WD[d.getDay()]}, ${fmtS(s)}`; };
+let seq = 0;
+const uid = p => (p || 'x') + Date.now().toString(36).slice(-4) + (++seq).toString(36) + Math.random().toString(36).slice(2, 5);
+function hash(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+const initials = n => String(n).split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+const av = (n, size) => `<span class="av ${size || ''} c${hash(n) % 8}" title="${esc(n)}" aria-hidden="true">${esc(initials(n))}</span>`;
+const pct = (a, b) => b ? Math.round(a / b * 100) : 100;
+const opts = (list, val) => list.map(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(l)}</option>`; }).join('');
+
+/* ---------- Stammdaten der Demo ---------- */
+const ABT = ['Fertigung', 'Lager/Logistik', 'Instandhaltung', 'Verwaltung', 'Vertrieb'];
+const MERK = ['Staplerfahrer', 'Gefahrstoffe', 'Bildschirmarbeit', 'Ersthelfer', 'Maschinen'];
+const ROLLEN = ['Mitarbeitende', 'Abteilungsleitung', 'Sicherheitsfachkraft'];
+function seedPeople() {
+  const P = (name, abt, merk, eintritt, rolle) => ({ id: 'p' + hash(name).toString(36), name, abt, merk, eintritt, rolle: rolle || 'Mitarbeitende', email: name.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z ]/g, '').replace(' ', '.').replace(/ /g, '') + '@muster.example' });
+  return [
+    P('Katrin Schäfer', 'Verwaltung', ['Bildschirmarbeit', 'Ersthelfer'], rel(-2400), 'Sicherheitsfachkraft'),
+    P('Michael Braun', 'Verwaltung', ['Bildschirmarbeit'], rel(-4100), 'Abteilungsleitung'),
+    P('Sandra Wolf', 'Verwaltung', ['Bildschirmarbeit'], rel(-1500)),
+    P('Julia Neumann', 'Verwaltung', ['Bildschirmarbeit'], rel(-900)),
+    P('Thomas Berger', 'Fertigung', ['Maschinen'], rel(-3300), 'Abteilungsleitung'),
+    P('Ahmet Yilmaz', 'Fertigung', ['Maschinen', 'Gefahrstoffe'], rel(-2100)),
+    P('Sven Richter', 'Fertigung', ['Maschinen'], rel(-1800)),
+    P('Marco Hoffmann', 'Fertigung', ['Maschinen', 'Ersthelfer'], rel(-1300)),
+    P('Dennis Krüger', 'Fertigung', ['Maschinen'], rel(-210)),
+    P('Elena Popescu', 'Fertigung', ['Maschinen', 'Gefahrstoffe'], rel(-1100)),
+    P('Kevin Lange', 'Fertigung', ['Maschinen'], rel(-120)),
+    P('Nina Vogel', 'Fertigung', ['Maschinen', 'Ersthelfer'], rel(-2600)),
+    P('Lukas Schmitt', 'Fertigung', ['Maschinen'], rel(-6)),
+    P('Frank Möller', 'Lager/Logistik', ['Staplerfahrer'], rel(-3900), 'Abteilungsleitung'),
+    P('Patrick Kaiser', 'Lager/Logistik', ['Staplerfahrer'], rel(-1600)),
+    P('Jan Zimmermann', 'Lager/Logistik', ['Staplerfahrer'], rel(-800)),
+    P('Olga Schulz', 'Lager/Logistik', ['Staplerfahrer', 'Gefahrstoffe'], rel(-1200)),
+    P('Tim Bauer', 'Lager/Logistik', ['Staplerfahrer'], rel(-2)),
+    P('Stefan Krause', 'Instandhaltung', ['Maschinen', 'Gefahrstoffe'], rel(-3600), 'Abteilungsleitung'),
+    P('Daniel Fuchs', 'Instandhaltung', ['Maschinen', 'Gefahrstoffe', 'Ersthelfer'], rel(-1900)),
+    P('Robert Lehmann', 'Instandhaltung', ['Maschinen'], rel(-600)),
+    P('Laura Becker', 'Vertrieb', ['Bildschirmarbeit'], rel(-2800), 'Abteilungsleitung'),
+    P('Philipp Wagner', 'Vertrieb', ['Bildschirmarbeit'], rel(-1000)),
+    P('Anna Scholz', 'Vertrieb', ['Bildschirmarbeit', 'Ersthelfer'], rel(-1400)),
+    P('Markus Peters', 'Vertrieb', ['Bildschirmarbeit'], rel(-500))
+  ];
+}
+const C = (t, x) => ({ t, x });
+const Q = (q, a, r) => ({ q, a, r });
+function seedThemen() {
+  return [
+    { id: 'erst', name: 'Erstunterweisung für Neue', short: 'Erstunterweisung', turnus: 0, alle: true, abt: [], merk: [], form: 'online', color: 't4',
+      cards: [C('Willkommen bei der Muster GmbH', 'Bevor Sie loslegen: In 5 Minuten erfahren Sie, wie Sie sicher arbeiten und wen Sie bei Fragen ansprechen.'), C('Ansprechpartner', 'Sicherheitsfachkraft: Katrin Schäfer. Ersthelfer erkennen Sie am grünen Aufkleber am Spind. Notruf intern: 112 über jedes Telefon.'), C('Wege und Ausgänge', 'Grüne Schilder zeigen Fluchtwege. Sammelplatz ist der Parkplatz vor Tor 1. Gekennzeichnete Fahrwege sind für Stapler, nicht für Fußgänger.'), C('Melden statt hoffen', 'Beinaheunfälle, Mängel und Verletzungen melden Sie sofort der Führungskraft, auch Kleinigkeiten.')],
+      quiz: [Q('Wo ist der Sammelplatz?', ['Vor Tor 1 auf dem Parkplatz', 'In der Kantine', 'In der eigenen Abteilung'], 0), Q('Was tun Sie bei einem Beinaheunfall?', ['Nichts, es ist ja nichts passiert', 'Sofort der Führungskraft melden', 'Erst am Monatsende erwähnen'], 1), Q('Wem gehören die gekennzeichneten Fahrwege?', ['Fußgängern', 'Fahrrädern', 'Staplern'], 2)] },
+    { id: 'allg', name: 'Allgemeine Arbeitsschutzunterweisung', short: 'Allgemein', turnus: 12, alle: true, abt: [], merk: [], form: 'praesenz', color: 't1',
+      cards: [C('Warum wir das jährlich machen', 'Arbeitsschutz lebt von Wiederholung. Einmal im Jahr gehen wir die wichtigsten Regeln gemeinsam durch.'), C('Ordnung am Arbeitsplatz', 'Verkehrswege frei halten, Kabel nicht quer über den Gang, verschüttete Flüssigkeiten sofort aufnehmen.'), C('Unfall, was nun?', 'Erste Hilfe leisten, Notruf absetzen, Führungskraft informieren. Jeder Unfall kommt ins Verbandbuch.')],
+      quiz: [Q('Was gehört ins Verbandbuch?', ['Nur schwere Unfälle', 'Jeder Unfall, auch kleine Verletzungen', 'Nur Unfälle mit Ausfallzeit'], 1), Q('Was ist mit Verkehrswegen?', ['Freihalten', 'Als Lagerfläche nutzen', 'Nach Schichtende räumen'], 0), Q('Wer wird nach einem Unfall informiert?', ['Niemand', 'Nur die Kollegen', 'Die Führungskraft'], 2)] },
+    { id: 'brand', name: 'Brandschutz und Evakuierung', short: 'Brandschutz', turnus: 12, alle: true, abt: [], merk: [], form: 'praesenz', color: 't3',
+      cards: [C('Brände verhüten', 'Keine offenen Flammen außerhalb freigegebener Bereiche. Ölige Lappen in die roten Metallbehälter.'), C('Im Brandfall', 'Alarm auslösen, Feuerwehr 112, Personen warnen. Nur löschen, wenn es ohne Eigengefährdung geht.'), C('Evakuierung', 'Aufzüge nicht benutzen. Zum Sammelplatz gehen und dort bleiben, bis die Vollzähligkeit geprüft ist.')],
+      quiz: [Q('Darf man im Brandfall den Aufzug nutzen?', ['Ja, wenn es schnell geht', 'Nein', 'Nur mit Begleitung'], 1), Q('Wohin mit öligen Lappen?', ['In den Restmüll', 'In die roten Metallbehälter', 'Auf die Werkbank'], 1), Q('Was zuerst?', ['Alarm auslösen und warnen', 'Persönliche Sachen holen', 'Fenster öffnen'], 0)] },
+    { id: 'stapler', name: 'Flurförderzeuge (Gabelstapler)', short: 'Gabelstapler', turnus: 12, alle: false, abt: [], merk: ['Staplerfahrer'], form: 'praesenz', color: 't2',
+      cards: [C('Vor jeder Schicht', 'Sichtprüfung: Reifen, Gabeln, Hydraulik, Bremsen, Hupe, Licht. Mängel melden, Stapler nicht benutzen.'), C('Fahren', 'Gurt anlegen, Last bergseitig, Schrittgeschwindigkeit in Hallen. Niemand fährt mit.'), C('Abstellen', 'Gabeln ganz absenken, Feststellbremse, Schlüssel abziehen. Nie vor Notausgängen abstellen.')],
+      quiz: [Q('Darf eine zweite Person mitfahren?', ['Ja, auf der Gabel', 'Nein', 'Nur kurz'], 1), Q('Was gehört zur Prüfung vor der Schicht?', ['Bremsen, Hupe, Hydraulik', 'Nur der Tankstand', 'Nichts, das macht die Werkstatt'], 0), Q('Wie stellen Sie den Stapler ab?', ['Gabeln oben lassen', 'Gabeln ganz absenken, Schlüssel abziehen', 'Motor laufen lassen'], 1)] },
+    { id: 'gefahr', name: 'Gefahrstoffe', short: 'Gefahrstoffe', turnus: 12, alle: false, abt: [], merk: ['Gefahrstoffe'], form: 'online', color: 't3',
+      cards: [C('Erkennen', 'Gefahrstoffe tragen rote Raute-Piktogramme. Das Sicherheitsdatenblatt und die Betriebsanweisung hängen am Arbeitsplatz aus.'), C('Schützen', 'Vorgeschriebene Handschuhe und Schutzbrille tragen. Nicht essen oder trinken, wo mit Gefahrstoffen gearbeitet wird.'), C('Lagern', 'Nur in Originalgebinden oder gekennzeichneten Behältern. Niemals in Getränkeflaschen umfüllen.')],
+      quiz: [Q('Wo finden Sie Hinweise zum sicheren Umgang?', ['In der Betriebsanweisung am Arbeitsplatz', 'Im Internet', 'Nirgends'], 0), Q('Darf man Reste in eine Getränkeflasche füllen?', ['Ja, wenn beschriftet', 'Nein, niemals', 'Nur über Nacht'], 1), Q('Woran erkennen Sie Gefahrstoffe?', ['Am Preis', 'An roten Raute-Piktogrammen', 'An der Farbe des Deckels'], 1)] },
+    { id: 'bild', name: 'Bildschirmarbeit', short: 'Bildschirm', turnus: 24, alle: false, abt: [], merk: ['Bildschirmarbeit'], form: 'online', color: 't5',
+      cards: [C('Einstellen', 'Oberkante Bildschirm auf Augenhöhe oder etwas darunter, Abstand etwa eine Armlänge, Bildschirm seitlich zum Fenster.'), C('Sitzen', 'Füße flach auf dem Boden, Ober- und Unterarm etwa im rechten Winkel. Rückenlehne nutzen.'), C('Pausen', 'Kurze Pausen und Haltungswechsel helfen mehr als eine lange Pause. Augenuntersuchung ist ein Angebot für Sie.')],
+      quiz: [Q('Wie hoch steht der Bildschirm?', ['Oberkante auf Augenhöhe oder darunter', 'Deutlich über Augenhöhe', 'Egal'], 0), Q('Wie steht der Bildschirm zum Fenster?', ['Mit dem Rücken zum Fenster', 'Seitlich zum Fenster', 'Direkt vor dem Fenster'], 1), Q('Was hilft gegen Verspannungen?', ['Häufige kurze Pausen', 'Durcharbeiten', 'Höherer Stuhl'], 0)] },
+    { id: 'eh', name: 'Erste Hilfe (Ersthelfer)', short: 'Erste Hilfe', turnus: 24, alle: false, abt: [], merk: ['Ersthelfer'], form: 'praesenz', color: 't2',
+      cards: [C('Ihre Rolle', 'Als Ersthelfer sind Sie bis zum Eintreffen des Rettungsdienstes die wichtigste Person.'), C('Material', 'Verbandkästen monatlich prüfen, verbrauchtes Material melden. Standorte sind im Hallenplan markiert.'), C('Dokumentation', 'Jede Hilfeleistung im Verbandbuch eintragen, auch das Pflaster.')],
+      quiz: [Q('Wie oft prüfen Sie die Verbandkästen?', ['Monatlich', 'Jährlich', 'Nie'], 0), Q('Was kommt ins Verbandbuch?', ['Jede Hilfeleistung', 'Nur Krankenhausfälle', 'Nichts'], 0), Q('Bis wann sind Sie zuständig?', ['Bis der Rettungsdienst übernimmt', '5 Minuten', 'Bis Schichtende'], 0)] },
+    { id: 'masch', name: 'Maschinensicherheit', short: 'Maschinen', turnus: 12, alle: false, abt: [], merk: ['Maschinen'], form: 'online', color: 't1',
+      cards: [C('Schutzeinrichtungen', 'Schutzhauben, Lichtschranken und Türschalter nie überbrücken oder entfernen.'), C('Rüsten und Störungen', 'Vor Eingriffen Maschine stillsetzen und gegen Wiedereinschalten sichern, eigenes Schloss am Hauptschalter.'), C('Kleidung', 'Keine weiten Ärmel, keine Ringe, lange Haare zusammenbinden. Handschuhe nicht an drehenden Teilen.')],
+      quiz: [Q('Darf eine Schutzhaube zum Rüsten entfernt bleiben, wenn es schneller geht?', ['Ja', 'Nein', 'Nur nachts'], 1), Q('Was vor Eingriffen?', ['Stillsetzen und gegen Wiedereinschalten sichern', 'Langsamer laufen lassen', 'Kollegen Bescheid geben reicht'], 0), Q('Handschuhe an drehenden Teilen?', ['Immer', 'Nein', 'Nur dünne'], 1)] },
+    { id: 'psa', name: 'Persönliche Schutzausrüstung', short: 'PSA', turnus: 12, alle: false, abt: ['Fertigung', 'Lager/Logistik', 'Instandhaltung'], merk: [], form: 'online', color: 't2',
+      cards: [C('Pflicht in den Hallen', 'Sicherheitsschuhe immer. Gehörschutz, Brille und Handschuhe je nach Arbeitsplatz, siehe Aushang.'), C('Pflegen und tauschen', 'Beschädigte PSA sofort tauschen. Ausgabe über das Lager, kostenlos.')],
+      quiz: [Q('Wer zahlt die PSA?', ['Der Betrieb', 'Sie selbst', 'Halbe-halbe'], 0), Q('Was tun mit beschädigter PSA?', ['Weiter tragen', 'Sofort tauschen', 'Kleben'], 1), Q('Sicherheitsschuhe in der Halle?', ['Immer', 'Nur bei schweren Teilen', 'Freiwillig'], 0)] },
+    { id: 'ds', name: 'Datenschutz', short: 'Datenschutz', turnus: 12, alle: true, abt: [], merk: [], form: 'online', color: 't5',
+      cards: [C('Was sind personenbezogene Daten?', 'Alles, was sich einer Person zuordnen lässt: Namen, E-Mail, Fotos, Personalnummern.'), C('Im Alltag', 'Bildschirm sperren, wenn Sie gehen. Keine Kundendaten in private Messenger. Ausdrucke nicht liegen lassen.'), C('Panne?', 'Falsch verschickte E-Mail oder verlorener Laptop: sofort melden, es gibt Fristen.')],
+      quiz: [Q('Was tun Sie beim Verlassen des Platzes?', ['Bildschirm sperren', 'Nichts', 'Monitor ausschalten reicht'], 0), Q('Kundendaten per privatem Messenger?', ['Ja, ist schneller', 'Nein', 'Nur Fotos'], 1), Q('Laptop verloren, wann melden?', ['Sofort', 'In einer Woche', 'Gar nicht'], 0)] }
+  ];
+}
+function seedVorlagen() {
+  return [
+    { id: 'v-halle', name: 'Arbeitsplatzbegehung Halle', punkte: ['Verkehrs- und Fluchtwege frei', 'Fluchtwegkennzeichnung und Notbeleuchtung', 'Feuerlöscher zugänglich und geprüft', 'Schutzeinrichtungen an Maschinen vollständig', 'Not-Halt erreichbar und gekennzeichnet', 'Ordnung und Sauberkeit, keine Stolperstellen', 'Elektrische Geräte und Kabel unbeschädigt', 'PSA wird getragen', 'Betriebsanweisungen ausgehängt', 'Erste-Hilfe-Material vollständig', 'Augendusche funktionsfähig und geprüft', 'Beleuchtung ausreichend'] },
+    { id: 'v-brand', name: 'Brandschutzbegehung', punkte: ['Feuerlöscher: Prüfplakette gültig', 'Feuerlöscher frei zugänglich', 'Brandschutztüren schließen selbsttätig', 'Brandschutztüren nicht verkeilt', 'Fluchtwege frei', 'Flucht- und Rettungspläne aktuell', 'Sammelplatz gekennzeichnet', 'Brandlasten in Hallen begrenzt', 'Rauchmelder und Alarm geprüft', 'Ölige Abfälle in Metallbehältern'] },
+    { id: 'v-iso', name: 'Internes Audit ISO 45001', punkte: ['Arbeitsschutzpolitik bekannt gemacht', 'Gefährdungsbeurteilungen aktuell', 'Rechtskataster gepflegt', 'Ziele und Kennzahlen festgelegt', 'Unterweisungen nachgewiesen', 'Beteiligung der Beschäftigten', 'Unfälle und Beinaheunfälle ausgewertet', 'Korrekturmaßnahmen wirksam', 'Notfallplanung geübt', 'Fremdfirmen eingewiesen', 'Prüffristen Arbeitsmittel eingehalten', 'Managementbewertung durchgeführt'] },
+    { id: 'v-gefahr', name: 'Gefahrstofflager', punkte: ['Gefahrstoffverzeichnis aktuell', 'Sicherheitsdatenblätter verfügbar', 'Betriebsanweisungen ausgehängt', 'Zusammenlagerung zulässig', 'Auffangwannen ausreichend', 'Behälter gekennzeichnet', 'Lüftung funktionsfähig', 'Bindemittel vorhanden', 'Zugang nur für Befugte'] }
+  ];
+}
+function seed() {
+  const people = seedPeople(), themen = seedThemen(), nachweise = [], termine = [];
+  const sifa = people[0].name;
+  let r = 7;
+  const rnd = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
+  // Präsenz: Termine je Thema an festen Daten, damit Teilnehmerlisten entstehen
+  const slots = t => t.turnus ? { ok1: rel(-38), ok2: rel(-160), soon: addDays(addMonths(TODAY, -t.turnus), 16), over: addDays(addMonths(TODAY, -t.turnus), -24) } : null;
+  const pT = {};
+  people.forEach(p => {
+    themen.forEach(t => {
+      if (!reqP(p, t)) return;
+      const neu = daysBetween(p.eintritt, TODAY) < 30;
+      if (t.id === 'erst') { if (!neu || p.name === 'Tim Bauer') nachweise.push({ id: uid('n'), tid: t.id, pid: p.id, datum: addDays(p.eintritt, 0), form: 'online', by: 'Online', sig: 'auto', quiz: true }); return; }
+      if (neu) return;
+      const x = rnd();
+      const cat = x < .66 ? 'ok' : x < .80 ? 'soon' : x < .93 ? 'over' : 'nie';
+      if (cat === 'nie') return;
+      const s = slots(t);
+      let datum;
+      if (cat === 'ok') datum = rnd() < .5 ? s.ok1 : s.ok2; else datum = s[cat];
+      if (datum < p.eintritt) datum = addDays(p.eintritt, 3);
+      const n = { id: uid('n'), tid: t.id, pid: p.id, datum, form: t.form, by: t.form === 'online' ? 'Online' : sifa, sig: 'auto', quiz: t.form === 'online' };
+      nachweise.push(n);
+      if (t.form === 'praesenz') { const k = t.id + '|' + datum; (pT[k] = pT[k] || []).push(n); }
+    });
+  });
+  const ORTE = ['Schulungsraum 1', 'Halle 1, Meisterbüro', 'Kantine', 'Lager, Rampe 2'];
+  Object.entries(pT).forEach(([k, ns]) => {
+    const [tid, datum] = k.split('|');
+    const id = uid('t');
+    termine.push({ id, tid, datum, zeit: '07:30', ort: tid === 'stapler' ? 'Lager, Rampe 2' : tid === 'eh' ? 'Schulungsraum 1' : ORTE[hash(k) % 3], leiter: tid === 'stapler' ? 'Frank Möller' : sifa, teil: ns.map(n => n.pid), anw: Object.fromEntries(ns.map(n => [n.pid, 'auto'])), status: 'abgeschlossen' });
+    ns.forEach(n => { n.terminId = id; });
+  });
+  const S0 = { people, themen, nachweise, termine };
+  // Geplante Termine: wer fällig oder überfällig ist
+  const due = tid => people.filter(p => { const st = statusOf(p, themen.find(t => t.id === tid), S0); return ['over', 'soon', 'nie'].includes(st.s); }).map(p => p.id);
+  termine.push({ id: uid('t'), tid: 'brand', datum: rel(6), zeit: '13:00', ort: 'Kantine', leiter: sifa, teil: due('brand'), anw: {}, status: 'geplant' });
+  termine.push({ id: uid('t'), tid: 'stapler', datum: rel(12), zeit: '07:00', ort: 'Lager, Rampe 2', leiter: 'Frank Möller', teil: due('stapler'), anw: {}, status: 'geplant' });
+  // Online zugewiesen
+  const assigned = [];
+  people.forEach(p => ['ds', 'masch'].forEach(tid => { const t = themen.find(x => x.id === tid); const st = statusOf(p, t, S0); if (['over', 'nie'].includes(st.s)) assigned.push({ id: uid('z'), tid, pid: p.id, at: rel(-5), due: rel(9) }); }));
+  // Audits
+  const vorlagen = seedVorlagen();
+  const mkPunkte = (v, res) => vorlagen.find(x => x.id === v).punkte.map((t, i) => Object.assign({ t, r: '', note: '', foto: '', risiko: 'mittel', mtext: '', owner: '', due: '' }, res[i] || { r: 'io' }));
+  const audits = [
+    { id: 'a1', vorlage: 'v-brand', titel: 'Brandschutzbegehung', bereich: 'Halle 1', datum: rel(-75), auditor: sifa, status: 'abgeschlossen',
+      punkte: mkPunkte('v-brand', { 0: { r: 'nio', note: 'Feuerlöscher F-12 an Säule C4: Prüfplakette seit 2 Monaten abgelaufen.', risiko: 'mittel' }, 4: { r: 'nio', note: 'Fluchtweg vor Tor 3 mit Gitterboxen zugestellt.', risiko: 'hoch' }, 8: { r: 'na' } }) },
+    { id: 'a2', vorlage: 'v-halle', titel: 'Arbeitsplatzbegehung', bereich: 'Halle 2, Zerspanung', datum: rel(-31), auditor: sifa, status: 'abgeschlossen',
+      punkte: mkPunkte('v-halle', { 3: { r: 'nio', note: 'Drehmaschine D4: Schutzhaube gerissen, Späne treten aus.', risiko: 'hoch' }, 5: { r: 'nio', note: 'Kabelkanal am Platz 7 hochstehend, Stolperstelle.', risiko: 'gering' }, 10: { r: 'nio', note: 'Augendusche ohne aktuellen Prüfnachweis.', risiko: 'mittel' }, 8: { r: 'nio', note: 'Betriebsanweisung Kühlschmierstoff ist von 2019.', risiko: 'mittel' } }) },
+    { id: 'a3', vorlage: 'v-gefahr', titel: 'Gefahrstofflager', bereich: 'Außenlager Nord', datum: rel(-1), auditor: 'Stefan Krause', status: 'laufend',
+      punkte: mkPunkte('v-gefahr', { 4: { r: 'nio', note: 'Auffangwanne unter IBC 3 zu klein.', risiko: 'hoch' }, 5: { r: '' }, 6: { r: '' }, 7: { r: '' }, 8: { r: '' } }) },
+    { id: 'a4', vorlage: 'v-iso', titel: 'Internes Audit ISO 45001', bereich: 'Gesamtes Werk', datum: rel(14), auditor: sifa, status: 'geplant', punkte: mkPunkte('v-iso', Object.fromEntries([...Array(12).keys()].map(i => [i, { r: '' }]))) }
+  ];
+  const M = (aid, pi, titel, risiko, owner, due, status, doneAt) => ({ id: uid('m'), aid, pi, titel, risiko, owner, due, status, created: audits.find(a => a.id === aid).datum, doneAt: doneAt || null });
+  const massn = [
+    M('a1', 0, 'Feuerlöscher F-12 prüfen lassen', 'mittel', 'Stefan Krause', rel(-60), 'wirksam', rel(-66)),
+    M('a1', 4, 'Fluchtweg Tor 3 räumen, Bodenmarkierung erneuern', 'hoch', 'Frank Möller', rel(-70), 'erledigt', rel(-72)),
+    M('a2', 3, 'Schutzhaube Drehmaschine D4 ersetzen', 'hoch', 'Thomas Berger', rel(-5), 'arbeit'),
+    M('a2', 5, 'Kabelkanal Platz 7 neu befestigen', 'gering', 'Robert Lehmann', rel(7), 'offen'),
+    M('a2', 10, 'Augendusche prüfen und Prüfnachweis anbringen', 'mittel', 'Daniel Fuchs', rel(-20), 'erledigt', rel(-22)),
+    M('a2', 8, 'Betriebsanweisung Kühlschmierstoff aktualisieren', 'mittel', 'Katrin Schäfer', rel(-12), 'offen'),
+    M('a3', 4, 'Größere Auffangwanne für IBC 3 bestellen', 'hoch', 'Stefan Krause', rel(10), 'offen')
+  ];
+  const notes = [
+    { id: uid('n'), to: 'Lukas Schmitt', text: 'Willkommen! Bitte die Erstunterweisung am Handy machen, dauert 5 Minuten.', at: rel(-6) + ' 07:05', read: false },
+    { id: uid('n'), to: 'Tim Bauer', text: 'Staplerunterweisung am ' + fmtD(rel(12)) + ' um 07:00, Lager, Rampe 2', at: rel(-1) + ' 09:10', read: false },
+    { id: uid('n'), to: 'Thomas Berger', text: 'Maßnahme überfällig: Schutzhaube Drehmaschine D4 ersetzen', at: rel(-4) + ' 08:00', read: false }
+  ];
+  return { v: 1, user: sifa, route: { p: 'start', id: null }, mf: { abt: '', tid: '', gaps: false, q: '' }, mp: 'jahr', mz: 'bg',
+    people, themen, nachweise, termine, assigned, vorlagen, audits, massn, notes };
+}
+
+/* ---------- Zustand ---------- */
+let S;
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 1 && Array.isArray(s.people)) return s; } } catch (e) {}
+  return seed();
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); return true; }
+  catch (e) { toast('Der Speicher im Browser ist voll. Bitte Fotos entfernen oder die Demo zurücksetzen.'); return false; }
+}
+
+/* ---------- Logik ---------- */
+function reqP(p, t) { return !!(t.alle || t.abt.includes(p.abt) || t.merk.some(m => p.merk.includes(m))); }
+function lastN(pid, tid, St) { let best = null; (St || S).nachweise.forEach(n => { if (n.pid === pid && n.tid === tid && (!best || n.datum > best.datum)) best = n; }); return best; }
+function statusOf(p, t, St) {
+  if (!reqP(p, t)) return { s: 'na' };
+  const n = lastN(p.id, t.id, St);
+  if (!n) return { s: 'nie', due: p.eintritt };
+  if (!t.turnus) return { s: 'ok', n, until: null };
+  const until = addMonths(n.datum, t.turnus), d = daysBetween(TODAY, until);
+  return { s: d < 0 ? 'over' : d <= 30 ? 'soon' : 'ok', n, until, d };
+}
+const isGap = s => ['over', 'nie'].includes(s);
+const person = id => S.people.find(p => p.id === id);
+const byName = n => S.people.find(p => p.name === n);
+const thema = id => S.themen.find(t => t.id === id);
+const me = () => byName(S.user) || S.people[0];
+const role = () => me().rolle;
+const isSifa = () => role() === 'Sicherheitsfachkraft';
+const isLead = () => role() === 'Abteilungsleitung';
+const canManage = () => isSifa() || isLead();
+const scopePeople = () => isLead() ? S.people.filter(p => p.abt === me().abt) : S.people;
+function cells(people) {
+  const out = [];
+  (people || S.people).forEach(p => S.themen.forEach(t => { const st = statusOf(p, t); if (st.s !== 'na') out.push({ p, t, st }); }));
+  return out;
+}
+function stats(people) {
+  const c = cells(people), n = c.length;
+  const cnt = k => c.filter(x => x.st.s === k).length;
+  const ok = cnt('ok'), soon = cnt('soon'), over = cnt('over'), nie = cnt('nie');
+  return { n, ok, soon, over, nie, quote: pct(ok + soon, n), c };
+}
+const openM = () => S.massn.filter(m => !['erledigt', 'wirksam'].includes(m.status));
+const overM = () => openM().filter(m => m.due < TODAY);
+function readiness() {
+  const st = stats();
+  const mAll = S.massn.length, mDone = S.massn.filter(m => ['erledigt', 'wirksam'].includes(m.status)).length;
+  const mq = pct(mDone, mAll);
+  return { val: Math.round(st.quote * .7 + mq * .3), quote: st.quote, mq, st };
+}
+function myOpen(p) {
+  p = p || me();
+  return S.themen.map(t => ({ t, st: statusOf(p, t), z: S.assigned.find(a => a.pid === p.id && a.tid === t.id) })).filter(x => x.st.s !== 'na' && (x.z || ['over', 'nie', 'soon'].includes(x.st.s)));
+}
+function nextTermin(pid, tid) { return S.termine.filter(x => x.status === 'geplant' && x.tid === tid && x.teil.includes(pid) && x.datum >= TODAY).sort((a, b) => a.datum.localeCompare(b.datum))[0]; }
+function notify(toName, text) { if (!toName) return; S.notes.unshift({ id: uid('n'), to: toName, text, at: stamp(), read: false }); if (S.notes.length > 200) S.notes.length = 200; }
+function remindPerson(p) {
+  const o = myOpen(p).filter(x => isGap(x.st.s) || x.st.s === 'soon');
+  if (!o.length) return 0;
+  notify(p.name, `Erinnerung: ${o.length === 1 ? o[0].t.name + ' ist fällig' : o.length + ' Unterweisungen sind fällig'}`);
+  return 1;
+}
+const statusTxt = st => st.s === 'ok' ? (st.until ? `gültig bis ${fmt(st.until)}` : 'erledigt') : st.s === 'soon' ? `fällig am ${fmt(st.until)}` : st.s === 'over' ? `seit ${fmt(st.until)} überfällig` : st.s === 'nie' ? (st.due > TODAY ? `fällig ab ${fmt(st.due)}` : 'noch nie unterwiesen') : 'nicht erforderlich';
+const STL = { ok: 'Gültig', soon: 'Bald fällig', over: 'Überfällig', nie: 'Nie unterwiesen', na: 'Nicht erforderlich' };
+const STP = { ok: 'good', soon: 'warn', over: 'crit', nie: 'muted', na: 'muted' };
+const auditScore = a => { const io = a.punkte.filter(x => x.r === 'io').length, nio = a.punkte.filter(x => x.r === 'nio').length; return io + nio ? pct(io, io + nio) : null; };
+const auditDone = a => a.punkte.filter(x => x.r).length;
+const MSTAT = [['offen', 'Offen', 'info'], ['arbeit', 'In Arbeit', 'warn'], ['erledigt', 'Erledigt', 'good'], ['wirksam', 'Wirksam geprüft', 'accent']];
+const mLabel = s => (MSTAT.find(x => x[0] === s) || [])[1] || s;
+
+/* Unterschrift: echte Unterschrift oder für Beispieldaten eine erzeugte */
+const SIGC = {};
+function sigData(sig, name) {
+  if (sig && sig !== 'auto') return sig;
+  if (!sig) return null;
+  if (SIGC[name] !== undefined) return SIGC[name];
+  let out = null;
+  try {
+    const c = document.createElement('canvas'); c.width = 360; c.height = 110; const g = c.getContext('2d');
+    if (g) {
+      g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+      g.fillStyle = '#1B2A6B'; g.font = `italic ${30 + hash(name) % 8}px "Segoe Script", "Brush Script MT", "Snell Roundhand", cursive`;
+      g.save(); g.translate(18, 72); g.rotate(-0.06 + (hash(name) % 5) / 100); g.fillText(name.split(' ').map((w, i) => i ? w : w[0] + '.').join(' '), 0, 0); g.restore();
+      g.strokeStyle = '#1B2A6B'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(20, 86); g.bezierCurveTo(120, 96, 220, 80, 330, 88); g.stroke();
+      out = c.toDataURL('image/png');
+    }
+  } catch (e) { out = null; }
+  SIGC[name] = out; return out;
+}
+
+/* ---------- Rahmen ---------- */
+const NAV_ALL = [['start', 'Start', 'home', 'var(--accent)'], ['matrix', 'Matrix', 'grid', 'var(--kr)'], ['termine', 'Termine', 'cal', 'var(--n-aufg)'], ['audits', 'Audits', 'clip', 'var(--lr)'], ['massn', 'Maßnahmen', 'kanban', 'var(--crit)'], ['mappe', 'Behördenmappe', 'shield', 'var(--good)'], ['sep'], ['themen', 'Themen', 'book', 'var(--n-md)'], ['leute', 'Mitarbeitende', 'users', 'var(--n-md)']];
+const navFor = () => canManage() ? NAV_ALL : [['start', 'Meine Unterweisungen', 'home', 'var(--accent)'], ['massn', 'Meine Maßnahmen', 'kanban', 'var(--crit)']];
+function navCount(k) {
+  if (k === 'start' && !canManage()) { const o = myOpen().filter(x => x.st.s !== 'soon' || x.z); return { n: o.length, crit: o.some(x => isGap(x.st.s)) }; }
+  if (k === 'massn') { const l = canManage() ? overM() : openM().filter(m => m.owner === me().name); return { n: l.length, crit: canManage() ? l.length > 0 : l.some(m => m.due < TODAY) }; }
+  if (k === 'matrix') { const st = stats(scopePeople()); return { n: st.over + st.nie, crit: st.over + st.nie > 0 }; }
+  return { n: 0 };
+}
+const brandMark = () => `<span class="logo" aria-hidden="true">M</span>`;
+function renderFrame() {
+  const r = S.route.p, unread = S.notes.filter(n => n.to === me().name && !n.read).length;
+  const badge = unread ? `<span class="badge">${unread}</span>` : '';
+  const navOn = k => k === r || (k === 'audits' && r === 'audit') || (k === 'termine' && r === 'termin') || (k === 'leute' && r === 'person') || (k === 'start' && r === 'lern');
+  $('rail').innerHTML = `
+    <div class="brand">${brandMark()}<div><div class="brand-name">${ORG}</div><div class="brand-sub">Arbeitsschutz</div></div></div>
+    ${navFor().map(([k, l, i, c]) => {
+      if (k === 'sep') return '<div class="nav-sep"></div>';
+      const n = navCount(k);
+      return `<button class="nav-i${navOn(k) ? ' on' : ''}" data-action="go" data-p="${k}" title="${l}"${navOn(k) ? ' aria-current="page"' : ''}><span class="ni" style="--ni:${c}">${ic(i)}</span><span class="lbl">${l}</span>${n.n ? `<span class="cnt${n.crit ? ' crit' : ''}">${n.n}</span>` : ''}</button>`;
+    }).join('')}
+    <div class="rail-foot">
+      <button class="nav-i" data-action="bell" aria-label="Benachrichtigungen" title="Benachrichtigungen" style="position:relative"><span class="ni" style="--ni:var(--n-md)">${ic('bell')}</span><span class="lbl">Benachrichtigungen</span>${badge}</button>
+      <label class="me-card">${av(me().name, 's')}<div><span class="sr">Angemeldet als</span><select id="userSel" data-role="user">${userOpts()}</select><small>${esc(me().rolle)} · ${esc(me().abt)}</small></div></label>
+      <button class="linkbtn" data-action="reset">Demo zurücksetzen</button>
+    </div>`;
+  $('mtop').innerHTML = `<div class="brand">${brandMark()}<div><div class="brand-name">${ORG}</div></div></div>
+    <button class="icon-btn" data-action="bell" aria-label="Benachrichtigungen">${ic('bell')}${badge}</button>
+    <button class="icon-btn" data-action="more" aria-label="Menü und Person" style="border-radius:50%;border:0">${av(me().name, 's')}</button>`;
+  const tabs = canManage() ? [['start', 'Start', 'home'], ['matrix', 'Matrix', 'grid'], ['audits', 'Audits', 'clip'], ['massn', 'Maßnahmen', 'kanban'], ['more', 'Mehr', 'more']] : [['start', 'Meine', 'home'], ['massn', 'Maßnahmen', 'kanban'], ['more', 'Mehr', 'more']];
+  $('tabbar').innerHTML = tabs.map(([k, l, i]) => {
+    const on = k === 'more' ? ['termine', 'termin', 'mappe', 'themen', 'leute', 'person'].includes(r) : navOn(k);
+    const n = k === 'more' ? { n: 0 } : navCount(k);
+    return `<button class="tab-i${on ? ' on' : ''}" data-action="${k === 'more' ? 'more' : 'go'}" data-p="${k}">${ic(i)}<span>${l}</span>${n.n ? `<span class="cnt${n.crit ? ' crit' : ''}">${n.n}</span>` : ''}</button>`;
+  }).join('');
+  if (!$('bellPanel').hidden) renderBell();
+}
+function userOpts() {
+  return ROLLEN.slice().reverse().map(rl => `<optgroup label="${rl}">${S.people.filter(p => p.rolle === rl).map(p => `<option value="${esc(p.name)}"${p.name === S.user ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
+}
+function renderBell() {
+  const mine = S.notes.filter(n => n.to === me().name);
+  $('bellPanel').innerHTML = `<div class="bell-h"><span>Benachrichtigungen</span><span class="row-acts">${mine.some(n => !n.read) ? '<button class="linkbtn" data-action="read-all">Alle gelesen</button>' : ''}<button class="close" data-action="bell" aria-label="Schließen">${ic('x', 's')}</button></span></div>
+    ${mine.length ? `<ul class="notes">${mine.slice(0, 40).map(n => `<li class="note${n.read ? '' : ' unread'}">${ic('bell', 's')}<span>${esc(n.text)}<small>${esc(fmt(n.at.slice(0, 10)))} ${esc(n.at.slice(11))}</small></span></li>`).join('')}</ul>` : '<p class="empty">Keine Benachrichtigungen.</p>'}`;
+}
+
+/* ---------- Seiten ---------- */
+function ringSvg(v, size) {
+  const r = 52, c = 2 * Math.PI * r, col = v >= 90 ? 'var(--col-good)' : v >= 75 ? 'var(--col-today)' : 'var(--col-over)';
+  return `<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--muted-soft)" stroke-width="14"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${(c * v / 100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;
+}
+function hello() {
+  const h = new Date().getHours(), g = h < 11 ? 'Guten Morgen' : h < 18 ? 'Hallo' : 'Guten Abend';
+  return `${g} ${esc(me().name.split(' ')[0])}`;
+}
+function pageStart() {
+  if (!canManage()) return pageMine();
+  const pp = scopePeople(), st = stats(pp), rd = readiness();
+  const val = isLead() ? st.quote : rd.val;
+  const myM = isLead() ? openM().filter(m => pp.some(p => p.name === m.owner)) : openM();
+  const overMs = myM.filter(m => m.due < TODAY);
+  const byT = k => S.themen.map(t => ({ t, l: st.c.filter(x => x.t === t && (k === 'gap' ? isGap(x.st.s) : x.st.s === 'soon')) })).filter(x => x.l.length).sort((a, b) => b.l.length - a.l.length);
+  const gaps = byT('gap'), soon = byT('soon');
+  const plan = S.termine.filter(x => x.status === 'geplant' && x.datum >= TODAY).map(x => ({ k: 't', d: x.datum, x })).concat(S.audits.filter(a => a.status !== 'abgeschlossen').map(a => ({ k: 'a', d: a.datum, x: a }))).sort((a, b) => a.d.localeCompare(b.d));
+  const tcard = (x, cls) => `<button class="bcard" data-action="mx-topic" data-tid="${x.t.id}" data-gaps="${cls === 'over' ? 1 : 0}"><div class="bc-top"><span class="apill ${x.t.color}">${esc(x.t.short)}</span><span class="av-stack">${x.l.slice(0, 4).map(c => av(c.p.name, 'xs')).join('')}</span></div><div class="bc-t">${x.l.length} ${x.l.length === 1 ? 'Person' : 'Personen'} ${cls === 'over' ? 'ohne gültige Unterweisung' : 'bald fällig'}</div><div class="bc-b"><span class="bc-s">${x.t.form === 'online' ? 'Online, am Handy' : 'Präsenz'}</span><span class="dpill ${cls}">${cls === 'over' ? 'überfällig' : 'in 30 Tagen'}</span></div></button>`;
+  const mcard = m => `<button class="bcard" data-action="m-open" data-id="${m.id}"><div class="bc-top"><span class="apill t3">Maßnahme</span>${av(m.owner, 'xs')}</div><div class="bc-t">${esc(m.titel)}</div><div class="bc-b"><span class="risk ${m.risiko}">${esc(m.risiko)}</span><span class="dpill over">seit ${tage(daysBetween(m.due, TODAY))}</span></div></button>`;
+  const pcard = p => p.k === 't'
+    ? `<button class="bcard" data-action="termin" data-id="${p.x.id}"><div class="bc-top"><span class="apill ${thema(p.x.tid).color}">Termin</span><span class="av-stack">${p.x.teil.slice(0, 4).map(id => av(person(id).name, 'xs')).join('')}</span></div><div class="bc-t">${esc(thema(p.x.tid).name)}</div><div class="bc-b"><span class="bc-s">${esc(p.x.ort)} · ${p.x.teil.length} Teilnehmende</span><span class="dpill week">${fmtD(p.x.datum)} ${esc(p.x.zeit)}</span></div></button>`
+    : `<button class="bcard" data-action="audit" data-id="${p.x.id}"><div class="bc-top"><span class="apill t3">${p.x.status === 'laufend' ? 'Läuft' : 'Audit'}</span>${av(p.x.auditor, 'xs')}</div><div class="bc-t">${esc(p.x.titel)}</div><div class="bc-b"><span class="bc-s">${esc(p.x.bereich)}</span><span class="dpill ${p.x.status === 'laufend' ? 'acc' : 'week'}">${p.x.status === 'laufend' ? `${auditDone(p.x)}/${p.x.punkte.length} geprüft` : fmtD(p.x.datum)}</span></div></button>`;
+  const col = (cls, title, items, empty) => `<div class="col"><h2 class="col-h ${cls}"><span>${title}</span><span>${items.length}</span></h2>${items.length ? items.join('') : `<div class="col-empty">${empty}</div>`}</div>`;
+  return `
+  <div class="hello"><div><h1>${hello()}</h1><p>${isLead() ? 'Abteilung ' + esc(me().abt) : fmtD(TODAY).replace(',', ', den')}</p></div>
+    <div class="quick">
+      <button class="qbtn q1" data-action="t-new">${ic('cal', 's')} Termin planen</button>
+      <button class="qbtn q2" data-action="z-new">${ic('send', 's')} Online zuweisen</button>
+      ${isSifa() ? `<button class="qbtn q3" data-action="a-new">${ic('clip', 's')} Begehung starten</button><button class="qbtn q4" data-action="go" data-p="mappe">${ic('shield', 's')} Behördenmappe</button>` : ''}
+    </div></div>
+  <div class="hero">
+    <section class="card ring-card"><div class="ring" role="img" aria-label="${isLead() ? 'Unterweisungsquote' : 'Audit-Bereitschaft'} ${val} Prozent">${ringSvg(val)}<div class="rv"><b>${val}%</b><small>${isLead() ? 'unterwiesen' : 'bereit'}</small></div></div>
+      <div class="ring-l">${isLead() ? 'Unterweisungsquote' : 'Audit-Bereitschaft'}</div><div class="ring-s">${isLead() ? `${pp.length} Personen in ${esc(me().abt)}` : `Unterweisungen ${rd.quote}% · Maßnahmen ${rd.mq}%`}</div></section>
+    <div class="hero-r">
+      <div class="kpi-row">
+        <button class="kpi" data-action="mx-gaps"><div class="kpi-l">Überfällig</div><div class="kpi-v${st.over ? ' crit' : ''}">${st.over}</div><div class="kpi-s">Unterweisungen</div></button>
+        <button class="kpi" data-action="mx-gaps"><div class="kpi-l">Nie unterwiesen</div><div class="kpi-v${st.nie ? ' crit' : ''}">${st.nie}</div><div class="kpi-s">davon ${pp.filter(p => daysBetween(p.eintritt, TODAY) < 30).length} neu im Betrieb</div></button>
+        <button class="kpi" data-action="go" data-p="matrix"><div class="kpi-l">In 30 Tagen fällig</div><div class="kpi-v${st.soon ? ' warn' : ''}">${st.soon}</div><div class="kpi-s">rechtzeitig planen</div></button>
+        <button class="kpi" data-action="go" data-p="massn"><div class="kpi-l">Maßnahmen offen</div><div class="kpi-v${overMs.length ? ' crit' : ''}">${myM.length}</div><div class="kpi-s">${overMs.length} überfällig</div></button>
+      </div>
+      ${gaps.length ? `<div class="focus"><div class="focus-n">${st.over + st.nie}</div><div class="focus-t"><b>Lücken schließen</b><span>${gaps.slice(0, 3).map(g => esc(g.t.short)).join(' · ')}</span></div><button class="btn" data-action="mx-gaps">Matrix öffnen</button></div>` : `<div class="focus calm"><div class="focus-n">${ic('check')}</div><div class="focus-t"><b>Alles unterwiesen</b><span>Keine Lücken in ${isLead() ? 'Ihrer Abteilung' : 'der Matrix'}</span></div></div>`}
+    </div>
+  </div>
+  <div class="cols3">
+    ${col('over', 'Überfällig', gaps.map(x => tcard(x, 'over')).concat(overMs.map(mcard)), 'Nichts überfällig')}
+    ${col('today', 'Bald fällig', soon.map(x => tcard(x, 'soon')), 'Nichts in den nächsten 30 Tagen')}
+    ${col('week', 'Geplant', plan.map(pcard), 'Nichts geplant')}
+  </div>`;
+}
+function pageMine() {
+  const p = me(), o = myOpen(p), online = o.filter(x => x.t.form === 'online'), praes = o.filter(x => x.t.form !== 'online');
+  const all = S.themen.map(t => ({ t, st: statusOf(p, t) })).filter(x => x.st.s !== 'na');
+  const myM = openM().filter(m => m.owner === p.name);
+  const urgent = online.filter(x => isGap(x.st.s) || x.z);
+  return `
+  <div class="hello"><div><h1>${hello()}</h1><p>${esc(p.abt)}${p.merk.length ? ' · ' + p.merk.map(esc).join(', ') : ''}</p></div></div>
+  ${online.length ? `<div class="focus"><div class="focus-n">${online.length}</div><div class="focus-t"><b>${online.length === 1 ? 'Unterweisung wartet' : 'Unterweisungen warten'}</b><span>${esc(online[0].t.name)}${online.length > 1 ? ` und ${online.length - 1} weitere` : ''} · ca. 5 Minuten</span></div><button class="btn" data-action="lern" data-tid="${online[0].t.id}">${ic('play', 's')} Jetzt starten</button></div>`
+    : `<div class="focus calm"><div class="focus-n">${ic('check')}</div><div class="focus-t"><b>Alles erledigt</b><span>Sie sind für alle Themen unterwiesen.</span></div></div>`}
+  ${online.length > 1 || praes.length ? `<section class="card"><div class="card-h"><div><h2>Offen</h2><p>${urgent.length ? 'Bitte zuerst die roten erledigen.' : 'Rechtzeitig vor Ablauf erledigen.'}</p></div></div><div class="my-list">
+    ${online.map(x => `<div class="my-i"><span class="dot ${x.st.s}"></span><div class="t"><b>${esc(x.t.name)}</b><small>Online · ${esc(statusTxt(x.st))}${x.z ? ' · zugewiesen bis ' + fmt(x.z.due) : ''}</small></div><button class="btn primary" data-action="lern" data-tid="${x.t.id}">${ic('play', 's')} Starten</button></div>`).join('')}
+    ${praes.map(x => { const nt = nextTermin(p.id, x.t.id); return `<div class="my-i"><span class="dot ${x.st.s}"></span><div class="t"><b>${esc(x.t.name)}</b><small>Präsenz · ${nt ? `Termin ${fmtD(nt.datum)} ${esc(nt.zeit)}, ${esc(nt.ort)}` : 'Termin wird geplant'}</small></div>${nt ? `<span class="dpill week">${fmtS(nt.datum)}</span>` : ''}</div>`; }).join('')}
+  </div></section>` : ''}
+  ${myM.length ? `<section class="card"><div class="card-h"><div><h2>Meine Maßnahmen</h2><p>Aus Begehungen und Audits</p></div></div><div class="my-list">${myM.map(m => `<div class="my-i"><span class="risk ${m.risiko}">${esc(m.risiko)}</span><div class="t"><b>${esc(m.titel)}</b><small>${esc(mLabel(m.status))}</small></div><button class="dpill ${m.due < TODAY ? 'over' : 'week'}" data-action="m-open" data-id="${m.id}" style="border:0">bis ${fmtS(m.due)}</button></div>`).join('')}</div></section>` : ''}
+  <section class="card"><div class="card-h"><div><h2>Meine Nachweise</h2><p>${all.filter(x => x.st.s === 'ok' || x.st.s === 'soon').length} von ${all.length} gültig</p></div><button class="btn" data-action="pdf-person" data-id="${p.id}">${ic('download', 's')} PDF</button></div><div class="my-list">
+    ${all.map(x => `<div class="my-i"><span class="dot ${x.st.s}"></span><div class="t"><b>${esc(x.t.name)}</b><small>${x.st.n ? 'zuletzt ' + fmt(x.st.n.datum) + ' · ' : ''}${esc(statusTxt(x.st))}</small></div></div>`).join('')}
+  </div></section>`;
+}
+
+function pageMatrix() {
+  const f = S.mf;
+  let pp = scopePeople();
+  if (f.abt) pp = pp.filter(p => p.abt === f.abt);
+  if (f.q) pp = pp.filter(p => p.name.toLowerCase().includes(f.q.toLowerCase()));
+  let tt = S.themen;
+  if (f.tid) tt = tt.filter(t => t.id === f.tid);
+  if (f.gaps) pp = pp.filter(p => tt.some(t => isGap(statusOf(p, t).s)));
+  const st = stats(pp);
+  const short = { ok: '', soon: '', over: '!', nie: '–' };
+  return `
+  <div class="page-h"><div><h1>Unterweisungsmatrix</h1><p>Wer braucht was, und wer ist gültig unterwiesen. Zelle antippen für Details.</p></div>
+    <div class="row-acts"><button class="btn" data-action="xl-matrix">${ic('download', 's')} Excel</button><button class="btn primary" data-action="z-new">${ic('send', 's')} Online zuweisen</button></div></div>
+  <div class="tools">
+    <label class="search">${ic('users', 's')}<span class="sr">Person suchen</span><input id="mxq" type="search" placeholder="Person suchen" value="${esc(f.q)}" autocomplete="off"></label>
+    ${isLead() ? '' : `<select class="sel" id="mxAbt" aria-label="Abteilung"><option value="">Alle Abteilungen</option>${opts(ABT, f.abt)}</select>`}
+    <select class="sel" id="mxT" aria-label="Thema"><option value="">Alle Themen</option>${opts(S.themen.map(t => [t.id, t.name]), f.tid)}</select>
+    <button class="chip${f.gaps ? ' on' : ''}" data-action="mx-gaps-toggle" aria-pressed="${f.gaps}">Nur Lücken</button>
+  </div>
+  <div class="legend"><span><i class="dot ok"></i>gültig ${st.ok}</span><span><i class="dot soon"></i>bald fällig ${st.soon}</span><span><i class="dot over"></i>überfällig ${st.over}</span><span><i class="dot nie"></i>nie ${st.nie}</span><span><b>${st.quote}%</b>&nbsp;unterwiesen</span></div>
+  <section class="card"><div class="mx-wrap">${pp.length ? `<table class="mx"><thead><tr><th class="p">Person</th>${tt.map(t => `<th scope="col" title="${esc(t.name)}"><span class="th-r">${esc(t.short)}</span></th>`).join('')}</tr></thead>
+    <tbody>${pp.map(p => `<tr><th scope="row">${esc(p.name)}<small>${esc(p.abt)}${daysBetween(p.eintritt, TODAY) < 30 ? ' · neu' : ''}</small></th>${tt.map(t => { const s = statusOf(p, t); return `<td>${s.s === 'na' ? '<span class="cell na" aria-hidden="true"></span>' : `<button class="cell ${s.s}" data-action="cell" data-p="${p.id}" data-t="${t.id}" aria-label="${esc(p.name)}, ${esc(t.name)}: ${STL[s.s]}" title="${esc(t.name)}: ${esc(statusTxt(s))}">${short[s.s]}</button>`}</td>`; }).join('')}</tr>`).join('')}</tbody></table>` : '<p class="empty">Keine Personen für diesen Filter.</p>'}</div></section>`;
+}
+
+/* Online-Unterweisung */
+let L = null;
+function lernStart(tid) { L = { tid, step: 'card', i: 0, qi: 0, sel: null, msg: '', wrong: 0, signed: false, sig: null }; go('lern', tid); }
+function pageLern() {
+  const t = thema(S.route.id); if (!t) return '<p class="empty">Thema nicht gefunden.</p>';
+  if (!L || L.tid !== t.id) L = { tid: t.id, step: 'card', i: 0, qi: 0, sel: null, msg: '', wrong: 0, signed: false, sig: null };
+  const total = t.cards.length + t.quiz.length + 1;
+  const pos = L.step === 'card' ? L.i : L.step === 'quiz' ? t.cards.length + L.qi : L.step === 'sign' ? total - 1 : total;
+  const top = `<div class="lern-top"><button class="close" data-action="lern-exit" aria-label="Abbrechen">${ic('x')}</button><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${pos}"><i style="width:${pos / total * 100}%"></i></div><span class="mono">${Math.min(pos + 1, total)}/${total}</span></div>`;
+  let body = '';
+  if (L.step === 'card') {
+    const c = t.cards[L.i];
+    body = `<section class="card lcard"><span class="k">${esc(t.name)} · ${L.i + 1} von ${t.cards.length}</span><h2>${esc(c.t)}</h2><p>${esc(c.x)}</p><span class="demo-note">Beispielinhalt</span></section>
+      <div class="l-nav"><button class="btn big" data-action="lern-prev"${L.i ? '' : ' disabled'}>${ic('back', 's')} Zurück</button><button class="btn primary big" data-action="lern-next">Weiter ${ic('next', 's')}</button></div>`;
+  } else if (L.step === 'quiz') {
+    const q = t.quiz[L.qi];
+    body = `<section class="card lcard"><span class="k">Kurzer Check · Frage ${L.qi + 1} von ${t.quiz.length}</span><h2>${esc(q.q)}</h2>
+      <div class="q-opts" role="radiogroup" aria-label="Antworten">${q.a.map((a, i) => `<button class="q-opt${L.sel === i ? (L.msg === 'bad' ? ' wrong' : L.msg === 'good' ? ' right' : ' sel') : ''}" role="radio" aria-checked="${L.sel === i}" data-action="q-pick" data-i="${i}">${esc(a)}</button>`).join('')}</div>
+      ${L.msg === 'bad' ? '<p class="q-msg bad" role="alert">Nicht ganz. Lesen Sie die Frage noch einmal und wählen Sie erneut.</p>' : L.msg === 'good' ? '<p class="q-msg good" role="status">Richtig.</p>' : ''}</section>
+      <div class="l-nav"><span></span><button class="btn primary big" data-action="q-check"${L.sel === null ? ' disabled' : ''}>${L.msg === 'good' ? 'Weiter' : 'Prüfen'} ${ic('next', 's')}</button></div>`;
+  } else if (L.step === 'sign') {
+    body = `<section class="card lcard"><span class="k">Bestätigung</span><h2>Unterschreiben</h2><p>Ich wurde zum Thema „${esc(t.name)}“ unterwiesen und habe die Inhalte verstanden.</p>
+      <div class="sig${L.signed ? ' signed' : ''}" id="sigBox"><canvas id="sigPad" aria-label="Unterschriftenfeld, mit Finger oder Maus unterschreiben"></canvas><span class="sig-ph"></span><span class="sig-x">✕</span></div>
+      <div class="row-acts"><button class="linkbtn" data-action="sig-clear">Neu unterschreiben</button><span class="hint">${esc(me().name)} · ${fmt(TODAY)}</span></div></section>
+      <div class="l-nav"><span></span><button class="btn primary big" data-action="lern-sign" id="signBtn"${L.signed ? '' : ' disabled'}>${ic('check', 's')} Bestätigen</button></div>`;
+  } else {
+    const st = statusOf(me(), t);
+    body = `<section class="card lcard" style="align-items:center;text-align:center"><div class="done-ic">${ic('check')}</div><h2>Erledigt, danke!</h2><p>${esc(t.name)} ist nachgewiesen${st.until ? `, gültig bis ${fmt(st.until)}` : ''}.</p>${L.wrong ? `<p class="hint">${L.wrong} Antwort${L.wrong === 1 ? '' : 'en'} im zweiten Anlauf richtig.</p>` : ''}</section>
+      <div class="l-nav"><span></span><button class="btn primary big" data-action="go" data-p="start">Fertig</button></div>`;
+  }
+  return `<div class="lern">${top}${body}</div>`;
+}
+let PAD = null;
+function sigPad(canvasId, onChange) {
+  const c = $(canvasId); if (!c) return null;
+  const pad = { drawn: false, c };
+  let g = null;
+  try { const r = c.getBoundingClientRect(), k = window.devicePixelRatio || 1; c.width = Math.max(300, Math.round((r.width || 560) * k)); c.height = Math.round((r.height || 190) * k); g = c.getContext('2d'); if (g) { g.scale(k, k); g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 2.6; g.strokeStyle = '#1B2A6B'; } } catch (e) { g = null; }
+  let down = false, last = null;
+  const pt = e => { const r = c.getBoundingClientRect(); return [(e.clientX || 0) - r.left, (e.clientY || 0) - r.top]; };
+  c.addEventListener('pointerdown', e => { down = true; last = pt(e); try { c.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); });
+  c.addEventListener('pointermove', e => { if (!down) return; const p = pt(e); if (g) { g.beginPath(); g.moveTo(last[0], last[1]); g.lineTo(p[0], p[1]); g.stroke(); } last = p; if (!pad.drawn) { pad.drawn = true; onChange && onChange(true); } e.preventDefault(); });
+  const up = () => { down = false; };
+  c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up); c.addEventListener('pointerleave', up);
+  pad.clear = () => { if (g) g.clearRect(0, 0, c.width, c.height); pad.drawn = false; onChange && onChange(false); };
+  pad.data = () => { if (!g) return null; try { const o = document.createElement('canvas'); o.width = c.width; o.height = c.height; const og = o.getContext('2d'); og.fillStyle = '#fff'; og.fillRect(0, 0, o.width, o.height); og.drawImage(c, 0, 0); return o.toDataURL('image/png'); } catch (e) { return null; } };
+  return pad;
+}
+function mountLernPad() {
+  if (S.route.p !== 'lern' || !L || L.step !== 'sign') return;
+  PAD = sigPad('sigPad', on => { L.signed = on; const b = $('signBtn'); if (b) b.disabled = !on; const box = $('sigBox'); if (box) box.classList.toggle('signed', on); });
+}
+function lernFinish() {
+  const t = thema(L.tid), p = me();
+  S.nachweise.push({ id: uid('n'), tid: t.id, pid: p.id, datum: TODAY, at: stamp(), form: 'online', by: 'Online', sig: (PAD && PAD.data()) || 'auto', quiz: true, retries: L.wrong });
+  S.assigned = S.assigned.filter(a => !(a.pid === p.id && a.tid === t.id));
+  const sifa = S.people.find(x => x.rolle === 'Sicherheitsfachkraft');
+  if (sifa && sifa.id !== p.id) notify(sifa.name, `${p.name} hat „${t.name}“ online abgeschlossen`);
+  L.step = 'done'; save(); renderAll();
+}
+
+/* Termine */
+function pageTermine() {
+  const up = S.termine.filter(x => x.status === 'geplant').sort((a, b) => a.datum.localeCompare(b.datum));
+  const past = S.termine.filter(x => x.status !== 'geplant').sort((a, b) => b.datum.localeCompare(a.datum));
+  const row = x => { const t = thema(x.tid); return `<tr class="click" data-action="termin" data-id="${x.id}"><td>${fmt(x.datum)} <span class="muted">${esc(x.zeit)}</span></td><td><span class="apill ${t.color}">${esc(t.short)}</span></td><td>${esc(x.ort)}</td><td><span class="who">${av(x.leiter, 'xs')}<b>${esc(x.leiter)}</b></span></td><td class="num">${x.status === 'geplant' ? x.teil.length : Object.keys(x.anw).length}</td></tr>`; };
+  return `
+  <div class="page-h"><div><h1>Präsenz-Termine</h1><p>Planen, Anwesenheit mit Unterschrift erfassen, abschließen. Die Nachweise entstehen automatisch.</p></div>
+    <button class="btn primary" data-action="t-new">${ic('plus', 's')} Termin planen</button></div>
+  <div class="cols3" style="grid-template-columns:minmax(0,1fr)">
+  ${up.length ? `<div class="a-grid">${up.map(x => { const t = thema(x.tid); return `<button class="bcard" data-action="termin" data-id="${x.id}"><div class="bc-top"><span class="apill ${t.color}">${esc(t.short)}</span><span class="dpill week">${fmtD(x.datum)} ${esc(x.zeit)}</span></div><div class="bc-t">${esc(t.name)}</div><div class="bc-b"><span class="bc-s">${esc(x.ort)} · ${esc(x.leiter)}</span><span class="av-stack">${x.teil.slice(0, 5).map(id => av(person(id).name, 'xs')).join('')}${x.teil.length > 5 ? `<span class="av xs c7">+${x.teil.length - 5}</span>` : ''}</span></div></button>`; }).join('')}</div>` : '<div class="col-empty">Keine geplanten Termine.</div>'}
+  </div>
+  <section class="card"><div class="card-h"><div><h2>Durchgeführt</h2><p>${past.length} Termine mit Teilnehmerliste</p></div></div><div class="tbl"><table><thead><tr><th>Datum</th><th>Thema</th><th>Ort</th><th>Unterwiesen durch</th><th class="num">Teilnehmende</th></tr></thead><tbody>${past.slice(0, 40).map(row).join('')}</tbody></table></div></section>`;
+}
+function pageTermin() {
+  const x = S.termine.find(y => y.id === S.route.id); if (!x) return '<p class="empty">Termin nicht gefunden.</p>';
+  const t = thema(x.tid), open = x.status === 'geplant';
+  const present = Object.keys(x.anw).length;
+  return `
+  <button class="linkbtn" data-action="go" data-p="termine">${ic('back', 's')} Alle Termine</button>
+  <div class="page-h"><div><h1>${esc(t.name)}</h1><p>${fmtD(x.datum)}, ${esc(x.zeit)} Uhr · ${esc(x.ort)} · ${esc(x.leiter)}</p></div>
+    <div class="row-acts">${open ? `<button class="btn" data-action="t-edit" data-id="${x.id}">Teilnehmende</button><button class="btn primary" data-action="t-close" data-id="${x.id}"${present ? '' : ' disabled'}>${ic('check', 's')} Abschließen</button>` : `<span class="pill good">Abgeschlossen</span>`}<button class="btn" data-action="pdf-termin" data-id="${x.id}">${ic('download', 's')} Teilnehmerliste</button></div></div>
+  ${open ? `<p class="hint">${present} von ${x.teil.length} bestätigt. Am Tablet herumgeben: jede Person tippt „Unterschreiben“.</p>` : ''}
+  <section class="card"><div class="tbl"><table><thead><tr><th>Name</th><th>Abteilung</th><th>Status</th><th>Unterschrift</th></tr></thead><tbody>
+    ${x.teil.map(id => { const p = person(id), a = x.anw[id]; const img = a && a !== true ? sigData(a, p.name) : null; return `<tr><td><span class="who">${av(p.name, 'xs')}<b>${esc(p.name)}</b></span></td><td>${esc(p.abt)}</td><td>${a ? '<span class="pill good">anwesend</span>' : '<span class="pill muted">offen</span>'}</td><td>${img ? `<img class="sig-img" src="${img}" alt="Unterschrift ${esc(p.name)}">` : a === true ? '<span class="hint">ohne Unterschrift</span>' : ''}${open ? `<span class="row-acts">${a ? `<button class="mini" data-action="t-unmark" data-p="${id}">Zurücksetzen</button>` : `<button class="mini acc" data-action="t-sign" data-p="${id}">${ic('pen', 's')} Unterschreiben</button><button class="mini" data-action="t-mark" data-p="${id}">Anwesend</button>`}</span>` : ''}</td></tr>`; }).join('')}
+  </tbody></table></div></section>
+  <section class="card"><div class="card-h"><div><h2>Inhalte</h2><p>Beispielinhalt, wird im Nachweis mit ausgegeben</p></div></div><div class="card-b">${t.cards.map(c => `<div><b>${esc(c.t)}</b><p class="hint">${esc(c.x)}</p></div>`).join('')}</div></section>`;
+}
+
+/* Audits */
+function pageAudits() {
+  const list = S.audits.slice().sort((a, b) => (a.status === 'abgeschlossen') - (b.status === 'abgeschlossen') || b.datum.localeCompare(a.datum));
+  return `
+  <div class="page-h"><div><h1>Audits & Begehungen</h1><p>Checkliste am Handy durchgehen, Mängel mit Foto festhalten, Maßnahmen entstehen automatisch.</p></div>
+    <button class="btn primary" data-action="a-new">${ic('plus', 's')} Begehung starten</button></div>
+  <div class="a-grid">${list.map(a => {
+    const sc = auditScore(a), done = auditDone(a), nio = a.punkte.filter(x => x.r === 'nio').length, io = a.punkte.filter(x => x.r === 'io').length;
+    const stp = a.status === 'abgeschlossen' ? ['good', 'Abgeschlossen'] : a.status === 'laufend' ? ['accent', 'Läuft'] : ['info', 'Geplant'];
+    return `<button class="bcard" data-action="audit" data-id="${a.id}"><div class="bc-top"><span class="pill ${stp[0]}">${stp[1]}</span><span class="bc-s">${fmt(a.datum)}</span></div>
+      <div class="bc-t">${esc(a.titel)}</div><div class="bc-s">${esc(a.bereich)} · ${esc(a.auditor)}</div>
+      <div class="bar" aria-hidden="true"><i class="g" style="width:${io / a.punkte.length * 100}%"></i><i class="r" style="width:${nio / a.punkte.length * 100}%"></i><i class="n" style="width:${(done - io - nio) / a.punkte.length * 100}%"></i></div>
+      <div class="bc-b"><span class="bc-s">${done}/${a.punkte.length} geprüft · ${nio} Mängel</span>${sc !== null ? `<span class="score" style="color:${sc >= 90 ? 'var(--good)' : sc >= 75 ? 'var(--warn)' : 'var(--crit)'}">${sc}%</span>` : ''}</div></button>`;
+  }).join('')}</div>`;
+}
+function pageAudit() {
+  const a = S.audits.find(x => x.id === S.route.id); if (!a) return '<p class="empty">Audit nicht gefunden.</p>';
+  const ed = a.status !== 'abgeschlossen' && canManage(), done = auditDone(a), sc = auditScore(a);
+  const ppl = S.people.map(p => p.name);
+  return `
+  <button class="linkbtn" data-action="go" data-p="audits">${ic('back', 's')} Alle Audits</button>
+  <div class="page-h"><div><h1>${esc(a.titel)}</h1><p>${esc(a.bereich)} · ${fmt(a.datum)} · ${esc(a.auditor)}</p></div>
+    <div class="row-acts">${sc !== null ? `<span class="score">${sc}%</span>` : ''}${a.status === 'geplant' && ed ? `<button class="btn primary" data-action="a-begin">${ic('play', 's')} Jetzt starten</button>` : ''}${a.status === 'laufend' && ed ? `<button class="btn primary" data-action="a-close"${done === a.punkte.length ? '' : ' disabled'}>${ic('check', 's')} Abschließen</button>` : ''}</div></div>
+  ${a.status === 'laufend' ? `<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${a.punkte.length}" aria-valuenow="${done}" aria-label="Fortschritt"><i class="g" style="width:${done / a.punkte.length * 100}%"></i></div><p class="hint">${done} von ${a.punkte.length} Prüfpunkten bewertet. Bei n.i.O. Foto und Maßnahme ergänzen.</p>` : ''}
+  <section class="card"><div class="pp">${a.punkte.map((x, i) => `<div class="pp-i" id="pp${i}">
+    <div class="pp-h"><div class="t">${i + 1}. ${esc(x.t)}${x.r === 'nio' && !ed && x.note ? `<small>${esc(x.note)}</small>` : ''}</div>
+      ${ed && a.status === 'laufend' ? `<div class="seg3" role="group" aria-label="Bewertung">${[['io', 'i.O.'], ['nio', 'n.i.O.'], ['na', 'n.a.']].map(([k, l]) => `<button class="${k}${x.r === k ? ' on' : ''}" data-action="pp-set" data-i="${i}" data-r="${k}" aria-pressed="${x.r === k}">${l}</button>`).join('')}</div>` : `<span class="pill ${x.r === 'io' ? 'good' : x.r === 'nio' ? 'crit' : 'muted'}">${x.r === 'io' ? 'i.O.' : x.r === 'nio' ? 'n.i.O.' : x.r === 'na' ? 'n.a.' : 'offen'}</span>`}</div>
+    ${x.r === 'nio' ? (ed && a.status === 'laufend' ? `<div class="nio-box">
+      <div class="field"><label for="pn${i}">Feststellung</label><textarea id="pn${i}" data-pp="note" data-i="${i}" rows="2" placeholder="Was genau ist nicht in Ordnung?">${esc(x.note)}</textarea></div>
+      <div class="row-acts">${x.foto ? `<img class="foto" src="${x.foto}" alt="Foto zu Prüfpunkt ${i + 1}"><button class="mini" data-action="pp-foto-del" data-i="${i}">Foto entfernen</button>` : ''}<label class="btn" for="pf${i}">${ic('camera', 's')} ${x.foto ? 'Anderes Foto' : 'Foto'}</label><input id="pf${i}" class="sr" type="file" accept="image/*" capture="environment" data-pp="foto" data-i="${i}"></div>
+      <div class="grid2"><div class="field"><label for="pr${i}">Risiko</label><select id="pr${i}" data-pp="risiko" data-i="${i}">${opts(['gering', 'mittel', 'hoch'], x.risiko)}</select></div>
+        <div class="field"><label for="po${i}">Verantwortlich</label><select id="po${i}" data-pp="owner" data-i="${i}"><option value="">Bitte wählen</option>${opts(ppl, x.owner)}</select></div>
+        <div class="field"><label for="pd${i}">Termin</label><input id="pd${i}" type="date" data-pp="due" data-i="${i}" value="${esc(x.due || rel(x.risiko === 'hoch' ? 7 : 21))}"></div></div>
+      <div class="field"><label for="pm${i}">Maßnahme</label><input id="pm${i}" data-pp="mtext" data-i="${i}" value="${esc(x.mtext)}" placeholder="Was wird getan?"></div></div>` : x.foto ? `<img class="foto" src="${x.foto}" alt="Foto zu Prüfpunkt ${i + 1}">` : '') : ''}
+  </div>`).join('')}</div></section>
+  ${a.status === 'abgeschlossen' ? `<section class="card"><div class="card-h"><div><h2>Maßnahmen aus diesem Audit</h2></div></div><div class="my-list">${S.massn.filter(m => m.aid === a.id).map(m => `<div class="my-i"><span class="risk ${m.risiko}">${esc(m.risiko)}</span><div class="t"><b>${esc(m.titel)}</b><small>${esc(m.owner)} · bis ${fmt(m.due)}</small></div><button class="dpill ${['erledigt', 'wirksam'].includes(m.status) ? 'ok' : m.due < TODAY ? 'over' : 'week'}" style="border:0" data-action="m-open" data-id="${m.id}">${esc(mLabel(m.status))}</button></div>`).join('') || '<p class="empty">Keine Mängel.</p>'}</div></section>` : ''}`;
+}
+
+/* Maßnahmen */
+function pageMassn() {
+  let list = S.massn;
+  if (!canManage()) list = list.filter(m => m.owner === me().name);
+  else if (isLead()) list = list.filter(m => scopePeople().some(p => p.name === m.owner));
+  return `
+  <div class="page-h"><div><h1>${canManage() ? 'Maßnahmen' : 'Meine Maßnahmen'}</h1><p>Aus Audits und Begehungen. Karte antippen, um den Status zu ändern.</p></div>
+    ${canManage() ? `<div class="row-acts"><button class="btn" data-action="xl-massn">${ic('download', 's')} Excel</button><button class="btn primary" data-action="m-new">${ic('plus', 's')} Maßnahme</button></div>` : ''}</div>
+  <div class="board">${MSTAT.map(([k, l, c]) => { const items = list.filter(m => m.status === k).sort((a, b) => a.due.localeCompare(b.due)); return `<div class="col"><h2 class="col-h ${c}"><span>${l}</span><span>${items.length}</span></h2>
+    ${items.length ? items.map(m => { const a = S.audits.find(x => x.id === m.aid); const late = !['erledigt', 'wirksam'].includes(m.status) && m.due < TODAY; return `<button class="bcard" data-action="m-open" data-id="${m.id}"><div class="bc-top"><span class="risk ${m.risiko}">${esc(m.risiko)}</span>${av(m.owner, 'xs')}</div><div class="bc-t">${esc(m.titel)}</div><div class="bc-b"><span class="bc-s">${a ? esc(a.titel) : 'Ohne Audit'}</span><span class="dpill ${late ? 'over' : ['erledigt', 'wirksam'].includes(m.status) ? 'ok' : 'week'}">${late ? `seit ${tage(daysBetween(m.due, TODAY))}` : 'bis ' + fmtS(m.due)}</span></div></button>`; }).join('') : '<div class="col-empty">Leer</div>'}</div>`; }).join('')}</div>`;
+}
+
+/* Behördenmappe */
+const MZ = { bg: 'Berufsgenossenschaft', amt: 'Amt für Arbeitsschutz', iso: 'Zertifizierungsaudit ISO 45001' };
+function period() {
+  const y = new Date().getFullYear();
+  if (S.mp === 'kj') return { von: `${y}-01-01`, bis: TODAY, l: `Kalenderjahr ${y}` };
+  if (S.mp === 'vj') return { von: `${y - 1}-01-01`, bis: `${y - 1}-12-31`, l: `Vorjahr ${y - 1}` };
+  return { von: addMonths(TODAY, -12), bis: TODAY, l: 'Letzte 12 Monate' };
+}
+function checklist() {
+  const st = stats(), pr = period();
+  const neu = S.people.filter(p => daysBetween(p.eintritt, TODAY) <= 365);
+  const erstOk = neu.filter(p => { const n = lastN(p.id, 'erst'); return n && n.datum <= addDays(p.eintritt, 1); }).length;
+  const tIn = S.termine.filter(x => x.status === 'abgeschlossen' && x.datum >= pr.von && x.datum <= pr.bis);
+  const tSig = tIn.filter(x => Object.values(x.anw).every(v => v && v !== true)).length;
+  const aIn = S.audits.filter(a => a.status === 'abgeschlossen' && a.datum >= pr.von && a.datum <= pr.bis);
+  const mAll = S.massn, mOk = mAll.filter(m => m.owner && m.due).length;
+  const mDone = mAll.filter(m => ['erledigt', 'wirksam'].includes(m.status)), mWirk = mDone.filter(m => m.status === 'wirksam').length;
+  const lvl = (v, ok, warn) => v >= ok ? 'ok' : v >= warn ? 'warn' : 'bad';
+  return [
+    { k: lvl(st.quote, 95, 85), t: 'Alle Beschäftigten unterwiesen', d: `${st.quote}% der erforderlichen Unterweisungen gültig, ${st.over + st.nie} Lücken` },
+    { k: lvl(pct(erstOk, neu.length), 100, 70), t: 'Erstunterweisung vor Arbeitsbeginn', d: `${erstOk} von ${neu.length} neuen Beschäftigten der letzten 12 Monate am ersten Tag unterwiesen` },
+    { k: lvl(pct(tSig, tIn.length), 100, 90), t: 'Teilnehmerlisten mit Unterschrift', d: `${tSig} von ${tIn.length} Präsenz-Terminen vollständig unterschrieben` },
+    { k: S.themen.every(t => t.cards.length) ? 'ok' : 'warn', t: 'Inhalte der Unterweisungen dokumentiert', d: `${S.themen.length} Themen mit Inhalt und Turnus` },
+    { k: aIn.length >= 2 ? 'ok' : aIn.length ? 'warn' : 'bad', t: 'Begehungen und Audits durchgeführt', d: `${aIn.length} abgeschlossen im Zeitraum` },
+    { k: lvl(pct(mOk, mAll.length), 100, 90), t: 'Mängel mit Maßnahme, Verantwortlichem und Termin', d: `${mOk} von ${mAll.length} Maßnahmen vollständig` },
+    { k: overM().length ? (overM().some(m => m.risiko === 'hoch') ? 'bad' : 'warn') : 'ok', t: 'Maßnahmen fristgerecht umgesetzt', d: overM().length ? `${overM().length} überfällig, davon ${overM().filter(m => m.risiko === 'hoch').length} mit hohem Risiko` : 'Keine überfälligen Maßnahmen' },
+    { k: lvl(pct(mWirk, mDone.length), 60, 30), t: 'Wirksamkeit geprüft', d: `${mWirk} von ${mDone.length} erledigten Maßnahmen auf Wirksamkeit geprüft` }
+  ];
+}
+function pageMappe() {
+  const ck = checklist(), pr = period(), okN = ck.filter(c => c.k === 'ok').length;
+  return `
+  <div class="page-h"><div><h1>Behördenmappe</h1><p>Ein PDF mit allem, was BG, Amt oder Auditor sehen wollen. Daten kommen direkt aus Matrix, Terminen und Audits.</p></div>
+    <div class="row-acts"><button class="btn primary big" data-action="pdf-mappe">${ic('download', 's')} PDF erstellen</button></div></div>
+  <div class="tools"><select class="sel" id="mzSel" aria-label="Für">${opts(Object.entries(MZ), S.mz)}</select><select class="sel" id="mpSel" aria-label="Zeitraum">${opts([['jahr', 'Letzte 12 Monate'], ['kj', 'Kalenderjahr ' + new Date().getFullYear()], ['vj', 'Vorjahr ' + (new Date().getFullYear() - 1)]], S.mp)}</select></div>
+  <div class="two">
+    <section class="card"><div class="card-h"><div><h2>Was geprüft wird</h2><p>${okN} von ${ck.length} Punkten erfüllt</p></div></div>
+      <ul class="ck">${ck.map(c => `<li><span class="st ${c.k}">${ic(c.k === 'ok' ? 'check' : c.k === 'warn' ? 'alert' : 'x')}</span><div class="t"><b>${esc(c.t)}</b><small>${esc(c.d)}</small></div></li>`).join('')}</ul></section>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <section class="card"><div class="card-h"><div><h2>Inhalt der Mappe</h2><p>${esc(MZ[S.mz])} · ${esc(pr.l)}</p></div></div><div class="card-b"><ol class="toc">
+        <li>Deckblatt und Kennzahlen</li><li>Prüfliste wie links</li><li>Unterweisungsmatrix</li><li>Nachweise im Zeitraum</li><li>Teilnehmerlisten mit Unterschrift</li><li>Audit- und Begehungsberichte mit Fotos</li><li>Maßnahmenliste</li></ol></div></section>
+      <section class="card"><div class="card-h"><div><h2>Einzeln exportieren</h2></div></div><div class="card-b"><div class="row-acts">
+        <button class="btn" data-action="xl-matrix">${ic('sheet', 's')} Matrix</button><button class="btn" data-action="xl-nachweise">${ic('sheet', 's')} Nachweise</button><button class="btn" data-action="xl-massn">${ic('sheet', 's')} Maßnahmen</button></div>
+        <p class="hint">Excel für eigene Auswertungen. Für Behörden besser das PDF, es enthält die Unterschriften.</p></div></section>
+    </div>
+  </div>`;
+}
+
+/* Themen, Mitarbeitende */
+function pageThemen() {
+  return `
+  <div class="page-h"><div><h1>Themen</h1><p>Turnus, Zielgruppe und Inhalte. Wer betroffen ist, ergibt sich aus Abteilung und Merkmalen.</p></div>
+    <button class="btn primary" data-action="th-new">${ic('plus', 's')} Thema</button></div>
+  <section class="card"><div class="tbl"><table><thead><tr><th>Thema</th><th>Form</th><th>Turnus</th><th>Zielgruppe</th><th class="num">Betroffen</th><th class="num">Gültig</th></tr></thead><tbody>
+    ${S.themen.map(t => { const c = cells().filter(x => x.t === t); const ok = c.filter(x => ['ok', 'soon'].includes(x.st.s)).length; return `<tr class="click" data-action="th-edit" data-id="${t.id}"><td><span class="apill ${t.color}">${esc(t.short)}</span> <b>${esc(t.name)}</b></td><td>${t.form === 'online' ? 'Online' : 'Präsenz'}</td><td>${t.turnus ? `alle ${t.turnus} Monate` : 'einmalig'}</td><td>${t.alle ? 'Alle' : t.abt.concat(t.merk).map(esc).join(', ')}</td><td class="num">${c.length}</td><td class="num">${pct(ok, c.length)}%</td></tr>`; }).join('')}
+  </tbody></table></div></section>`;
+}
+function pageLeute() {
+  const pp = scopePeople();
+  return `
+  <div class="page-h"><div><h1>Mitarbeitende</h1><p>${pp.length} Personen. Neue bekommen die Erstunterweisung sofort zugewiesen.</p></div>
+    <div class="row-acts"><button class="btn" data-action="remind-all">${ic('bell', 's')} Alle mit Lücken erinnern</button>${isSifa() ? `<button class="btn primary" data-action="p-new">${ic('plus', 's')} Person</button>` : ''}</div></div>
+  <section class="card"><div class="tbl"><table><thead><tr><th>Name</th><th>Abteilung</th><th>Merkmale</th><th class="num">Quote</th><th class="num">Lücken</th></tr></thead><tbody>
+    ${pp.map(p => { const st = stats([p]); return `<tr class="click" data-action="person" data-id="${p.id}"><td><span class="who">${av(p.name, 'xs')}<b>${esc(p.name)}</b></span>${daysBetween(p.eintritt, TODAY) < 30 ? ' <span class="pill accent">neu</span>' : ''}</td><td>${esc(p.abt)}</td><td>${p.merk.map(m => `<span class="tag">${esc(m)}</span>`).join(' ')}</td><td class="num">${st.quote}%</td><td class="num">${st.over + st.nie ? `<span class="pill crit">${st.over + st.nie}</span>` : '<span class="pill good">0</span>'}</td></tr>`; }).join('')}
+  </tbody></table></div></section>`;
+}
+function pagePerson() {
+  const p = person(S.route.id); if (!p) return '<p class="empty">Person nicht gefunden.</p>';
+  const all = S.themen.map(t => ({ t, st: statusOf(p, t) })).filter(x => x.st.s !== 'na'), st = stats([p]);
+  return `
+  <button class="linkbtn" data-action="go" data-p="leute">${ic('back', 's')} Alle Mitarbeitenden</button>
+  <div class="page-h"><div class="who">${av(p.name)}<div><h1>${esc(p.name)}</h1><p>${esc(p.abt)} · ${esc(p.rolle)} · seit ${fmt(p.eintritt)}</p></div></div>
+    <div class="row-acts"><button class="btn" data-action="remind" data-id="${p.id}">${ic('bell', 's')} Erinnern</button><button class="btn" data-action="mail-person" data-id="${p.id}">${ic('mail', 's')} E-Mail</button><button class="btn" data-action="pdf-person" data-id="${p.id}">${ic('download', 's')} Nachweis-PDF</button>${isSifa() ? `<button class="btn" data-action="p-edit" data-id="${p.id}">${ic('pen', 's')} Bearbeiten</button>` : ''}</div></div>
+  <div class="tools">${p.merk.map(m => `<span class="tag">${esc(m)}</span>`).join('')}<span class="pill ${st.quote >= 95 ? 'good' : st.quote >= 80 ? 'warn' : 'crit'}">${st.quote}% gültig</span></div>
+  <section class="card"><div class="my-list">${all.map(x => `<div class="my-i"><span class="dot ${x.st.s}"></span><div class="t"><b>${esc(x.t.name)}</b><small>${x.st.n ? `zuletzt ${fmt(x.st.n.datum)}, ${x.st.n.form === 'online' ? 'online' : 'Präsenz'} · ` : ''}${esc(statusTxt(x.st))}</small></div><button class="mini" data-action="cell" data-p="${p.id}" data-t="${x.t.id}">Details</button></div>`).join('')}</div></section>`;
+}
+
+/* ---------- Dialoge ---------- */
+function openSheet(html, wide) { $('sheet').className = 'sheet' + (wide ? ' wide' : ''); $('sheet').innerHTML = html; $('overlay').hidden = false; const f = $('sheet').querySelector('input:not([type=checkbox]):not([type=file]):not([type=radio]), textarea, select'); if (f) setTimeout(() => { try { f.focus(); } catch (e) {} }, 30); }
+function closeSheet() { $('overlay').hidden = true; $('sheet').innerHTML = ''; SPAD = null; }
+const sheetH = t => `<div class="sheet-h"><h2>${t}</h2><button class="close" data-action="close" aria-label="Schließen">${ic('x')}</button></div>`;
+const foot = (label, extra) => `<div class="sheet-f">${extra || ''}<button type="button" class="btn" data-action="close">Abbrechen</button><button type="submit" class="btn primary">${label}</button></div>`;
+const checks = (name, list, sel) => `<div class="checks">${list.map(x => `<label><input type="checkbox" name="${name}" value="${esc(x)}"${sel.includes(x) ? ' checked' : ''}> ${esc(x)}</label>`).join('')}</div>`;
+const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
+function cellSheet(pid, tid) {
+  const p = person(pid), t = thema(tid), st = statusOf(p, t), n = st.n;
+  const nt = nextTermin(p.id, t.id), z = S.assigned.find(a => a.pid === p.id && a.tid === t.id);
+  const img = n ? sigData(n.sig, p.name) : null;
+  openSheet(`${sheetH(esc(t.name))}<div class="sheet-b">
+    <div class="who">${av(p.name)}<div><b>${esc(p.name)}</b><div class="hint">${esc(p.abt)}</div></div><span class="pill ${STP[st.s]}" style="margin-left:auto">${STL[st.s]}</span></div>
+    <dl class="dl"><div><dt>Letzte Unterweisung</dt><dd>${n ? fmt(n.datum) : '–'}</dd></div><div><dt>Gültig bis</dt><dd>${st.until ? fmt(st.until) : n ? 'unbegrenzt' : '–'}</dd></div><div><dt>Form</dt><dd>${n ? (n.form === 'online' ? 'Online mit Quiz' : 'Präsenz') : t.form === 'online' ? 'Online' : 'Präsenz'}</dd></div><div><dt>Unterwiesen durch</dt><dd>${n ? esc(n.by) : '–'}</dd></div></dl>
+    ${img ? `<div><div class="hint">Unterschrift</div><img class="sig-img" src="${img}" alt="Unterschrift"></div>` : ''}
+    ${nt ? `<p class="hint">Eingeplant: ${fmtD(nt.datum)} ${esc(nt.zeit)}, ${esc(nt.ort)}</p>` : ''}${z ? `<p class="hint">Online zugewiesen am ${fmt(z.at)}, bis ${fmt(z.due)}</p>` : ''}
+  </div><div class="sheet-f">${canManage() ? `<button class="btn" data-action="n-add" data-p="${p.id}" data-t="${t.id}" style="margin-right:auto">Nachweis nachtragen</button>${t.form === 'online' && !z ? `<button class="btn" data-action="z-one" data-p="${p.id}" data-t="${t.id}">Online zuweisen</button>` : ''}<button class="btn" data-action="remind" data-id="${p.id}">Erinnern</button>` : ''}<button class="btn primary" data-action="close">Schließen</button></div>`);
+}
+function nAddSheet(pid, tid) {
+  const p = person(pid), t = thema(tid);
+  openSheet(`${sheetH('Nachweis nachtragen')}<form id="nForm" data-p="${pid}" data-t="${tid}" novalidate><div class="sheet-b"><p class="hint">${esc(p.name)} · ${esc(t.name)}. Zum Beispiel aus einer Papierliste.</p>
+    <div class="grid2"><div class="field"><label for="na-d">Datum</label><input id="na-d" type="date" value="${TODAY}" max="${TODAY}"></div><div class="field"><label for="na-by">Unterwiesen durch</label><input id="na-by" value="${esc(me().name)}"></div></div></div>${foot('Speichern')}</form>`);
+}
+function tNewSheet(id) {
+  const x = id ? S.termine.find(y => y.id === id) : null;
+  const tid = x ? x.tid : (S.themen.find(t => t.form === 'praesenz') || S.themen[0]).id;
+  openSheet(`${sheetH(x ? 'Teilnehmende' : 'Termin planen')}<form id="tForm" data-id="${x ? x.id : ''}" novalidate><div class="sheet-b">
+    <div class="grid2"><div class="field"><label for="tf-t">Thema</label><select id="tf-t"${x ? ' disabled' : ''}>${opts(S.themen.map(t => [t.id, t.name + (t.form === 'online' ? ' (online)' : '')]), tid)}</select></div>
+      <div class="field"><label for="tf-d">Datum</label><input id="tf-d" type="date" value="${x ? x.datum : rel(7)}" min="${TODAY}"></div>
+      <div class="field"><label for="tf-z">Uhrzeit</label><input id="tf-z" type="time" value="${x ? x.zeit : '08:00'}"></div></div>
+    <div class="grid2"><div class="field"><label for="tf-o">Ort</label><input id="tf-o" value="${esc(x ? x.ort : 'Schulungsraum 1')}"></div><div class="field"><label for="tf-l">Unterweisende Person</label><select id="tf-l">${opts(S.people.map(p => p.name), x ? x.leiter : me().name)}</select></div></div>
+    <div class="field"><span class="lbl">Teilnehmende <span id="tf-n"></span></span><div id="tf-p"></div><span class="help">Vorgeschlagen: wer das Thema braucht und fällig oder überfällig ist.</span></div>
+  </div>${foot(x ? 'Speichern' : 'Planen')}</form>`, true);
+  renderTeil(tid, x ? x.teil : null);
+}
+function renderTeil(tid, sel) {
+  const t = thema(tid), need = S.people.filter(p => reqP(p, t));
+  const due = need.filter(p => ['over', 'nie', 'soon'].includes(statusOf(p, t).s)).map(p => p.id);
+  const chosen = sel || due;
+  $('tf-p').innerHTML = need.length ? `<div class="checks">${need.map(p => { const s = statusOf(p, t).s; return `<label><input type="checkbox" name="teil" value="${p.id}"${chosen.includes(p.id) ? ' checked' : ''}> <span class="dot ${s}"></span> ${esc(p.name)}</label>`; }).join('')}</div>` : '<p class="hint">Niemand braucht dieses Thema.</p>';
+  $('tf-n').textContent = `(${chosen.length} von ${need.length})`;
+}
+function zNewSheet(pid, tid) {
+  const online = S.themen.filter(t => t.form === 'online'), t0 = tid ? thema(tid) : online.find(t => S.people.some(p => isGap(statusOf(p, t).s))) || online[0];
+  openSheet(`${sheetH('Online-Unterweisung zuweisen')}<form id="zForm" novalidate><div class="sheet-b">
+    <div class="grid2"><div class="field"><label for="zf-t">Thema</label><select id="zf-t">${opts(online.map(t => [t.id, t.name]), t0.id)}</select></div><div class="field"><label for="zf-d">Erledigen bis</label><input id="zf-d" type="date" value="${rel(14)}" min="${TODAY}"></div></div>
+    <div class="field"><span class="lbl">An</span><div id="zf-p"></div><span class="help">Die Personen sehen es sofort auf ihrer Startseite und bekommen eine Benachrichtigung.</span></div>
+  </div>${foot('Zuweisen')}</form>`, true);
+  renderZ(t0.id, pid ? [pid] : null);
+}
+function renderZ(tid, sel) {
+  const t = thema(tid), need = scopePeople().filter(p => reqP(p, t));
+  const due = need.filter(p => ['over', 'nie', 'soon'].includes(statusOf(p, t).s)).map(p => p.id);
+  const chosen = sel || due;
+  $('zf-p').innerHTML = need.length ? `<div class="checks">${need.map(p => `<label><input type="checkbox" name="zp" value="${p.id}"${chosen.includes(p.id) ? ' checked' : ''}> <span class="dot ${statusOf(p, t).s}"></span> ${esc(p.name)}</label>`).join('')}</div>` : '<p class="hint">Niemand braucht dieses Thema.</p>';
+}
+let SPAD = null;
+function signSheet(tid, pid) {
+  const p = person(pid);
+  openSheet(`${sheetH('Unterschreiben')}<div class="sheet-b"><p><b>${esc(p.name)}</b> bestätigt die Teilnahme an „${esc(thema(S.termine.find(x => x.id === tid).tid).name)}“.</p>
+    <div class="sig" id="sSigBox"><canvas id="sSig" aria-label="Unterschriftenfeld"></canvas><span class="sig-ph"></span><span class="sig-x">✕</span></div><button class="linkbtn" data-action="ssig-clear">Neu unterschreiben</button></div>
+    <div class="sheet-f"><button class="btn" data-action="close">Abbrechen</button><button class="btn primary" id="sSigOk" data-action="ssig-ok" data-tid="${tid}" data-p="${pid}" disabled>Bestätigen</button></div>`);
+  SPAD = sigPad('sSig', on => { $('sSigOk').disabled = !on; $('sSigBox').classList.toggle('signed', on); });
+}
+function aNewSheet() {
+  openSheet(`${sheetH('Begehung starten')}<form id="aForm" novalidate><div class="sheet-b">
+    <div class="field"><label for="af-v">Checkliste</label><select id="af-v">${opts(S.vorlagen.map(v => [v.id, `${v.name} (${v.punkte.length} Punkte)`]), S.vorlagen[0].id)}</select></div>
+    <div class="grid2"><div class="field"><label for="af-b">Bereich</label><input id="af-b" placeholder="z. B. Halle 3, Montage" value="Halle 1, Montage"></div><div class="field"><label for="af-d">Datum</label><input id="af-d" type="date" value="${TODAY}"></div></div>
+    <div class="field"><label for="af-a">Durchgeführt von</label><select id="af-a">${opts(S.people.filter(p => p.rolle !== 'Mitarbeitende').map(p => p.name), me().name)}</select></div>
+  </div>${foot('Starten')}</form>`);
+}
+function mSheet(id) {
+  const m = id ? S.massn.find(x => x.id === id) : null, a = m && m.aid ? S.audits.find(x => x.id === m.aid) : null;
+  const ed = canManage() || (m && m.owner === me().name);
+  const p = a && m.pi !== undefined ? a.punkte[m.pi] : null;
+  openSheet(`${sheetH(m ? 'Maßnahme' : 'Neue Maßnahme')}<form id="mForm" data-id="${m ? m.id : ''}" novalidate><div class="sheet-b">
+    ${a ? `<p class="hint">Aus: ${esc(a.titel)}, ${esc(a.bereich)}, ${fmt(a.datum)}${p && p.note ? ` · „${esc(p.note)}“` : ''}</p>${p && p.foto ? `<img class="foto" src="${p.foto}" alt="Foto zur Feststellung">` : ''}` : ''}
+    <div class="field"><label for="mf-t">Maßnahme</label><input id="mf-t" value="${esc(m ? m.titel : '')}"${canManage() ? '' : ' disabled'}></div>
+    <div class="grid2"><div class="field"><label for="mf-r">Risiko</label><select id="mf-r"${canManage() ? '' : ' disabled'}>${opts(['gering', 'mittel', 'hoch'], m ? m.risiko : 'mittel')}</select></div>
+      <div class="field"><label for="mf-o">Verantwortlich</label><select id="mf-o"${canManage() ? '' : ' disabled'}>${opts(S.people.map(x => x.name), m ? m.owner : me().name)}</select></div>
+      <div class="field"><label for="mf-d">Termin</label><input id="mf-d" type="date" value="${m ? m.due : rel(14)}"${canManage() ? '' : ' disabled'}></div></div>
+    <div class="field"><span class="lbl">Status</span><div class="checks">${MSTAT.filter(s => s[0] !== 'wirksam' || canManage()).map(([k, l]) => `<label><input type="radio" name="mst" value="${k}"${(m ? m.status : 'offen') === k ? ' checked' : ''}${ed ? '' : ' disabled'}> ${l}</label>`).join('')}</div>
+      <span class="help">„Wirksam geprüft“ setzt die Sicherheitsfachkraft nach einer Kontrolle vor Ort.</span></div>
+  </div>${ed ? foot('Speichern') : '<div class="sheet-f"><button type="button" class="btn primary" data-action="close">Schließen</button></div>'}</form>`);
+}
+function thSheet(id) {
+  const t = id ? thema(id) : { id: '', name: '', short: '', turnus: 12, alle: false, abt: [], merk: [], form: 'online', cards: [], quiz: [], color: 't1' };
+  const cardsTxt = t.cards.map(c => `${c.t}\n${c.x}`).join('\n\n');
+  const quizTxt = t.quiz.map(q => [q.q].concat(q.a.map((a, i) => (i === q.r ? '* ' : '- ') + a)).join('\n')).join('\n\n');
+  const ro = !isSifa();
+  openSheet(`${sheetH(id ? esc(t.name) : 'Neues Thema')}<form id="thForm" data-id="${t.id}" novalidate><div class="sheet-b">
+    <div class="grid2"><div class="field"><label for="th-n">Name</label><input id="th-n" value="${esc(t.name)}"${ro ? ' disabled' : ''}></div><div class="field"><label for="th-s">Kurzname</label><input id="th-s" value="${esc(t.short)}" maxlength="16"${ro ? ' disabled' : ''}></div></div>
+    <div class="grid2"><div class="field"><label for="th-t">Turnus</label><select id="th-t"${ro ? ' disabled' : ''}>${opts([[0, 'einmalig'], [6, 'alle 6 Monate'], [12, 'alle 12 Monate'], [24, 'alle 24 Monate'], [36, 'alle 36 Monate']], t.turnus)}</select></div><div class="field"><label for="th-f">Form</label><select id="th-f"${ro ? ' disabled' : ''}>${opts([['online', 'Online am Handy'], ['praesenz', 'Präsenz']], t.form)}</select></div></div>
+    <div class="field"><span class="lbl">Zielgruppe</span><div class="checks"><label><input type="checkbox" id="th-all"${t.alle ? ' checked' : ''}${ro ? ' disabled' : ''}> Alle</label></div>${checks('th-abt', ABT, t.abt)}${checks('th-merk', MERK, t.merk)}</div>
+    <div class="field"><label for="th-c">Inhalte</label><textarea id="th-c" rows="7"${ro ? ' disabled' : ''}>${esc(cardsTxt)}</textarea><span class="help">Je Karte: erste Zeile Titel, darunter Text. Karten mit Leerzeile trennen.</span></div>
+    <div class="field"><label for="th-q">Quizfragen</label><textarea id="th-q" rows="7"${ro ? ' disabled' : ''}>${esc(quizTxt)}</textarea><span class="help">Frage, dann Antworten. Richtige Antwort mit *, falsche mit -. Fragen mit Leerzeile trennen.</span></div>
+  </div><div class="sheet-f">${id ? `<button type="button" class="btn" data-action="lern-preview" data-tid="${t.id}" style="margin-right:auto">${ic('play', 's')} Vorschau</button>` : ''}<button type="button" class="btn" data-action="close">${ro ? 'Schließen' : 'Abbrechen'}</button>${ro ? '' : '<button type="submit" class="btn primary">Speichern</button>'}</div></form>`, true);
+}
+function pSheet(id) {
+  const p = id ? person(id) : { name: '', abt: ABT[0], merk: [], eintritt: TODAY, rolle: 'Mitarbeitende', email: '' };
+  openSheet(`${sheetH(id ? esc(p.name) : 'Neue Person')}<form id="pForm" data-id="${id || ''}" novalidate><div class="sheet-b">
+    <div class="grid2"><div class="field"><label for="pf-n">Name</label><input id="pf-n" value="${esc(p.name)}"></div><div class="field"><label for="pf-e">E-Mail</label><input id="pf-e" type="email" value="${esc(p.email)}"></div></div>
+    <div class="grid2"><div class="field"><label for="pf-a">Abteilung</label><select id="pf-a">${opts(ABT, p.abt)}</select></div><div class="field"><label for="pf-r">Rolle</label><select id="pf-r">${opts(ROLLEN, p.rolle)}</select></div><div class="field"><label for="pf-d">Eintritt</label><input id="pf-d" type="date" value="${p.eintritt}"></div></div>
+    <div class="field"><span class="lbl">Merkmale</span>${checks('pf-m', MERK, p.merk)}<span class="help">Merkmale steuern, welche Unterweisungen nötig sind.</span></div>
+    <p class="hint" id="pf-err" style="color:var(--crit)" hidden></p>
+  </div>${foot(id ? 'Speichern' : 'Anlegen')}</form>`);
+}
+function moreSheet() {
+  const items = canManage() ? [['termine', 'Termine', 'cal', 'var(--n-aufg)'], ['mappe', 'Behördenmappe', 'shield', 'var(--good)'], ['themen', 'Themen', 'book', 'var(--n-md)'], ['leute', 'Mitarbeitende', 'users', 'var(--n-md)']] : [];
+  openSheet(`${sheetH('Mehr')}<div class="sheet-b"><div class="more-list">${items.map(([k, l, i, c]) => `<button class="nav-i" data-action="go" data-p="${k}"><span class="ni" style="--ni:${c}">${ic(i)}</span><span class="lbl">${l}</span></button>`).join('')}</div>
+    <div class="field"><label for="userSel2">Ansicht als (Demo)</label><select id="userSel2" data-role="user">${userOpts()}</select><span class="help">Sicherheitsfachkraft, Abteilungsleitung oder Mitarbeitende ausprobieren.</span></div>
+    <button class="linkbtn" data-action="reset">Demo zurücksetzen</button></div>`);
+}
+function mailPerson(p) {
+  const o = myOpen(p);
+  const body = `Hallo ${p.name.split(' ')[0]},\n\nbitte denke an folgende Unterweisungen:\n${o.map(x => `- ${x.t.name}: ${statusTxt(x.st)}${x.t.form === 'online' ? ' (online am Handy, ca. 5 Minuten)' : ''}`).join('\n') || '- aktuell nichts offen'}\n\nDanke und viele Grüße\n${me().name}`;
+  const a = document.createElement('a'); a.href = `mailto:${p.email}?subject=${encodeURIComponent('Unterweisungen fällig')}&body=${encodeURIComponent(body)}`; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- Export: Excel und PDF ---------- */
+let DL = null;
+async function saveFile(filename, data) {
+  if (DL) {
+    try { await DL.save({ filename, data }); toast('Gespeichert'); }
+    catch (e) { if (e && e.code === 'declined') return; toast(e && e.code === 'rate_limited' ? 'Bitte kurz warten und erneut versuchen.' : 'Download nicht möglich.'); }
+    return;
+  }
+  try {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  } catch (e) { toast('Download nicht möglich.'); }
+}
+function xlsxBlob(sheetName, aoa) {
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = aoa[0].map((h, i) => ({ wch: Math.min(42, Math.max(10, ...aoa.map(r => String(r[i] ?? '').length + 2))) }));
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  return new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })]);
+}
+const noXL = () => { if (typeof XLSX === 'undefined') { toast('Excel-Export ist gerade nicht verfügbar.'); return true; } return false; };
+function xlMatrix() {
+  if (noXL()) return;
+  const pp = scopePeople();
+  const aoa = [['Name', 'Abteilung', 'Merkmale'].concat(S.themen.map(t => t.name))].concat(pp.map(p => [p.name, p.abt, p.merk.join(', ')].concat(S.themen.map(t => { const st = statusOf(p, t); return st.s === 'na' ? '' : st.s === 'nie' ? 'nie' : `${STL[st.s]} (${fmt(st.n.datum)})`; }))));
+  saveFile(`Unterweisungsmatrix_${TODAY}.xlsx`, xlsxBlob('Matrix', aoa));
+}
+function xlNachweise() {
+  if (noXL()) return;
+  const rows = S.nachweise.slice().sort((a, b) => b.datum.localeCompare(a.datum)).map(n => { const p = person(n.pid), t = thema(n.tid); return [fmt(n.datum), t ? t.name : n.tid, p ? p.name : n.pid, p ? p.abt : '', n.form === 'online' ? 'Online mit Quiz' : 'Präsenz', n.by, n.sig ? 'ja' : 'nein', t && t.turnus ? fmt(addMonths(n.datum, t.turnus)) : 'unbegrenzt']; });
+  saveFile(`Nachweise_${TODAY}.xlsx`, xlsxBlob('Nachweise', [['Datum', 'Thema', 'Person', 'Abteilung', 'Form', 'Unterwiesen durch', 'Unterschrift', 'Gültig bis']].concat(rows)));
+}
+function xlMassn() {
+  if (noXL()) return;
+  const rows = S.massn.map(m => { const a = S.audits.find(x => x.id === m.aid); return [m.titel, m.risiko, m.owner, fmt(m.due), mLabel(m.status), m.doneAt ? fmt(m.doneAt) : '', a ? `${a.titel}, ${a.bereich}` : '', a ? fmt(a.datum) : '']; });
+  saveFile(`Massnahmen_${TODAY}.xlsx`, xlsxBlob('Maßnahmen', [['Maßnahme', 'Risiko', 'Verantwortlich', 'Termin', 'Status', 'Erledigt am', 'Audit', 'Audit-Datum']].concat(rows)));
+}
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function needPdf() {
+  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('assets/jspdf.umd.min.js');
+  return window.jspdf.jsPDF;
+}
+const pdfTxt = s => String(s ?? '').replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/[→]/g, '->').replace(/[•✕]/g, '-').replace(/ /g, ' ').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');
+const RGB = { ink: [23, 24, 28], gray: [95, 97, 107], line: [222, 225, 232], acc: [110, 74, 242], ok: [31, 138, 85], soon: [244, 178, 63], over: [217, 54, 68], nie: [150, 153, 165], soft: [244, 245, 248] };
+function pdfKit(doc) {
+  const K = { y: 16, M: 16 };
+  K.W = () => doc.internal.pageSize.getWidth(); K.H = () => doc.internal.pageSize.getHeight(); K.CW = () => K.W() - 2 * K.M;
+  K.font = (sz, st, c) => { doc.setFont('helvetica', st || 'normal'); doc.setFontSize(sz); doc.setTextColor(...(c || RGB.ink)); };
+  K.need = h => { if (K.y + h > K.H() - 16) { doc.addPage('a4', 'portrait'); K.y = 18; return true; } return false; };
+  K.page = (orient) => { doc.addPage('a4', orient || 'portrait'); K.y = 18; };
+  K.h1 = t => { K.need(16); K.font(15, 'bold'); doc.text(pdfTxt(t), K.M, K.y); K.y += 3; doc.setDrawColor(...RGB.acc); doc.setLineWidth(.7); doc.line(K.M, K.y, K.M + 30, K.y); K.y += 7; };
+  K.h2 = t => { K.need(12); K.font(11, 'bold'); doc.text(pdfTxt(t), K.M, K.y); K.y += 5.5; };
+  K.p = (t, sz, c) => { K.font(sz || 9.5, 'normal', c); doc.splitTextToSize(pdfTxt(t), K.CW()).forEach(l => { K.need(5); doc.text(l, K.M, K.y); K.y += (sz || 9.5) * .43; }); K.y += 1.5; };
+  K.table = (cols, rows, opt) => {
+    opt = opt || {}; const rh = opt.rh || 0;
+    const head = () => { doc.setFillColor(...RGB.soft); doc.rect(K.M, K.y - 4.2, K.CW(), 6.6, 'F'); let x = K.M + 2; K.font(7.5, 'bold', RGB.gray); cols.forEach(([w, l]) => { doc.text(pdfTxt(l).toUpperCase(), x, K.y); x += w; }); K.y += 4.8; };
+    head();
+    rows.forEach(r => {
+      const cells = r.map((c, j) => (c && c.img) ? c : doc.splitTextToSize(pdfTxt(c), cols[j][0] - 3));
+      const h = Math.max(rh, ...cells.map(c => c.img ? 0 : c.length * 3.9)) + 2.6;
+      if (K.y + h > K.H() - 16) { doc.addPage('a4', opt.orient || 'portrait'); K.y = 18; head(); }
+      let x = K.M + 2; K.font(8.5, 'normal');
+      cells.forEach((c, j) => { if (c.img) { try { doc.addImage(c.img, 'PNG', x, K.y - 3.4, Math.min(cols[j][0] - 4, 34), Math.min(rh - 1, 10)); } catch (e) {} } else if (c.dot) {} else doc.text(c, x, K.y); x += cols[j][0]; });
+      doc.setDrawColor(...RGB.line); doc.setLineWidth(.2); doc.line(K.M, K.y + h - 3.6, K.M + K.CW(), K.y + h - 3.6);
+      K.y += h;
+    });
+    K.y += 3;
+  };
+  return K;
+}
+function footers(doc, left) {
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...RGB.gray); doc.text(pdfTxt(left), 16, H - 8); doc.text(`Seite ${i} von ${n}`, W - 16, H - 8, { align: 'right' }); }
+}
+async function pdfMappe() {
+  const J = await needPdf(), doc = new J({ unit: 'mm', format: 'a4' }), K = pdfKit(doc), pr = period(), st = stats(), rd = readiness(), ck = checklist();
+  const sifa = S.people.find(p => p.rolle === 'Sicherheitsfachkraft');
+  // Deckblatt
+  doc.setFillColor(...RGB.acc); doc.rect(0, 0, K.W(), 70, 'F');
+  K.font(11, 'bold', [255, 255, 255]); doc.text(ORG, K.M, 22);
+  K.font(26, 'bold', [255, 255, 255]); doc.text('Nachweis Arbeitsschutz', K.M, 44);
+  K.font(12, 'normal', [255, 255, 255]); doc.text(pdfTxt(`Unterlagen für: ${MZ[S.mz]}`), K.M, 56);
+  K.y = 88;
+  const meta = [['Zeitraum', `${pr.l} (${fmt(pr.von)} bis ${fmt(pr.bis)})`], ['Stand', fmt(TODAY)], ['Verantwortlich', sifa ? `${sifa.name}, Sicherheitsfachkraft` : '-'], ['Beschäftigte', String(S.people.length)]];
+  meta.forEach(([k, v]) => { K.font(8, 'bold', RGB.gray); doc.text(k.toUpperCase(), K.M, K.y); K.font(11, 'normal'); doc.text(pdfTxt(v), K.M + 42, K.y); K.y += 8; });
+  K.y += 6;
+  const tiles = [['Audit-Bereitschaft', `${rd.val} %`], ['Unterweisungen gültig', `${st.quote} %`], ['Lücken', String(st.over + st.nie)], ['Maßnahmen offen', String(openM().length)]];
+  const tw = (K.CW() - 9) / 4;
+  tiles.forEach(([k, v], i) => { const x = K.M + i * (tw + 3); doc.setFillColor(...RGB.soft); doc.roundedRect(x, K.y, tw, 24, 2, 2, 'F'); K.font(7.5, 'bold', RGB.gray); doc.text(pdfTxt(k), x + 4, K.y + 7); K.font(17, 'bold'); doc.text(v, x + 4, K.y + 18); });
+  K.y += 34;
+  K.h2('Inhalt'); ['Prüfliste', 'Unterweisungsmatrix', 'Nachweise im Zeitraum', 'Teilnehmerlisten mit Unterschrift', 'Audit- und Begehungsberichte', 'Maßnahmenliste'].forEach((t, i) => K.p(`${i + 1}. ${t}`, 10));
+  K.y += 4; K.p('Diese Unterlage wurde aus den gepflegten Daten erzeugt. Unterschriften der Online-Unterweisungen wurden am Gerät der jeweiligen Person geleistet, nach bestandenem Verständnistest.', 8.5, RGB.gray);
+  // 1 Prüfliste
+  K.page(); K.h1('1. Prüfliste');
+  ck.forEach(c => { K.need(14); const col = c.k === 'ok' ? RGB.ok : c.k === 'warn' ? RGB.soon : RGB.over; doc.setFillColor(...col); doc.circle(K.M + 3, K.y - 1.3, 2.6, 'F'); K.font(10, 'bold'); doc.text(pdfTxt(c.t), K.M + 9, K.y); K.y += 4.6; K.font(8.5, 'normal', RGB.gray); doc.text(pdfTxt(c.d), K.M + 9, K.y); K.y += 7; });
+  // 2 Matrix (quer)
+  K.page('landscape'); K.h1('2. Unterweisungsmatrix');
+  const tt = S.themen, colW = Math.min(20, (K.CW() - 58) / tt.length), x0 = K.M + 58;
+  const mHead = () => { K.font(7, 'bold', RGB.gray); tt.forEach((t, i) => { doc.text(pdfTxt(t.short), x0 + i * colW + colW / 2 + 1, K.y + 19, { angle: 60 }); }); K.y += 24; };
+  mHead();
+  S.people.forEach(p => {
+    if (K.y + 5.3 > K.H() - 16) { doc.addPage('a4', 'landscape'); K.y = 18; mHead(); }
+    K.font(8.5, 'normal'); doc.text(pdfTxt(p.name), K.M, K.y); K.font(7, 'normal', RGB.gray); doc.text(pdfTxt(p.abt), K.M + 36, K.y);
+    tt.forEach((t, i) => { const s = statusOf(p, t).s; if (s === 'na') return; const x = x0 + i * colW + colW / 2 - 3.5; if (s === 'nie') { doc.setDrawColor(...RGB.nie); doc.setLineWidth(.5); doc.roundedRect(x, K.y - 3.4, 7, 4.2, 1, 1, 'S'); } else { doc.setFillColor(...RGB[s]); doc.roundedRect(x, K.y - 3.4, 7, 4.2, 1, 1, 'F'); } });
+    doc.setDrawColor(...RGB.line); doc.setLineWidth(.15); doc.line(K.M, K.y + 1.4, K.W() - K.M, K.y + 1.4); K.y += 5.3;
+  });
+  K.y += 4; [['ok', 'gültig'], ['soon', 'in 30 Tagen fällig'], ['over', 'überfällig'], ['nie', 'nie unterwiesen']].forEach(([k, l], i) => { const x = K.M + i * 46; if (k === 'nie') { doc.setDrawColor(...RGB.nie); doc.roundedRect(x, K.y - 3.6, 7, 4.6, 1, 1, 'S'); } else { doc.setFillColor(...RGB[k]); doc.roundedRect(x, K.y - 3.6, 7, 4.6, 1, 1, 'F'); } K.font(8, 'normal', RGB.gray); doc.text(pdfTxt(l), x + 9, K.y); });
+  // 3 Nachweise
+  K.page(); K.h1('3. Nachweise im Zeitraum');
+  const ns = S.nachweise.filter(n => n.datum >= pr.von && n.datum <= pr.bis).sort((a, b) => b.datum.localeCompare(a.datum));
+  K.p(`${ns.length} Nachweise, davon ${ns.filter(n => n.form === 'online').length} online mit Verständnistest.`, 9, RGB.gray);
+  K.table([[22, 'Datum'], [58, 'Thema'], [44, 'Person'], [30, 'Form'], [24, 'Unterschrift']], ns.map(n => { const p = person(n.pid), t = thema(n.tid); return [fmt(n.datum), t ? t.name : '', p ? p.name : '', n.form === 'online' ? 'Online + Quiz' : 'Präsenz', n.sig ? 'ja' : 'nein']; }));
+  // 4 Teilnehmerlisten
+  K.page(); K.h1('4. Teilnehmerlisten');
+  const ts = S.termine.filter(x => x.status === 'abgeschlossen' && x.datum >= pr.von && x.datum <= pr.bis).sort((a, b) => b.datum.localeCompare(a.datum));
+  ts.forEach(x => {
+    const t = thema(x.tid); K.need(30);
+    K.h2(`${t.name} · ${fmt(x.datum)} ${x.zeit}`); K.p(`Ort: ${x.ort} · Unterwiesen durch: ${x.leiter} · Inhalt: ${t.cards.map(c => c.t).join(', ')}`, 8.5, RGB.gray);
+    K.table([[60, 'Name'], [44, 'Abteilung'], [74, 'Unterschrift']], Object.keys(x.anw).map(id => { const p = person(id); const img = p ? sigData(x.anw[id], p.name) : null; return [p ? p.name : id, p ? p.abt : '', img ? { img } : (x.anw[id] === true ? 'anwesend, ohne Unterschrift' : '')]; }), { rh: 10 });
+  });
+  if (!ts.length) K.p('Keine Präsenz-Termine im Zeitraum.');
+  // 5 Audits
+  K.page(); K.h1('5. Audit- und Begehungsberichte');
+  const as = S.audits.filter(a => a.status !== 'geplant' && a.datum >= pr.von && a.datum <= pr.bis).sort((a, b) => b.datum.localeCompare(a.datum));
+  for (const a of as) {
+    K.need(26); K.h2(`${a.titel}, ${a.bereich}`);
+    const sc = auditScore(a); K.p(`${fmt(a.datum)} · ${a.auditor} · ${a.status === 'abgeschlossen' ? 'abgeschlossen' : 'läuft'} · ${auditDone(a)}/${a.punkte.length} Punkte geprüft${sc !== null ? ` · Ergebnis ${sc} %` : ''}`, 8.5, RGB.gray);
+    const nio = a.punkte.map((x, i) => ({ x, i })).filter(o => o.x.r === 'nio');
+    if (!nio.length) K.p('Keine Mängel festgestellt.');
+    for (const o of nio) {
+      const m = S.massn.find(z => z.aid === a.id && z.pi === o.i);
+      const hasImg = !!o.x.foto; K.need(hasImg ? 34 : 16);
+      const y0 = K.y; K.font(9.5, 'bold'); doc.text(pdfTxt(`${o.i + 1}. ${o.x.t}`), K.M, K.y); K.y += 4.4;
+      const tx = hasImg ? K.CW() - 48 : K.CW();
+      K.font(8.5, 'normal'); doc.splitTextToSize(pdfTxt(o.x.note || 'ohne Beschreibung'), tx).forEach(l => { doc.text(l, K.M, K.y); K.y += 3.8; });
+      if (m) { K.font(8.5, 'normal', RGB.gray); doc.splitTextToSize(pdfTxt(`Maßnahme: ${m.titel} · ${m.owner} · bis ${fmt(m.due)} · ${mLabel(m.status)} · Risiko ${m.risiko}`), tx).forEach(l => { doc.text(l, K.M, K.y); K.y += 3.8; }); }
+      if (hasImg) { try { doc.addImage(o.x.foto, 'JPEG', K.M + K.CW() - 44, y0 - 3, 44, 33); } catch (e) {} K.y = Math.max(K.y, y0 + 32); }
+      K.y += 3;
+    }
+    K.y += 3;
+  }
+  if (!as.length) K.p('Keine Audits im Zeitraum.');
+  // 6 Maßnahmen
+  K.page(); K.h1('6. Maßnahmenliste');
+  K.table([[62, 'Maßnahme'], [16, 'Risiko'], [36, 'Verantwortlich'], [22, 'Termin'], [42, 'Status']], S.massn.slice().sort((a, b) => a.due.localeCompare(b.due)).map(m => [m.titel, m.risiko, m.owner, fmt(m.due), mLabel(m.status) + (!['erledigt', 'wirksam'].includes(m.status) && m.due < TODAY ? ' (überfällig)' : '')]));
+  footers(doc, `${ORG} · Nachweis Arbeitsschutz · ${pr.l} · Stand ${fmt(TODAY)}`);
+  return doc.output('blob');
+}
+async function pdfTermin(x) {
+  const J = await needPdf(), doc = new J({ unit: 'mm', format: 'a4' }), K = pdfKit(doc), t = thema(x.tid);
+  K.font(10, 'bold', RGB.gray); doc.text(ORG, K.M, K.y); K.y += 9; K.h1('Teilnehmerliste Unterweisung');
+  [['Thema', t.name], ['Datum', `${fmt(x.datum)}, ${x.zeit} Uhr`], ['Ort', x.ort], ['Unterwiesen durch', x.leiter], ['Status', x.status === 'abgeschlossen' ? 'durchgeführt' : 'geplant']].forEach(([k, v]) => { K.font(8, 'bold', RGB.gray); doc.text(k.toUpperCase(), K.M, K.y); K.font(10, 'normal'); doc.text(pdfTxt(v), K.M + 40, K.y); K.y += 6.5; });
+  K.y += 2; K.h2('Inhalte'); t.cards.forEach(c => K.p(`${c.t}: ${c.x}`, 9));
+  K.y += 2; K.h2('Teilnehmende');
+  K.table([[60, 'Name'], [44, 'Abteilung'], [74, 'Unterschrift']], x.teil.map(id => { const p = person(id), a = x.anw[id]; const img = a && a !== true ? sigData(a, p.name) : null; return [p.name, p.abt, img ? { img } : a === true ? 'anwesend' : '']; }), { rh: 12 });
+  footers(doc, `${ORG} · Teilnehmerliste ${t.short} ${fmt(x.datum)}`);
+  return doc.output('blob');
+}
+async function pdfPerson(p) {
+  const J = await needPdf(), doc = new J({ unit: 'mm', format: 'a4' }), K = pdfKit(doc);
+  K.font(10, 'bold', RGB.gray); doc.text(ORG, K.M, K.y); K.y += 9; K.h1('Unterweisungsnachweis');
+  [['Name', p.name], ['Abteilung', p.abt], ['Merkmale', p.merk.join(', ') || '-'], ['Eintritt', fmt(p.eintritt)], ['Stand', fmt(TODAY)]].forEach(([k, v]) => { K.font(8, 'bold', RGB.gray); doc.text(k.toUpperCase(), K.M, K.y); K.font(10, 'normal'); doc.text(pdfTxt(v), K.M + 40, K.y); K.y += 6.5; });
+  K.y += 3;
+  const rows = S.themen.map(t => ({ t, st: statusOf(p, t) })).filter(x => x.st.s !== 'na');
+  K.table([[52, 'Thema'], [22, 'Zuletzt'], [26, 'Form'], [24, 'Gültig bis'], [22, 'Status'], [32, 'Unterschrift']], rows.map(x => { const img = x.st.n ? sigData(x.st.n.sig, p.name) : null; return [x.t.name, x.st.n ? fmt(x.st.n.datum) : '-', x.st.n ? (x.st.n.form === 'online' ? 'Online + Quiz' : 'Präsenz') : '-', x.st.until ? fmt(x.st.until) : x.st.n ? 'unbegrenzt' : '-', STL[x.st.s], img ? { img } : '']; }), { rh: 10 });
+  footers(doc, `${ORG} · Unterweisungsnachweis ${p.name}`);
+  return doc.output('blob');
+}
+async function runPdf(fn, name) { toast('PDF wird erstellt …'); try { const b = await fn(); await saveFile(name, b); return b; } catch (e) { console.warn(e); toast('PDF konnte nicht erstellt werden.'); return null; } }
+
+/* ---------- Rendern ---------- */
+function renderAll() {
+  const p = S.route.p;
+  if (!canManage() && !['start', 'massn', 'lern'].includes(p)) S.route = { p: 'start', id: null };
+  renderFrame();
+  const R = { start: pageStart, matrix: pageMatrix, lern: pageLern, termine: pageTermine, termin: pageTermin, audits: pageAudits, audit: pageAudit, massn: pageMassn, mappe: pageMappe, themen: pageThemen, leute: pageLeute, person: pagePerson };
+  $('center').innerHTML = (R[S.route.p] || pageStart)();
+  mountLernPad();
+}
+function go(p, id) {
+  if (p !== 'lern') L = null;
+  S.route = { p, id: id || null }; closeSheet(); $('bellPanel').hidden = true; save(); renderAll(); try { window.scrollTo(0, 0); } catch (e) {}
+}
+let toastT;
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2800); }
+function commit(msg) { save(); renderAll(); if (msg) toast(msg); }
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-action]'); if (!b) return;
+  const d = b.dataset, a = d.action;
+  const audit = () => S.audits.find(x => x.id === S.route.id);
+  switch (a) {
+    case 'go': go(d.p); break;
+    case 'more': moreSheet(); break;
+    case 'close': closeSheet(); break;
+    case 'bell': { const bp = $('bellPanel'); bp.hidden = !bp.hidden; if (!bp.hidden) { renderBell(); } else { S.notes.forEach(n => { if (n.to === me().name) n.read = true; }); commit(); } break; }
+    case 'read-all': S.notes.forEach(n => { if (n.to === me().name) n.read = true; }); save(); renderBell(); renderFrame(); break;
+    case 'reset': closeSheet(); S = seed(); L = null; save(); renderAll(); toast('Demo zurückgesetzt'); break;
+    case 'mx-gaps': S.mf = { abt: '', tid: '', gaps: true, q: '' }; go('matrix'); break;
+    case 'mx-topic': S.mf = { abt: '', tid: d.tid, gaps: d.gaps === '1', q: '' }; go('matrix'); break;
+    case 'mx-gaps-toggle': S.mf.gaps = !S.mf.gaps; commit(); break;
+    case 'cell': cellSheet(d.p, d.t); break;
+    case 'n-add': nAddSheet(d.p, d.t); break;
+    case 'z-one': zNewSheet(d.p, d.t); break;
+    case 'remind': { const p = person(d.id); commit(remindPerson(p) ? `${p.name} erinnert` : `${p.name} hat nichts offen`); break; }
+    case 'remind-all': { const n = scopePeople().filter(p => remindPerson(p)).length; commit(n ? `${n} Personen erinnert` : 'Niemand hat etwas offen'); break; }
+    case 'mail-person': mailPerson(person(d.id)); break;
+    case 'lern': lernStart(d.tid); break;
+    case 'lern-preview': closeSheet(); lernStart(d.tid); break;
+    case 'lern-exit': L = null; go('start'); break;
+    case 'lern-prev': if (L.i > 0) { L.i--; renderAll(); } break;
+    case 'lern-next': { const t = thema(L.tid); if (L.i < t.cards.length - 1) L.i++; else { L.step = 'quiz'; L.qi = 0; L.sel = null; L.msg = ''; } renderAll(); break; }
+    case 'q-pick': if (L.msg === 'good') break; L.sel = +d.i; L.msg = ''; renderAll(); break;
+    case 'q-check': {
+      const t = thema(L.tid), q = t.quiz[L.qi];
+      if (L.msg === 'good') { if (L.qi < t.quiz.length - 1) { L.qi++; L.sel = null; L.msg = ''; } else { L.step = 'sign'; L.signed = false; } renderAll(); break; }
+      if (L.sel === q.r) L.msg = 'good'; else { L.msg = 'bad'; L.wrong++; }
+      renderAll(); break;
+    }
+    case 'sig-clear': if (PAD) PAD.clear(); break;
+    case 'lern-sign': if (L && L.signed) lernFinish(); break;
+    case 't-new': tNewSheet(); break;
+    case 't-edit': tNewSheet(d.id); break;
+    case 'termin': go('termin', d.id); break;
+    case 't-sign': signSheet(S.route.id, d.p); break;
+    case 'ssig-clear': if (SPAD) SPAD.clear(); break;
+    case 'ssig-ok': { const x = S.termine.find(y => y.id === d.tid); x.anw[d.p] = (SPAD && SPAD.data()) || 'auto'; closeSheet(); commit('Unterschrieben'); break; }
+    case 't-mark': { const x = S.termine.find(y => y.id === S.route.id); x.anw[d.p] = true; commit(); break; }
+    case 't-unmark': { const x = S.termine.find(y => y.id === S.route.id); delete x.anw[d.p]; commit(); break; }
+    case 't-close': {
+      const x = S.termine.find(y => y.id === d.id), t = thema(x.tid);
+      Object.entries(x.anw).forEach(([pid, sig]) => S.nachweise.push({ id: uid('n'), tid: x.tid, pid, datum: x.datum > TODAY ? TODAY : x.datum, at: stamp(), form: 'praesenz', by: x.leiter, sig: sig === true ? null : sig, terminId: x.id }));
+      const fehlt = x.teil.filter(id => !x.anw[id]);
+      fehlt.forEach(id => notify(person(id).name, `Sie haben „${t.name}“ verpasst. Ein Ersatztermin folgt.`));
+      x.teil = x.teil.filter(id => x.anw[id]); x.status = 'abgeschlossen'; x.datum = x.datum > TODAY ? TODAY : x.datum;
+      commit(`${Object.keys(x.anw).length} Nachweise erstellt${fehlt.length ? `, ${fehlt.length} gefehlt` : ''}`); break;
+    }
+    case 'z-new': zNewSheet(); break;
+    case 'a-new': aNewSheet(); break;
+    case 'audit': go('audit', d.id); break;
+    case 'a-begin': { const x = audit(); x.status = 'laufend'; x.datum = TODAY; commit('Begehung gestartet'); break; }
+    case 'pp-set': { const x = audit(), pt = x.punkte[+d.i]; pt.r = pt.r === d.r ? '' : d.r; if (pt.r === 'nio' && !pt.due) { pt.due = rel(21); pt.owner = pt.owner || ''; } save(); renderAll(); const el = $('pp' + d.i); if (el && pt.r === 'nio') { try { el.scrollIntoView({ block: 'nearest' }); } catch (er) {} } break; }
+    case 'pp-foto-del': { const x = audit(); x.punkte[+d.i].foto = ''; commit(); break; }
+    case 'a-close': {
+      const x = audit(); let n = 0;
+      x.punkte.forEach((pt, i) => { if (pt.r !== 'nio' || S.massn.some(m => m.aid === x.id && m.pi === i)) return; S.massn.push({ id: uid('m'), aid: x.id, pi: i, titel: pt.mtext || `Mangel beheben: ${pt.t}`, risiko: pt.risiko || 'mittel', owner: pt.owner || x.auditor, due: pt.due || rel(21), status: 'offen', created: TODAY, doneAt: null }); notify(pt.owner || x.auditor, `Neue Maßnahme aus ${x.titel}: ${pt.mtext || pt.t}`); n++; });
+      x.status = 'abgeschlossen'; commit(`Abgeschlossen, ${n} ${n === 1 ? 'Maßnahme' : 'Maßnahmen'} angelegt`); break;
+    }
+    case 'm-open': mSheet(d.id); break;
+    case 'm-new': mSheet(); break;
+    case 'th-edit': thSheet(d.id); break;
+    case 'th-new': thSheet(); break;
+    case 'person': go('person', d.id); break;
+    case 'p-new': pSheet(); break;
+    case 'p-edit': pSheet(d.id); break;
+    case 'xl-matrix': xlMatrix(); break;
+    case 'xl-nachweise': xlNachweise(); break;
+    case 'xl-massn': xlMassn(); break;
+    case 'pdf-mappe': runPdf(pdfMappe, `Behoerdenmappe_Arbeitsschutz_${TODAY}.pdf`); break;
+    case 'pdf-termin': { const x = S.termine.find(y => y.id === d.id); runPdf(() => pdfTermin(x), `Teilnehmerliste_${thema(x.tid).short}_${x.datum}.pdf`); break; }
+    case 'pdf-person': { const p = person(d.id); runPdf(() => pdfPerson(p), `Unterweisungsnachweis_${p.name.replace(/\s+/g, '_')}.pdf`); break; }
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target, d = t.dataset;
+  if (d.role === 'user') { S.user = t.value; L = null; S.route = { p: 'start', id: null }; S.mf = { abt: '', tid: '', gaps: false, q: '' }; closeSheet(); $('bellPanel').hidden = true; commit(`Ansicht: ${me().name}, ${me().rolle}`); return; }
+  if (t.id === 'mxAbt') { S.mf.abt = t.value; commit(); return; }
+  if (t.id === 'mxT') { S.mf.tid = t.value; commit(); return; }
+  if (t.id === 'mzSel') { S.mz = t.value; commit(); return; }
+  if (t.id === 'mpSel') { S.mp = t.value; commit(); return; }
+  if (t.id === 'tf-t') { renderTeil(t.value, null); return; }
+  if (t.id === 'zf-t') { renderZ(t.value, null); return; }
+  if (t.name === 'teil') { const n = checked('teil').length; $('tf-n').textContent = `(${n} ausgewählt)`; return; }
+  if (d.pp) {
+    const x = S.audits.find(y => y.id === S.route.id); if (!x) return; const pt = x.punkte[+d.i];
+    if (d.pp === 'foto') { const f = t.files && t.files[0]; t.value = ''; if (f) shrinkPhoto(f).then(url => { if (!url) { toast('Foto konnte nicht gelesen werden.'); return; } pt.foto = url; if (!save()) { pt.foto = ''; } renderAll(); }); return; }
+    pt[d.pp] = t.value; save(); return;
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target, d = t.dataset;
+  if (t.id === 'mxq') { S.mf.q = t.value; save(); const pos = t.selectionStart; renderAll(); const n = $('mxq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (er) {} } return; }
+  if (d.pp && d.pp !== 'foto') { const x = S.audits.find(y => y.id === S.route.id); if (x) { x.punkte[+d.i][d.pp] = t.value; save(); } }
+});
+function shrinkPhoto(file) {
+  return new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        try {
+          const k = Math.min(1, 900 / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
+          c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+          const g = c.getContext('2d'); g.drawImage(im, 0, 0, c.width, c.height);
+          let q = .72, url = c.toDataURL('image/jpeg', q);
+          while (url.length > 200000 * 1.37 && q > .3) { q -= .12; url = c.toDataURL('image/jpeg', q); }
+          res(url);
+        } catch (er) { res(null); }
+      };
+      im.onerror = () => res(null); im.src = String(r.result);
+    };
+    r.onerror = () => res(null); r.readAsDataURL(file);
+  });
+}
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target, id = f.id, v = x => ($(x) ? $(x).value.trim() : '');
+  if (id === 'nForm') { S.nachweise.push({ id: uid('n'), tid: f.dataset.t, pid: f.dataset.p, datum: v('na-d') || TODAY, at: stamp(), form: thema(f.dataset.t).form, by: v('na-by') || me().name, sig: null, manual: true }); closeSheet(); commit('Nachweis gespeichert'); }
+  else if (id === 'tForm') {
+    const teil = checked('teil'); if (!teil.length) { toast('Bitte mindestens eine Person auswählen.'); return; }
+    if (f.dataset.id) { const x = S.termine.find(y => y.id === f.dataset.id); Object.assign(x, { datum: v('tf-d') || x.datum, zeit: v('tf-z'), ort: v('tf-o'), leiter: v('tf-l'), teil }); closeSheet(); commit('Gespeichert'); return; }
+    const x = { id: uid('t'), tid: v('tf-t'), datum: v('tf-d') || rel(7), zeit: v('tf-z') || '08:00', ort: v('tf-o') || 'Schulungsraum 1', leiter: v('tf-l'), teil, anw: {}, status: 'geplant' };
+    S.termine.push(x); teil.forEach(pid => notify(person(pid).name, `Termin: ${thema(x.tid).name} am ${fmtD(x.datum)} um ${x.zeit}, ${x.ort}`));
+    S.route = { p: 'termin', id: x.id }; closeSheet(); commit(`Geplant, ${teil.length} Personen eingeladen`);
+  }
+  else if (id === 'zForm') {
+    const tid = v('zf-t'), due = v('zf-d') || rel(14), pp = checked('zp'); if (!pp.length) { toast('Bitte mindestens eine Person auswählen.'); return; }
+    pp.forEach(pid => { S.assigned = S.assigned.filter(a => !(a.pid === pid && a.tid === tid)); S.assigned.push({ id: uid('z'), tid, pid, at: TODAY, due }); notify(person(pid).name, `Neue Unterweisung am Handy: ${thema(tid).name}, bis ${fmt(due)}`); });
+    closeSheet(); commit(`${pp.length} ${pp.length === 1 ? 'Person' : 'Personen'} zugewiesen`);
+  }
+  else if (id === 'aForm') {
+    const vo = S.vorlagen.find(x => x.id === v('af-v'));
+    const x = { id: uid('a'), vorlage: vo.id, titel: vo.name, bereich: v('af-b') || 'Ohne Bereich', datum: v('af-d') || TODAY, auditor: v('af-a'), status: (v('af-d') || TODAY) > TODAY ? 'geplant' : 'laufend', punkte: vo.punkte.map(t => ({ t, r: '', note: '', foto: '', risiko: 'mittel', mtext: '', owner: '', due: '' })) };
+    S.audits.push(x); S.route = { p: 'audit', id: x.id }; closeSheet(); commit(x.status === 'laufend' ? 'Los geht’s: Punkt für Punkt bewerten' : 'Audit geplant');
+  }
+  else if (id === 'mForm') {
+    const st = (document.querySelector('input[name=mst]:checked') || {}).value || 'offen';
+    let m = f.dataset.id ? S.massn.find(x => x.id === f.dataset.id) : null;
+    if (!m) { if (!v('mf-t')) { toast('Bitte die Maßnahme beschreiben.'); return; } m = { id: uid('m'), aid: '', titel: '', created: TODAY, doneAt: null }; S.massn.push(m); }
+    if (canManage()) Object.assign(m, { titel: v('mf-t') || m.titel, risiko: v('mf-r'), owner: v('mf-o'), due: v('mf-d') || m.due || rel(14) });
+    const was = m.status; m.status = st; if (['erledigt', 'wirksam'].includes(st) && !m.doneAt) m.doneAt = TODAY; if (!['erledigt', 'wirksam'].includes(st)) m.doneAt = null;
+    if (was !== st && st === 'erledigt') { const sf = S.people.find(p => p.rolle === 'Sicherheitsfachkraft'); if (sf && sf.name !== me().name) notify(sf.name, `Erledigt, bitte Wirksamkeit prüfen: ${m.titel}`); }
+    closeSheet(); commit('Gespeichert');
+  }
+  else if (id === 'thForm') {
+    const t = f.dataset.id ? thema(f.dataset.id) : { id: 'th' + uid(''), color: 't' + (1 + S.themen.length % 5) };
+    const cards = v('th-c').split(/\n\s*\n/).map(b => b.trim().split('\n')).filter(l => l[0]).map(l => ({ t: l[0].trim(), x: l.slice(1).join(' ').trim() }));
+    const quiz = v('th-q').split(/\n\s*\n/).map(b => b.trim().split('\n').map(s => s.trim()).filter(Boolean)).filter(l => l.length >= 3).map(l => { const ans = l.slice(1); return { q: l[0], a: ans.map(a => a.replace(/^[*-]\s*/, '')), r: Math.max(0, ans.findIndex(a => a.startsWith('*'))) }; });
+    if (!v('th-n')) { toast('Bitte einen Namen eingeben.'); return; }
+    Object.assign(t, { name: v('th-n'), short: v('th-s') || v('th-n').slice(0, 14), turnus: +v('th-t'), form: v('th-f'), alle: $('th-all').checked, abt: checked('th-abt'), merk: checked('th-merk'), cards: cards.length ? cards : [C(v('th-n'), 'Inhalt folgt.')], quiz });
+    if (!f.dataset.id) S.themen.push(t);
+    closeSheet(); commit('Thema gespeichert');
+  }
+  else if (id === 'pForm') {
+    const name = v('pf-n'), err = $('pf-err');
+    if (!name) { err.textContent = 'Bitte einen Namen eingeben.'; err.hidden = false; return; }
+    let p = f.dataset.id ? person(f.dataset.id) : null;
+    if (!p && byName(name)) { err.textContent = 'Den Namen gibt es schon.'; err.hidden = false; return; }
+    const neu = !p;
+    if (!p) { p = { id: 'p' + uid('') }; S.people.push(p); }
+    const oldName = p.name;
+    Object.assign(p, { name, email: v('pf-e'), abt: v('pf-a'), rolle: v('pf-r'), eintritt: v('pf-d') || TODAY, merk: checked('pf-m') });
+    if (oldName && oldName !== name) { S.notes.forEach(n => { if (n.to === oldName) n.to = name; }); S.massn.forEach(m => { if (m.owner === oldName) m.owner = name; }); if (S.user === oldName) S.user = name; }
+    if (neu) { S.assigned.push({ id: uid('z'), tid: 'erst', pid: p.id, at: TODAY, due: p.eintritt }); notify(name, 'Willkommen! Bitte die Erstunterweisung am Handy machen, dauert 5 Minuten.'); }
+    closeSheet(); commit(neu ? `${name} angelegt, Erstunterweisung zugewiesen` : 'Gespeichert');
+  }
+});
+
+document.addEventListener('mousedown', e => { if (e.target && e.target.id === 'overlay') closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('overlay').hidden) closeSheet(); else if (!$('bellPanel').hidden) $('bellPanel').hidden = true; } });
+
+/* ---------- Start ---------- */
+S = load();
+renderAll();
+(async () => { try { DL = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { DL = null; } })();
+
+</script>
+
+</body>
+</html>

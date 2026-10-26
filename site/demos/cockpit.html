@@ -8,9 +8,11 @@
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 300 900; font-display: swap; src: url(shared-files/figtree-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(shared-files/geist-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(shared-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2-variations"); }
+</style>
 <style>
 /* Geschäftsführungs-Cockpit (Demo). Farben wie die Devunox-Apps: data-skin="bunt", data-mode="auto". */
 :root {
@@ -394,10 +396,10 @@ td.bad { background: var(--crit-soft); }
 <div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="shared-files/xlsx.full.min.js"></script>
 <script>
 /* ---------- Grundlagen ---------- */
-const KEY = 'cockpit-demo-v1';
+const KEY = 'cockpit-demo-v2';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
@@ -429,10 +431,10 @@ const SAMPLE_MONTHS = Array.from({ length: 24 }, (_, i) => mAdd(SAMPLE_ANCHOR, i
 
 /* ---------- Beispieldaten (deterministisch) ---------- */
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const CUST = [['Hartmann Antriebstechnik GmbH', 'DE West', 9, 31], ['Brandt Landtechnik AG', 'DE Nord', 8, 36], ['Sommer Hydraulik GmbH', 'DE Süd', 10, 29], ['Lindner Fördertechnik GmbH', 'DE West', 6, 118],
-  ['Krämer Maschinenbau GmbH', 'DE Ost', 5, 41], ['Weiss Agrartechnik GmbH', 'Österreich', 5, 44], ['Alpina Lifttechnik AG', 'Schweiz', 4, 33], ['Novák Strojírny s.r.o.', 'EU', 4, 52],
-  ['Berger Kranbau GmbH', 'DE Süd', 6, 30], ['Fischer Pumpen GmbH', 'DE Nord', 5, 38], ['Haas Baumaschinen GmbH', 'Österreich', 3, 40], ['Meyer Verpackungstechnik GmbH', 'DE West', 4, 29],
-  ['Ostsee Schiffstechnik GmbH', 'DE Nord', 3, 58], ['Schulte Industrieanlagen GmbH', 'DE West', 5, 34], ['Vogel Medizintechnik GmbH', 'DE Süd', 3, 26]].map(([name, region, w, pay]) => ({ name, region, w, pay }));
+const CUST = [['Fiktive GmbH 1', 'DE West', 9, 31], ['Fiktive GmbH 2', 'DE Nord', 8, 36], ['Fiktive GmbH 3', 'DE Süd', 10, 29], ['Fiktive GmbH 4', 'DE West', 6, 118],
+  ['Fiktive GmbH 5', 'DE Ost', 5, 41], ['Fiktive GmbH 6', 'Österreich', 5, 44], ['Fiktive GmbH 7', 'Schweiz', 4, 33], ['Fiktive GmbH 8', 'EU', 4, 52],
+  ['Fiktive GmbH 9', 'DE Süd', 6, 30], ['Fiktive GmbH 10', 'DE Nord', 5, 38], ['Fiktive GmbH 11', 'Österreich', 3, 40], ['Fiktive GmbH 12', 'DE West', 4, 29],
+  ['Fiktive GmbH 13', 'DE Nord', 3, 58], ['Fiktive GmbH 14', 'DE West', 5, 34], ['Fiktive GmbH 15', 'DE Süd', 3, 26]].map(([name, region, w, pay]) => ({ name, region, w, pay }));
 const REP = { 'DE Nord': 'Anna Becker', 'DE West': 'Jonas Hoffmann', 'DE Ost': 'Jonas Hoffmann', 'DE Süd': 'Mert Yılmaz', 'Österreich': 'Mert Yılmaz', 'Schweiz': 'Sabine Krüger', 'EU': 'Sabine Krüger' };
 const PGS = [{ name: 'Hydraulikblöcke', werk: 'Bielefeld', s0: .27, s1: .35, price: 180, marge: .34 }, { name: 'Drehteile', werk: 'Bielefeld', s0: .26, s1: .24, price: 14, marge: .27 },
   { name: 'Baugruppen', werk: 'Gütersloh', s0: .21, s1: .2, price: 650, marge: .22 }, { name: 'Schweißkonstruktionen', werk: 'Gütersloh', s0: .15, s1: .11, price: 420, marge: .18 },
@@ -440,8 +442,8 @@ const PGS = [{ name: 'Hydraulikblöcke', werk: 'Bielefeld', s0: .27, s1: .35, pr
 const LINES = [['Bielefeld', 'BAZ 1'], ['Bielefeld', 'BAZ 2'], ['Bielefeld', 'Drehzentrum'], ['Gütersloh', 'Schweißen'], ['Gütersloh', 'Montage'], ['Gütersloh', 'Lackierung']];
 const STOPS = [['Rüsten', .30], ['Störung mechanisch', .17], ['Materialmangel', .15], ['Werkzeugwechsel', .11], ['Störung elektrisch', .09], ['Personalmangel', .08], ['Qualitätsprüfung', .07], ['Sonstiges', .03]];
 const FEHLER = [['Maßabweichung', .28], ['Oberfläche/Korrosion', .18], ['Montagefehler', .12], ['Grat', .13], ['Materialfehler/Härte', .08], ['Verpackung/Transport', .09], ['Falsche Teile/Menge', .08], ['Dokumentation', .04]];
-const SUPP = [['Stahlhandel Ruhr GmbH', 'Bielefeld', .965, 185000], ['Metallbau Kessler KG', 'Gütersloh', .95, 96000], ['Hydraulik Partner Süd GmbH', 'Bielefeld', .975, 121000], ['Härterei Lippe GmbH', 'Bielefeld', .955, 52000],
-  ['Pulverbeschichtung Nord GmbH', 'Gütersloh', .935, 43000], ['Kunststofftechnik Albers GmbH', 'Gütersloh', .97, 38000], ['Elektro Brandes GmbH', 'Gütersloh', .96, 33000], ['Schrauben Wolff KG', 'Gütersloh', .985, 26000]];
+const SUPP = [['Muster GmbH 1', 'Bielefeld', .965, 185000], ['Muster GmbH 2', 'Gütersloh', .95, 96000], ['Muster GmbH 3', 'Bielefeld', .975, 121000], ['Muster GmbH 4', 'Bielefeld', .955, 52000],
+  ['Muster GmbH 5', 'Gütersloh', .935, 43000], ['Muster GmbH 6', 'Gütersloh', .97, 38000], ['Muster GmbH 7', 'Gütersloh', .96, 33000], ['Muster GmbH 8', 'Gütersloh', .985, 26000]];
 const SEAS = [.92, .97, 1.06, 1.02, 1.0, 1.04, .98, .80, 1.05, 1.06, 1.03, .82];
 
 function genData() {
@@ -495,7 +497,7 @@ function genData() {
       const kosten = Math.round(220 + r() * 1800 + menge * pg.price * .35);
       const dlz = Math.max(6, Math.round(26 - 9 * i / 23 + (r() - .5) * 12));
       const d = day();
-      D.rekla.push({ m: k, d, nr: `KR-${yy}-${pad(krNr++).padStart(4, '0')}`, kunde: c.name, region: c.region, pg: pg.name, werk: pg.werk, fehlerart: fehler, menge, kosten, dlz, status: i >= 22 && r() < .6 ? 'offen' : 'abgeschlossen', lieferant: sp ? 'Stahlhandel Ruhr GmbH' : '' });
+      D.rekla.push({ m: k, d, nr: `KR-${yy}-${pad(krNr++).padStart(4, '0')}`, kunde: c.name, region: c.region, pg: pg.name, werk: pg.werk, fehlerart: fehler, menge, kosten, dlz, status: i >= 22 && r() < .6 ? 'offen' : 'abgeschlossen', lieferant: sp ? 'Muster GmbH 1' : '' });
     }
     // Lieferanten
     SUPP.forEach(([name, werk, base, vol], si) => {
@@ -1198,7 +1200,7 @@ function readUpload(file) {
   r.readAsArrayBuffer(file);
 }
 function testFile() {
-  const r = rng(4711), kunden = [['Baustoffe Petersen KG', 'Hamburg'], ['Tischlerei Wolters', 'Niedersachsen'], ['Elektro Hansen GmbH', 'Schleswig-Holstein'], ['Hausbau Nord GmbH', 'Bremen'], ['Metallbau Jensen', 'Hamburg'], ['Sanitär Brinkmann', 'Niedersachsen'], ['Dachdecker Ohlsen', 'Schleswig-Holstein'], ['Gartenbau Meyer', 'Bremen']];
+  const r = rng(4711), kunden = [['Fiktive GmbH 21', 'Hamburg'], ['Fiktive GmbH 22', 'Niedersachsen'], ['Fiktive GmbH 23', 'Schleswig-Holstein'], ['Fiktive GmbH 24', 'Bremen'], ['Fiktive GmbH 25', 'Hamburg'], ['Fiktive GmbH 26', 'Niedersachsen'], ['Fiktive GmbH 27', 'Schleswig-Holstein'], ['Fiktive GmbH 28', 'Bremen']];
   const wg = [['Befestigung', 38], ['Werkzeuge', 120], ['Arbeitsschutz', 22], ['Elektroinstallation', 65]];
   const rows = [], a = mAdd(SAMPLE_ANCHOR, 0);
   for (let i = 17; i >= 0; i--) {
@@ -1346,7 +1348,7 @@ let JSPDF = null;
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 async function needPdf() {
   if (JSPDF) return JSPDF;
-  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('shared-files/jspdf.umd.min.js');
   JSPDF = window.jspdf.jsPDF; return JSPDF;
 }
 const pdfTxt = s => String(s ?? '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/−/g, '-').replace(/[▲]/g, '+').replace(/[▼]/g, '-').replace(/ı/g, 'i').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');

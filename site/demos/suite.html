@@ -4,13 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="App-Suite: Workflow Management, Kundenreklamation und Lieferantenreklamation (8D) in einer App.">
-<title>Devunox Apps</title>
+<title>Workflow und Reklamationen</title>
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 300 900; font-display: swap; src: url(shared-files/figtree-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(shared-files/geist-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(shared-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2-variations"); }
+</style>
 <style>
 /* Layout: Navigation links (farbige Kacheln), Inhalt in der Mitte; Startseite und Listen breit, Detail mit Seitenspalte.
    Themes: data-skin (bunt | klar) × data-mode (auto | light | dark) × data-density (normal | kompakt); Firmenfarbe setzt --accent per Script. */
@@ -713,9 +715,9 @@ button.bcard:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--card-shadow
 <div class="bell-panel" id="bellPanel" hidden></div>
 <div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="shared-files/xlsx.full.min.js"></script>
 <script>
-const KEY = 'devunox-apps-demo-v1';
+const KEY = 'devunox-apps-demo-v2';
 const ICONS = {
   home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
   flow: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14"/>',
@@ -824,8 +826,8 @@ const MD = {
     { k: 'text', l: 'Fehler', req: true, al: ['text', 'fehler', 'kurztext', 'beschreibung'] }] }
 };
 const MD_EXAMPLE = {
-  kunden: ['K-10010', 'Muster Maschinenbau GmbH', 'Stuttgart', 'DE', 'Frau Muster', 'qs@muster.example'],
-  lieferanten: ['L-20010', 'Muster Zulieferteile GmbH', 'Kassel', 'DE', 'Herr Muster', 'vertrieb@zuliefer.example'],
+  kunden: ['K-10010', 'Fiktive GmbH 10', 'Stuttgart', 'DE', 'Frau Muster', 'qs@muster.example'],
+  lieferanten: ['L-20010', 'Muster GmbH 10', 'Kassel', 'DE', 'Herr Muster', 'vertrieb@muster-10.example'],
   material: ['8800-100', 'Lagerdeckel Ø 80', 'Stk.', 'GUSS'],
   mitarbeiter: ['Max Muster', 'Fertigung', 'Mitarbeiter', 'm.muster@firma.example'],
   abteilungen: ['Logistik', 'Max Muster'],
@@ -833,8 +835,8 @@ const MD_EXAMPLE = {
   fehler: ['MA03', 'Maß', 'Gewinde nicht lehrenhaltig']
 };
 const MD_SAMPLE = {
-  kunden: 'Kundennummer\tName\tOrt\tLand\tAnsprechpartner\tE-Mail\nK-10005\tWerner Maschinenbau GmbH\tKassel\tDE\tFrau Werner\teinkauf@werner-mb.example\nK-10006\tNordhafen Logistik AG\tHamburg\tDE\tHerr Jansen\tqs@nordhafen.example\nK-10001\tHartmann Antriebstechnik GmbH\tBielefeld-Sennestadt\tDE\tHerr Krause\tqs@hartmann-at.example\nK-10007\t\tLeipzig\tDE\t\t\nK-10008\tAlpina Fahrzeugteile GmbH\tInnsbruck\tAT\tHerr Moser\tmoser(at)alpina.example',
-  lieferanten: 'LIFNR\tNAME1\tORT01\tLAND1\tKontakt\tE-Mail\nL-20005\tGusswerk Eifel GmbH\tMayen\tDE\tFrau Schmitz\tqs@gusswerk.example\nL-20006\tSchraubenhandel Süd KG\tAugsburg\tDE\tHerr Huber\tauftrag@schrauben-sued.example\nL-20002\tStahlhandel Ruhr GmbH\tDuisburg\tDE\tHerr Ademi\tqualitaet@stahl-ruhr.example\nL-20006\tSchraubenhandel Süd KG\tAugsburg\tDE\tHerr Huber\t',
+  kunden: 'Kundennummer\tName\tOrt\tLand\tAnsprechpartner\tE-Mail\nK-10005\tFiktive GmbH 5\tKassel\tDE\tFrau Werner\teinkauf@fiktive-5.example\nK-10006\tFiktive GmbH 6\tHamburg\tDE\tHerr Jansen\tqs@fiktive-6.example\nK-10001\tFiktive GmbH 1\tBielefeld-Sennestadt\tDE\tHerr Krause\tqs@fiktive-1.example\nK-10007\t\tLeipzig\tDE\t\t\nK-10008\tFiktive GmbH 8\tInnsbruck\tAT\tHerr Moser\tmoser(at)alpina.example',
+  lieferanten: 'LIFNR\tNAME1\tORT01\tLAND1\tKontakt\tE-Mail\nL-20005\tMuster GmbH 5\tMayen\tDE\tFrau Schmitz\tqs@muster-5.example\nL-20006\tMuster GmbH 6\tAugsburg\tDE\tHerr Huber\tauftrag@muster-6.example\nL-20002\tMuster GmbH 2\tDuisburg\tDE\tHerr Ademi\tqualitaet@muster-2.example\nL-20006\tMuster GmbH 6\tAugsburg\tDE\tHerr Huber\t',
   material: 'MATNR\tMAKTX\tMEINS\tMATKL\n8800-100\tLagerdeckel Ø 80\tST\tGUSS\n8800-110\tLagerdeckel Ø 100\tStk.\tGUSS\n4711-220\tLagerflansch Ø 22 H7\tStk.\tDREH\n9100-001\tSchmierfett 1 kg\tkg\tHILF\n9100-002\t\tkg\tHILF',
   mitarbeiter: 'Name\tAbteilung\tRolle\tE-Mail\nNina Schulz\tQualität\tQM\tn.schulz@firma.example\nKarl Brenner\tFertigung\tMitarbeiter\tk.brenner@firma.example\nOle Hansen\tLogistik\tMitarbeiter\to.hansen@firma.example\nJonas Weber\tFertigung\tMitarbeiter\tj.weber@firma.example',
   abteilungen: 'Abteilung\tLeitung\nLogistik\t\nInstandhaltung\tJonas Weber\nQualität\tDr. Sabine Roth',
@@ -890,16 +892,16 @@ function seedMD() {
       { name: 'Anna Berger', abteilung: 'IT', rolle: 'Admin', email: 'a.berger@firma.example' }
     ],
     kunden: [
-      { nr: 'K-10001', name: 'Hartmann Antriebstechnik GmbH', ort: 'Bielefeld', land: 'DE', kontakt: 'Herr Krause', email: 'qs@hartmann-at.example' },
-      { nr: 'K-10002', name: 'Brandt Landtechnik AG', ort: 'Osnabrück', land: 'DE', kontakt: 'Frau Lüders', email: 'reklamation@brandt-lt.example' },
-      { nr: 'K-10003', name: 'Sommer Hydraulik GmbH', ort: 'Ulm', land: 'DE', kontakt: 'Herr Sommer', email: 'qm@sommer-hydraulik.example' },
-      { nr: 'K-10004', name: 'Lindner Fördertechnik GmbH', ort: 'Dortmund', land: 'DE', kontakt: 'Frau Lindner', email: 'einkauf@lindner-ft.example' }
+      { nr: 'K-10001', name: 'Fiktive GmbH 1', ort: 'Bielefeld', land: 'DE', kontakt: 'Herr Krause', email: 'qs@fiktive-1.example' },
+      { nr: 'K-10002', name: 'Fiktive GmbH 2', ort: 'Osnabrück', land: 'DE', kontakt: 'Frau Lüders', email: 'reklamation@fiktive-2.example' },
+      { nr: 'K-10003', name: 'Fiktive GmbH 3', ort: 'Ulm', land: 'DE', kontakt: 'Herr Sommer', email: 'qm@fiktive-3.example' },
+      { nr: 'K-10004', name: 'Fiktive GmbH 4', ort: 'Dortmund', land: 'DE', kontakt: 'Frau Lindner', email: 'einkauf@fiktive-4.example' }
     ],
     lieferanten: [
-      { nr: 'L-20001', name: 'Metallbau Kessler KG', ort: 'Siegen', land: 'DE', kontakt: 'Herr Brandl', email: 'qs@kessler-metall.example' },
-      { nr: 'L-20002', name: 'Stahlhandel Ruhr GmbH', ort: 'Duisburg', land: 'DE', kontakt: 'Herr Ademi', email: 'qualitaet@stahl-ruhr.example' },
-      { nr: 'L-20003', name: 'Kunststofftechnik Albers GmbH', ort: 'Lüdenscheid', land: 'DE', kontakt: 'Frau Albers', email: 'qm@albers-kt.example' },
-      { nr: 'L-20004', name: 'Pulverbeschichtung Nord GmbH', ort: 'Bremen', land: 'DE', kontakt: 'Herr Petersen', email: 'service@pulver-nord.example' }
+      { nr: 'L-20001', name: 'Muster GmbH 1', ort: 'Siegen', land: 'DE', kontakt: 'Herr Brandl', email: 'qs@muster-1.example' },
+      { nr: 'L-20002', name: 'Muster GmbH 2', ort: 'Duisburg', land: 'DE', kontakt: 'Herr Ademi', email: 'qualitaet@muster-2.example' },
+      { nr: 'L-20003', name: 'Muster GmbH 3', ort: 'Lüdenscheid', land: 'DE', kontakt: 'Frau Albers', email: 'qm@muster-3.example' },
+      { nr: 'L-20004', name: 'Muster GmbH 4', ort: 'Bremen', land: 'DE', kontakt: 'Herr Petersen', email: 'service@muster-4.example' }
     ],
     material: [
       { nr: '4711-220', bez: 'Lagerflansch Ø 22 H7', einheit: 'Stk.', gruppe: 'DREH' },
@@ -990,10 +992,10 @@ function seedItems() {
   rk({ app: 'lr', nr: `LR-${YEAR}-0046`, titel: 'Lackabplatzer an Gehäusedeckel', partnerNr: 'L-20001', ref: 'LS 50418', matNr: '3120-045', charge: 'K-50418', menge: 400, fehlerCode: 'OB02', fehlerort: 'Wareneingang', prio: 'mittel', erfasser: 'Murat Kaya',
     beschreibung: 'Lack platzt an den Kanten ab, sichtbar bei der Wareneingangsprüfung. Teile nicht verbaubar.', eingang: rel(-34), status: 'freigabe', berechtigt: true, lead: 'Elif Demir',
     l8d: { angefordert: rel(-33), eingegangen: rel(-27) },
-    steps: makeSteps(rel(-34), 7, ['Teamleitung Elif Demir (Konstruktion), Murat Kaya (QM), Ansprechpartner bei Kessler: Hr. Brandl.', 'Lackabplatzer an den Kanten, 46 von 400 Stk. betroffen.', 'Lieferung gesperrt, 100-%-Sichtprüfung, 46 Stk. an Lieferant zurück.',
+    steps: makeSteps(rel(-34), 7, ['Teamleitung Elif Demir (Konstruktion), Murat Kaya (QM), Ansprechpartner bei Muster GmbH 1: Hr. Brandl.', 'Lackabplatzer an den Kanten, 46 von 400 Stk. betroffen.', 'Lieferung gesperrt, 100-%-Sichtprüfung, 46 Stk. an Lieferant zurück.',
       'Entstehung: Entfettungsbad beim Lieferanten verbraucht. Nichtentdeckung: keine Haftprüfung (Gitterschnitt) beim Lieferanten.', 'Badwechsel nach Durchsatz statt nach Zeit. Gitterschnittprüfung je Los beim Lieferanten.',
       'Drei Folgelieferungen ohne Befund, Gitterschnitt GT0 bis GT1 dokumentiert.', 'Qualitätssicherungsvereinbarung um Haftprüfung ergänzt, Prüfplan Wareneingang aktualisiert.'], 'Elif Demir'),
-    massnahmen: [M('S01', 'Sofort', 'Lieferung sperren', 'Murat Kaya', rel(-33), 'erledigt'), M('A05', 'Abstell', '8D-Bericht von Kessler anfordern', 'Murat Kaya', rel(-31), 'erledigt'),
+    massnahmen: [M('S01', 'Sofort', 'Lieferung sperren', 'Murat Kaya', rel(-33), 'erledigt'), M('A05', 'Abstell', '8D-Bericht von Muster GmbH 1 anfordern', 'Murat Kaya', rel(-31), 'erledigt'),
       M('', 'Abstell', 'Lieferant: Badwechsel nach Durchsatz statt nach Zeit', 'Elif Demir', rel(-20), 'erledigt', { wirksam: true }), M('V03', 'Vorbeuge', 'QSV um Haftprüfung (Gitterschnitt) ergänzen', 'Murat Kaya', rel(-6), 'erledigt', { wirksam: true })],
     kosten: [{ art: 'Sortierung', betrag: 1240 }, { art: 'Nacharbeit', betrag: 860 }], weiterbelastung: 2100,
     comments: [CM('Elif Demir', at(-2, '11:15'), 'Alle Nachweise hängen an D6. Von meiner Seite fertig.', ['Murat Kaya'])],
@@ -1001,9 +1003,9 @@ function seedItems() {
   rk({ app: 'lr', nr: `LR-${YEAR}-0043`, titel: 'Härte unter Spezifikation', partnerNr: 'L-20002', ref: 'LS 77420', matNr: '5530-118', charge: 'S-77420', menge: 600, fehlerCode: 'WE01', fehlerort: 'Wareneingang', prio: 'hoch', erfasser: 'Murat Kaya',
     beschreibung: 'Härteprüfung im Wareneingang: 48 bis 51 HRC statt 54 bis 58 HRC.', eingang: rel(-25), status: 'bearbeitung', berechtigt: true, lead: 'Tobias Klein',
     l8d: { angefordert: rel(-24), eingegangen: null },
-    steps: makeSteps(rel(-25), 4, ['Teamleitung Tobias Klein (Einkauf), Murat Kaya (QM), Lieferant Stahlhandel Ruhr.', 'Härte bei 12 von 50 Stichproben 48 bis 51 HRC statt 54 bis 58 HRC. Werkszeugnis 3.1 weist Sollwerte aus.',
+    steps: makeSteps(rel(-25), 4, ['Teamleitung Tobias Klein (Einkauf), Murat Kaya (QM), Lieferant Muster GmbH 2.', 'Härte bei 12 von 50 Stichproben 48 bis 51 HRC statt 54 bis 58 HRC. Werkszeugnis 3.1 weist Sollwerte aus.',
       'Charge S-77420 (600 Stk.) gesperrt, Lieferant informiert, Ersatz aus Lager nach Härteprüfung freigegeben.', 'Entstehung: Ofenprofil beim Vergüten nach Wartung falsch eingestellt. Nichtentdeckung: Lieferant prüft nur 1 Teil je Los.'], 'Tobias Klein'),
-    massnahmen: [M('S01', 'Sofort', 'Charge S-77420 sperren', 'Murat Kaya', rel(-24), 'erledigt'), M('A05', 'Abstell', '8D-Bericht von Stahlhandel Ruhr anfordern', 'Tobias Klein', rel(-20), 'erledigt'),
+    massnahmen: [M('S01', 'Sofort', 'Charge S-77420 sperren', 'Murat Kaya', rel(-24), 'erledigt'), M('A05', 'Abstell', '8D-Bericht von Muster GmbH 2 anfordern', 'Tobias Klein', rel(-20), 'erledigt'),
       M('', 'Abstell', 'Lieferant: Ofenprofil korrigieren, Freigabe nach Erstmuster', 'Tobias Klein', rel(-4), 'offen'), M('A01', 'Abstell', 'Prüfplan Wareneingang: Härte an 5 Teilen je Los', 'Murat Kaya', rel(5), 'offen'),
       M('V03', 'Vorbeuge', 'QSV: Härteprüfung je Ofencharge vereinbaren', 'Tobias Klein', rel(12), 'offen')],
     kosten: [{ art: 'Prüfung', betrag: 640 }, { art: 'Fracht', betrag: 410 }], weiterbelastung: 1050,
@@ -1037,7 +1039,7 @@ function seedItems() {
     beschreibung: 'Neue Prüfanweisung für die Sichtprüfung lackierter Teile im Wareneingang.',
     chain: [st('p', 'Dr. Sabine Roth', 'nok', at(-3, '16:10'), 'Dr. Sabine Roth', 'Grenzmuster fehlen. Bitte Fotos für i.O. und n.i.O. ergänzen.')],
     docs: [{ name: 'PA-07_Entwurf.pdf', size: 188000 }], log: [{ at: at(-3, '16:10'), who: 'Dr. Sabine Roth', text: 'Zurückgewiesen' }] });
-  wf({ nr: `WF-${YEAR}-0014`, typ: 'Allgemeine Freigabe', titel: 'Lieferantenaudit bei Stahlhandel Ruhr durchführen', creator: 'Tobias Klein', created: at(-15, '11:00'), due: rel(-8), status: 'abgeschlossen', doneAt: rel(-9),
+  wf({ nr: `WF-${YEAR}-0014`, typ: 'Allgemeine Freigabe', titel: 'Lieferantenaudit bei Muster GmbH 2 durchführen', creator: 'Tobias Klein', created: at(-15, '11:00'), due: rel(-8), status: 'abgeschlossen', doneAt: rel(-9),
     beschreibung: 'Prozessaudit Vergüten beim Lieferanten im nächsten Monat. Reisekosten ca. 600 €.',
     chain: [st('p', 'Dr. Sabine Roth', 'ok', at(-12, '09:00'), 'Dr. Sabine Roth')],
     tasks: [{ id: uid('t'), text: 'Auditplan an Lieferanten senden', owner: 'Tobias Klein', due: rel(-10), status: 'erledigt', doneAt: rel(-10), reminded: null }],
@@ -1791,7 +1793,7 @@ function xlsxBlob(sheetName, aoa) {
 
 
 /* ---------- Darstellung (Themes) ---------- */
-const ORG_DEFAULT = { skin: 'bunt', mode: 'auto', brand: '', name: 'Devunox', logo: '', density: 'normal', allowUser: true };
+const ORG_DEFAULT = { skin: 'bunt', mode: 'auto', brand: '', name: 'Muster GmbH', logo: '', density: 'normal', allowUser: true };
 const BRANDS = [['', 'Standard der Farbwelt'], ['#0B7A71', 'Petrol'], ['#2459C4', 'Blau'], ['#B4233A', 'Rot'], ['#C2410C', 'Orange'], ['#1F7A4C', 'Grün'], ['#17181C', 'Schwarz']];
 function themeInit() {
   S.org = Object.assign({}, ORG_DEFAULT, S.org || {});
@@ -1802,7 +1804,7 @@ function themeInit() {
 const isAdmin = () => ['Admin', 'QM-Leitung'].includes(roleOf(me()));
 function effTheme() {
   const o = S.org, p = o.allowUser ? (S.pers[me()] || {}) : {};
-  return { skin: p.skin || o.skin, mode: p.mode || o.mode, brand: p.brand !== undefined ? p.brand : o.brand, density: p.density || o.density, name: o.name || 'Devunox', logo: o.logo };
+  return { skin: p.skin || o.skin, mode: p.mode || o.mode, brand: p.brand !== undefined ? p.brand : o.brand, density: p.density || o.density, name: o.name || 'Muster GmbH', logo: o.logo };
 }
 const thScope = () => isAdmin() && S.thScope === 'org' ? 'org' : 'me';
 function setTheme(k, v) {
@@ -2304,7 +2306,7 @@ document.addEventListener('change', e => {
   if (d.role === 'user' && LV.on) { const mine = (myPerson() || {}).name; LV.as = t.value === mine ? '' : t.value; closeSheet(); $('bellPanel').hidden = true; S.tp = ''; renderAll(); toast(LV.as ? 'Testansicht: ' + LV.as : 'Wieder als ' + mine); return; }
   if (d.role === 'user') { S.user = t.value; closeSheet(); $('bellPanel').hidden = true; if (S.route.p === 'aufg') S.tp = ''; commit('Angemeldet als ' + S.user); return; }
   if (t.id === 'brandColor') { if (setTheme('brand', t.value)) commit('Firmenfarbe gesetzt'); return; }
-  if (t.id === 'orgName') { S.org.name = t.value.trim() || 'Devunox'; commit('Firmenname gespeichert'); return; }
+  if (t.id === 'orgName') { S.org.name = t.value.trim() || 'Muster GmbH'; commit('Firmenname gespeichert'); return; }
   if (t.id === 'allowUser') { S.org.allowUser = t.checked; commit(t.checked ? 'Mitarbeitende dürfen umschalten' : 'Darstellung für alle festgelegt'); return; }
   if (t.id === 'logoFile') {
     const f = t.files[0]; if (!f) return;
@@ -2634,7 +2636,7 @@ function gatePage() {
     if (!LV.owner) return `<div class="gate card"><h1>Noch nicht eingerichtet</h1><p>Die Person, die diese Seite geteilt hat, richtet den Pilot gerade ein. Bitte später erneut öffnen.</p></div>`;
     return `<div class="gate card"><h1>Pilot einrichten</h1><p>Einmalig. Danach sehen alle, mit denen Sie diese Seite teilen, denselben Stand. Teilen Sie die Seite mit Kolleginnen und Kollegen als <b>Mitwirkende</b>, damit sie erfassen und bearbeiten können.</p>
       <form id="setupF" novalidate>
-        <div class="grid2"><div class="field"><label for="su-org">Firmenname</label><input id="su-org" value="${esc(S.org.name === 'Devunox' ? '' : S.org.name)}" placeholder="z. B. Muster GmbH"></div>
+        <div class="grid2"><div class="field"><label for="su-org">Firmenname</label><input id="su-org" value="${esc(S.org.name === 'Muster GmbH' ? '' : S.org.name)}" placeholder="z. B. Muster GmbH"></div>
         <div class="field"><label for="su-name">Ihr Name *</label><input id="su-name" value="${esc(P.name || '')}"></div></div>
         <div class="grid2"><div class="field"><label for="su-mail">Ihre E-Mail</label><input id="su-mail" type="email" value="${esc(P.email || '')}"></div>
         <div class="field"><label for="su-rolle">Ihre Rolle</label><select id="su-rolle">${opts(['QM-Leitung', 'QM', 'Admin'], 'QM-Leitung')}</select></div></div>
@@ -2772,7 +2774,7 @@ let JSPDF = null;
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 async function needPdf() {
   if (JSPDF) return JSPDF;
-  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('shared-files/jspdf.umd.min.js');
   JSPDF = window.jspdf.jsPDF; return JSPDF;
 }
 const pdfTxt = s => String(s ?? '').replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/[→]/g, '->').replace(/[•]/g, '-').replace(/ /g, ' ').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');

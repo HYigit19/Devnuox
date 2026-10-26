@@ -12,4 +12,11 @@ SRC, OUT = ROOT / "site", ROOT / "dist"
 if OUT.exists():
     shutil.rmtree(OUT)
 shutil.copytree(SRC, OUT)
+
+# Demo-Apps ohne fremde Server ausliefern (Schriften und Bibliotheken lokal)
+import sys
+sys.path.insert(0, str(ROOT / "tools"))
+from localize_demos import localize
+for p in sorted((OUT / "demos").glob("*.html")):
+    localize(p)
 print(f"{sum(1 for p in OUT.rglob('*') if p.is_file())} Dateien nach {OUT} kopiert")

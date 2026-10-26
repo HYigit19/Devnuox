@@ -1,0 +1,1593 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Muster Präzisionsteile</title>
+<meta name="description" content="Beispiel-Website eines fiktiven Fertigungsbetriebs: CNC-Drehen und -Fräsen, filterbarer Maschinenpark, Machbarkeits-Check und Angebotsanfrage mit Zeichnung.">
+<meta name="theme-color" content="#14181D">
+<style>
+/* Gestaltung: technische Zeichnung auf Graphit. Blaupausen-Raster, Maßlinien in Messblau, Monospace nur für Maße und Toleranzen. */
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(fertigung-files/inter-tight-latin-wght-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(fertigung-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); }
+:root {
+  --g0: #12161B;
+  --g1: #191E24;
+  --g2: #1F252C;
+  --g3: #273039;
+  --field: #10141A;
+  --line: #36414C;
+  --line-2: #4A5764;
+  --ink: #E6EDF3;
+  --ink-2: #A6B4C1;
+  --ink-3: #82909D;
+  --cy: #45C9F2;
+  --cy-2: #9BE3FA;
+  --cy-ink: #04202A;
+  --cy-a: rgba(69, 201, 242, .14);
+  --ok: #62D69E;
+  --warn: #F3BE55;
+  --err: #FF8A80;
+  --sans: "Inter Tight", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --pad: max(20px, env(safe-area-inset-left, 0px));
+  --pad-r: max(20px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--g1); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.55; letter-spacing: .003em; -webkit-font-smoothing: antialiased; }
+a { color: var(--cy-2); text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+button, a, label, summary, input, select { touch-action: manipulation; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--cy); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad-r); }
+@media (min-width: 900px) { .wrap { padding-left: max(36px, env(safe-area-inset-left, 0px)); padding-right: max(36px, env(safe-area-inset-right, 0px)); } }
+.m { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.022em; line-height: 1.08; text-wrap: balance; }
+h2 { font-size: clamp(30px, 3.6vw, 46px); }
+h3 { font-size: 21px; letter-spacing: -.012em; line-height: 1.2; }
+p { margin: 0; }
+.muted { color: var(--ink-2); }
+.small { font-size: 14.5px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 20px; border: 1px solid var(--line-2); border-radius: 3px; background: transparent; color: var(--ink); font-weight: 600; font-size: 16px; text-decoration: none; transition: background-color .15s, border-color .15s, color .15s; }
+.btn:hover { border-color: var(--cy); color: var(--ink); }
+.btn.pri { background: var(--cy); border-color: var(--cy); color: var(--cy-ink); }
+.btn.pri:hover { background: var(--cy-2); border-color: var(--cy-2); color: var(--cy-ink); }
+.btn.sm { min-height: 40px; padding: 0 14px; font-size: 15px; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.lnk { background: none; border: 0; padding: 0; color: var(--cy-2); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.lnk:hover { color: var(--ink); }
+
+/* Hinweisleiste */
+.demo-strip { background: #0F2C37; color: var(--cy-2); font-size: 14px; border-bottom: 1px solid #1E4A5A; }
+.demo-strip .wrap { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: space-between; align-items: center; padding-top: 8px; padding-bottom: 8px; }
+.demo-strip a { color: var(--ink); font-weight: 600; }
+
+/* Kopf */
+.top { position: sticky; top: 0; z-index: 30; background: rgba(18, 22, 27, .94); border-bottom: 1px solid var(--line); }
+@supports (backdrop-filter: blur(8px)) { .top { background: rgba(18, 22, 27, .82); backdrop-filter: blur(10px); } }
+.top .wrap { display: flex; align-items: center; gap: 24px; min-height: 68px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; flex: none; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand b { display: block; font-size: 18px; font-weight: 650; letter-spacing: -.01em; line-height: 1.1; }
+.brand small { display: block; font-size: 13px; color: var(--ink-3); line-height: 1.2; }
+.nav { display: flex; gap: 2px; margin-left: auto; }
+.nav a { color: var(--ink-2); text-decoration: none; font-weight: 500; font-size: 15.5px; padding: 8px 12px; border-radius: 3px; }
+.nav a:hover { color: var(--ink); background: var(--g3); }
+.menu-btn { display: none; margin-left: auto; min-height: 44px; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 3px; background: none; font-weight: 600; align-items: center; gap: 8px; }
+@media (max-width: 1100px) { .nav a { padding: 8px 8px; font-size: 15px; } }
+@media (max-width: 980px) { .nav, .top .btn { display: none; } .menu-btn { display: inline-flex; } }
+
+/* Hero: Zeichnungsblatt */
+.bp { background-color: var(--g1); background-image: linear-gradient(rgba(69,201,242,.075) 1px, transparent 1px), linear-gradient(90deg, rgba(69,201,242,.075) 1px, transparent 1px), linear-gradient(rgba(69,201,242,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(69,201,242,.03) 1px, transparent 1px); background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px; background-position: -1px -1px; }
+.hero { padding: 36px 0 64px; border-bottom: 1px solid var(--line); }
+.sheet { position: relative; border: 1px solid rgba(69,201,242,.38); padding: 22px; }
+.sheet::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(69,201,242,.16); pointer-events: none; }
+.zones { position: absolute; display: flex; font-family: var(--mono); font-size: 11px; color: rgba(155,227,250,.6); pointer-events: none; }
+.zones span { flex: 1; display: flex; align-items: center; justify-content: center; }
+.zones span + span { border-left: 1px solid rgba(69,201,242,.3); }
+.zones.t { top: -18px; left: 0; right: 0; height: 18px; }
+.zones.t span + span { border-left: 0; background: linear-gradient(rgba(69,201,242,.4), rgba(69,201,242,.4)) left bottom / 1px 7px no-repeat; }
+.zones.l { left: -18px; top: 0; bottom: 0; width: 18px; flex-direction: column; }
+.zones.l span + span { border-left: 0; background: linear-gradient(90deg, rgba(69,201,242,.4), rgba(69,201,242,.4)) right top / 7px 1px no-repeat; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px 40px; align-items: center; }
+.hero-copy { padding: 34px 10px 10px 14px; display: flex; flex-direction: column; gap: 22px; }
+.hero h1 { font-size: clamp(36px, 4.1vw, 60px); font-weight: 600; letter-spacing: -.032em; line-height: 1.02; }
+.hero .lead { font-size: 18.5px; color: var(--ink-2); max-width: 34em; }
+.acts { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-drw { min-width: 0; }
+.hero-drw svg { display: block; width: 100%; height: auto; }
+.tblock { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.25fr); border: 1px solid rgba(69,201,242,.45); background: rgba(18,22,27,.78); }
+.tblock > div { padding: 12px 16px 14px; min-width: 0; }
+.tblock > div + div { border-left: 1px solid rgba(69,201,242,.3); }
+.tblock .k { display: block; font-size: 13px; color: var(--ink-3); }
+.tblock .v { display: block; font-family: var(--mono); font-size: clamp(20px, 2.1vw, 28px); font-weight: 600; color: var(--ink); line-height: 1.25; white-space: nowrap; letter-spacing: -.01em; }
+.tblock .s { display: block; font-size: 13px; color: var(--ink-2); }
+.tblock .meta { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; align-content: center; }
+.tblock .meta dt { color: var(--ink-3); }
+.tblock .meta dd { margin: 0; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+@media (max-width: 1100px) {
+  .tblock { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tblock .meta { grid-column: 1 / -1; border-left: 0 !important; border-top: 1px solid rgba(69,201,242,.3); grid-template-columns: auto 1fr auto 1fr; }
+}
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-copy { padding: 18px 4px 0; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 26px 0 40px; }
+  .sheet { padding: 14px 12px; }
+  .zones.l { display: none; }
+  .tblock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tblock > div:nth-child(3) { border-left: 0; }
+  .tblock > div:nth-child(n+3) { border-top: 1px solid rgba(69,201,242,.3); }
+  .tblock .meta { grid-template-columns: auto 1fr; }
+  .tblock > div { padding: 10px 12px 12px; }
+  .hero .lead { font-size: 17px; }
+}
+
+/* Zeichnungen */
+.drw text { font-family: var(--mono); fill: var(--cy); font-size: 12px; font-weight: 500; }
+.drw .halo { paint-order: stroke; stroke: var(--g1); stroke-width: 5px; stroke-linejoin: round; }
+.drw .ol { fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linejoin: round; }
+.drw .th { fill: none; stroke: var(--ink-2); stroke-width: .9; }
+.drw .hid { fill: none; stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 5 3; }
+.drw .cl { fill: none; stroke: var(--ink-3); stroke-width: .8; stroke-dasharray: 16 3 2 3; }
+.drw .dl { fill: none; stroke: var(--cy); stroke-width: .9; }
+.drw .ex { fill: none; stroke: var(--cy); stroke-width: .7; opacity: .7; }
+.drw .bg { fill: var(--g1); }
+.drw .gt { fill: var(--g1); stroke: var(--cy); stroke-width: .9; }
+.drw .fl { fill: var(--cy); }
+.drw .hatch-l { stroke: var(--ink-3); stroke-width: .8; opacity: .75; }
+@media (max-width: 640px) {
+  .hero-drw .drw text { font-size: 19px; }
+  .hero-drw .drw .lg-only { display: none; }
+}
+html.motion .hero-drw .ol, html.motion .hero-drw .th, html.motion .hero-drw .hid { stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: draw 1.3s cubic-bezier(.5,.1,.2,1) forwards; }
+html.motion .hero-drw .hid { animation-name: draw-hid; animation-delay: .9s; }
+html.motion .hero-drw .th { animation-delay: .8s; animation-duration: .7s; }
+html.motion .hero-drw .hz { opacity: 0; animation: fade .6s ease forwards .9s; }
+html.motion .hero-drw .dm { opacity: 0; animation: fade .2s linear forwards; animation-delay: var(--d, 1.3s); }
+html.motion .hero-drw .dm .dl, html.motion .hero-drw .dm .ex { stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: draw .55s cubic-bezier(.4,0,.2,1) forwards; animation-delay: var(--d, 1.3s); }
+html.motion .hero-drw .dm text { opacity: 0; animation: fade .35s ease forwards; animation-delay: calc(var(--d, 1.3s) + .4s); }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes draw-hid { 0% { stroke-dasharray: 1 1; stroke-dashoffset: 1; } 99% { stroke-dasharray: 1 1; stroke-dashoffset: 0; } 100% { stroke-dasharray: 5 3; stroke-dashoffset: 0; } }
+@keyframes fade { to { opacity: 1; } }
+
+/* Abschnitte */
+.sec { padding: 88px 0; border-bottom: 1px solid var(--line); }
+.sec.alt { background: var(--g2); }
+.sec-h { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; align-items: end; margin-bottom: 40px; }
+.sec-h p { color: var(--ink-2); max-width: 36em; }
+@media (max-width: 860px) { .sec { padding: 60px 0; } .sec-h { grid-template-columns: minmax(0, 1fr); margin-bottom: 28px; } }
+
+/* Kompetenzen */
+.comp { border-top: 1px solid var(--line); }
+.comp-row { display: grid; grid-template-columns: 76px minmax(0, 4fr) minmax(0, 6fr); gap: 16px 32px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+.comp-row .ico { width: 64px; height: 64px; }
+.comp-row .ico svg { width: 64px; height: 64px; display: block; }
+.comp-row h3 { margin-bottom: 8px; }
+.comp-row p { color: var(--ink-2); max-width: 30em; }
+.specs { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; border-top: 1px dashed var(--line-2); align-self: start; }
+.specs dt, .specs dd { padding: 9px 0; border-bottom: 1px dashed var(--line-2); margin: 0; }
+.specs dt { color: var(--ink-2); padding-right: 16px; }
+.specs dd { font-family: var(--mono); font-size: 15px; text-align: right; color: var(--ink); white-space: nowrap; }
+@media (max-width: 860px) {
+  .comp-row { grid-template-columns: 52px minmax(0, 1fr); }
+  .comp-row .ico, .comp-row .ico svg { width: 48px; height: 48px; }
+  .specs { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) { .specs dd { white-space: normal; font-size: 14px; } }
+.mat-wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px; margin-top: 56px; align-items: start; }
+.mat-wrap h3 { margin-bottom: 10px; }
+.tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
+table.t { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+table.t th { text-align: left; font-weight: 600; font-size: 14px; color: var(--ink-3); padding: 10px 12px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+table.t td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t td.m { font-size: 14.5px; white-space: nowrap; }
+table.t tr > :first-child { padding-left: 0; }
+@media (max-width: 600px) {
+  table.mat thead { display: none; }
+  table.mat, table.mat tbody { display: block; }
+  table.mat tr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  table.mat td { border: 0; padding: 0; }
+  table.mat td:first-child { font-weight: 600; }
+  table.mat td.m { white-space: normal; }
+  table.mat td:last-child { color: var(--ink-2); font-size: 14.5px; }
+}
+@media (max-width: 860px) { .mat-wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+
+/* Montage */
+.asm { margin-top: 64px; border: 1px solid var(--line); background: var(--g1); }
+.asm-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+.asm-h p { color: var(--ink-2); max-width: 42em; margin-top: 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 3px; padding: 3px; gap: 3px; }
+.seg button { border: 0; background: none; min-height: 40px; padding: 0 14px; border-radius: 2px; font-weight: 600; font-size: 15px; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--cy); color: var(--cy-ink); }
+.asm-b { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+.asm-b .bp { padding: 12px; border-right: 1px solid var(--line); }
+.asm-b svg { display: block; width: 100%; height: auto; }
+.asm .part { transition: transform .8s cubic-bezier(.6,.05,.25,1); }
+.asm .ball { transition: opacity .35s ease; }
+.asm.closed .ball { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .asm .part, .asm .ball { transition: none; } }
+.bom { padding: 18px 24px 22px; }
+.bom table.t td:first-child { width: 44px; }
+.bom .pos { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--cy); border-radius: 50%; font-family: var(--mono); font-size: 12.5px; color: var(--cy); }
+@media (max-width: 860px) { .asm-b { grid-template-columns: minmax(0, 1fr); } .asm-b .bp { border-right: 0; border-bottom: 1px solid var(--line); } .asm-h, .bom { padding-left: 16px; padding-right: 16px; } }
+@media (max-width: 640px) { .asm-b .drw text { font-size: 17px; } }
+
+/* Maschinenpark */
+.tools { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; justify-content: space-between; margin-bottom: 18px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 40px; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 3px; background: transparent; color: var(--ink-2); font-weight: 550; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; }
+.chip .m { font-size: 12.5px; color: var(--ink-3); }
+.chip:hover { color: var(--ink); border-color: var(--cy); }
+.chip[aria-pressed="true"] { background: var(--cy); border-color: var(--cy); color: var(--cy-ink); }
+.chip[aria-pressed="true"] .m { color: var(--cy-ink); }
+.search { position: relative; min-width: min(300px, 100%); }
+.search input { padding-left: 38px; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--ink-3); pointer-events: none; }
+.mt { border: 1px solid var(--line); background: var(--g1); }
+.mt table { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+.mt th { text-align: left; padding: 0; font-size: 14px; color: var(--ink-3); font-weight: 600; border-bottom: 1px solid var(--line-2); background: var(--g0); white-space: nowrap; }
+.mt th > span, .mt th button { display: flex; align-items: center; gap: 6px; padding: 12px 14px; width: 100%; background: none; border: 0; color: inherit; font-weight: 600; text-align: left; }
+.mt th button:hover { color: var(--ink); }
+.mt th button svg { width: 12px; height: 12px; opacity: .45; }
+.mt th[aria-sort="ascending"] button svg, .mt th[aria-sort="descending"] button svg { opacity: 1; color: var(--cy); }
+.mt th[aria-sort="descending"] button svg { transform: rotate(180deg); }
+.mt td { padding: 13px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.mt tbody tr:hover td { background: rgba(69,201,242,.04); }
+.mt td .sub { display: block; color: var(--ink-3); font-size: 14px; }
+.mt td.m { font-size: 14.5px; white-space: nowrap; }
+.mt td.n { text-align: right; font-family: var(--mono); font-size: 16px; font-weight: 600; }
+.mt th.n button, .mt th.n > span { justify-content: flex-end; }
+.vf { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.vf::before { content: ""; width: 8px; height: 8px; border: 1.5px solid var(--cy); transform: rotate(45deg); flex: none; }
+.vf[data-v="Fräsen"]::before { border-radius: 0; transform: none; }
+.vf[data-v="Schleifen"]::before { border-radius: 50%; transform: none; }
+.vf[data-v="Messen"]::before { border-color: var(--ok); border-radius: 50%; transform: none; background: var(--ok); }
+.vf[data-v="Erodieren"]::before { border-color: var(--warn); }
+.mt-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; padding: 12px 14px; color: var(--ink-2); font-size: 14.5px; background: var(--g0); }
+.empty { padding: 28px 14px; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .mt thead { display: none; }
+  .mt table, .mt tbody, .mt tr, .mt td { display: block; }
+  .mt tr { padding: 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+  .mt td { padding: 0; border: 0; }
+  .mt td.c-typ { grid-column: 1; }
+  .mt td.n { grid-column: 2; grid-row: 1; font-size: 20px; }
+  .mt td.n::after { content: " Stk."; font-size: 13px; font-weight: 400; color: var(--ink-3); }
+  .mt td.c-vf, .mt td.c-ax, .mt td.m { grid-column: 1 / -1; font-size: 14px; }
+  .mt td[data-l]::before { content: attr(data-l) ": "; color: var(--ink-3); font-family: var(--sans); }
+  .mt tbody tr:hover td { background: none; }
+}
+
+/* Branchen und Qualität */
+.branches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); }
+.branch { padding: 28px 26px 30px; display: flex; flex-direction: column; gap: 14px; }
+.branch + .branch { border-left: 1px solid var(--line); }
+.seal { width: 132px; height: 132px; }
+.seal svg { width: 100%; height: 100%; display: block; }
+.seal text { font-family: var(--mono); fill: var(--cy); }
+.branch ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; color: var(--ink-2); }
+.branch li { padding-left: 18px; position: relative; }
+.branch li::before { content: ""; position: absolute; left: 2px; top: .7em; width: 8px; height: 2px; background: var(--cy); }
+.branch .share { font-family: var(--mono); font-size: 14px; color: var(--ink-3); }
+@media (max-width: 900px) { .branches { grid-template-columns: minmax(0, 1fr); } .branch + .branch { border-left: 0; border-top: 1px solid var(--line); } .branch { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px 20px; } .branch .seal { width: 112px; height: 112px; grid-row: span 4; } }
+@media (max-width: 480px) { .branch { grid-template-columns: minmax(0, 1fr); } .branch .seal { grid-row: auto; } }
+.q-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 48px; margin-top: 64px; }
+.q-grid h3 { margin-bottom: 8px; }
+.q-grid > div > p { color: var(--ink-2); margin-bottom: 18px; }
+.lab { list-style: none; margin: 0 0 22px; padding: 0; border-top: 1px solid var(--line); }
+.lab li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.lab li b { font-weight: 600; }
+.lab li span { color: var(--ink-2); font-size: 15px; grid-column: 1; }
+.lab li .m { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--cy-2); font-size: 14px; text-align: right; }
+.empb { border: 1px solid var(--line); background: var(--g1); }
+.empb-h { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 14.5px; color: var(--ink-2); }
+.empb-h b { color: var(--ink); }
+.empb table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+.empb th { text-align: left; font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-3); padding: 9px 8px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+.empb td { padding: 9px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.empb td.ok { color: var(--ok); }
+.empb tr > :first-child { padding-left: 14px; } .empb tr > :last-child { padding-right: 14px; }
+.empb .bar { display: block; position: relative; width: 60px; margin-top: 3px; height: 10px; border-left: 1px solid var(--ink-3); border-right: 1px solid var(--ink-3); background: linear-gradient(var(--line-2), var(--line-2)) center / 1px 100% no-repeat; }
+.empb .bar i { position: absolute; top: 1px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--ok); }
+.empb-f { padding: 10px 14px; font-size: 13.5px; color: var(--ink-3); }
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 14px; padding: 0 0 22px; position: relative; }
+.steps li::before { content: counter(s); grid-row: span 2; width: 34px; height: 34px; border: 1px solid var(--cy); border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 14px; color: var(--cy); background: var(--g2); position: relative; z-index: 1; }
+.steps li:not(:last-child)::after { content: ""; position: absolute; left: 17px; top: 34px; bottom: 0; width: 1px; background: var(--line-2); }
+.steps b { font-weight: 600; padding-top: 5px; }
+.steps span { color: var(--ink-2); font-size: 15.5px; }
+@media (max-width: 900px) { .q-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
+
+/* Referenzen */
+.refs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.ref { background: var(--g1); display: flex; flex-direction: column; text-align: left; border: 0; padding: 0; color: inherit; position: relative; }
+.ref .pic { border-bottom: 1px solid var(--line); aspect-ratio: 16 / 10; display: grid; place-items: center; padding: 8px; }
+.ref .pic svg { width: 100%; height: 100%; display: block; }
+.ref .cap { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ref .cap h3 { font-size: 18.5px; }
+.ref dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 14px; font-size: 14.5px; }
+.ref dt { color: var(--ink-3); }
+.ref dd { margin: 0; font-family: var(--mono); font-size: 13.5px; color: var(--ink); overflow-wrap: anywhere; }
+.ref .open { margin-top: auto; padding-top: 4px; align-self: flex-start; min-height: 32px; }
+.ref .open::after { content: ""; position: absolute; inset: 0; }
+.ref .open:focus-visible { outline: none; }
+.ref:has(.open:focus-visible) { outline: 2px solid var(--cy); outline-offset: -2px; z-index: 1; }
+.ref { cursor: pointer; }
+.ref:hover .pic { background-color: #1B2229; }
+@media (max-width: 980px) { .refs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .refs { grid-template-columns: minmax(0, 1fr); } }
+
+/* Anfrage */
+.req { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px; align-items: start; }
+.panel { border: 1px solid var(--line); background: var(--g1); }
+.panel-h { padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.panel-h p { color: var(--ink-2); font-size: 15px; margin-top: 4px; }
+.panel-b { padding: 22px; }
+.check { position: sticky; top: 88px; }
+@media (max-width: 1020px) { .req { grid-template-columns: minmax(0, 1fr); } .check { position: static; order: -1; } }
+@media (max-width: 640px) { .panel-h, .panel-b { padding-left: 16px; padding-right: 16px; } }
+.fs { border: 0; margin: 0 0 26px; padding: 0; min-width: 0; }
+.fs legend { padding: 0; font-weight: 600; font-size: 17px; margin-bottom: 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 14px; }
+.full { grid-column: 1 / -1; }
+@media (max-width: 640px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) { .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid3 .f:first-child { grid-column: 1 / -1; } }
+.f { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.f > label, .f > .lbl { font-weight: 550; font-size: 15px; }
+.f .opt { font-weight: 400; color: var(--ink-3); }
+.f .hint { font-size: 13.5px; color: var(--ink-3); }
+.in, select.in, textarea.in { width: 100%; min-height: 48px; padding: 10px 12px; background: var(--field); border: 1px solid var(--line-2); border-radius: 3px; color: var(--ink); font-size: 16px; }
+textarea.in { min-height: 96px; resize: vertical; line-height: 1.45; }
+select.in { appearance: none; -webkit-appearance: none; padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23A6B4C1' stroke-width='1.6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px 8px; }
+.in:hover { border-color: #5D6B79; }
+.in:focus { border-color: var(--cy); outline: none; box-shadow: 0 0 0 3px var(--cy-a); }
+.in[aria-invalid="true"] { border-color: var(--err); }
+.in::placeholder { color: #66737F; }
+input[type="date"].in::-webkit-calendar-picker-indicator { filter: invert(.8); }
+.unit { position: relative; }
+.unit .in { padding-right: 46px; font-family: var(--mono); }
+.unit span { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-family: var(--mono); font-size: 14px; pointer-events: none; }
+.err { color: var(--err); font-size: 14px; display: flex; gap: 6px; align-items: flex-start; }
+.err:empty { display: none; }
+.err::before { content: "!"; flex: none; display: inline-grid; place-items: center; width: 16px; height: 16px; margin-top: 2px; border-radius: 50%; background: var(--err); color: var(--g0); font-size: 11px; font-weight: 800; }
+.cb { display: flex; gap: 12px; align-items: flex-start; font-size: 15.5px; cursor: pointer; padding: 4px 0; }
+.cb input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--cy); flex: none; }
+.cbs { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.drop { border: 1.5px dashed var(--line-2); border-radius: 4px; padding: 24px 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--field); transition: border-color .15s, background-color .15s; }
+.drop.over { border-color: var(--cy); background: rgba(69,201,242,.07); }
+.drop svg { width: 40px; height: 40px; color: var(--cy); }
+.drop p { color: var(--ink-2); font-size: 15px; }
+.drop .acts { justify-content: center; }
+.drop.bad { border-color: var(--err); }
+.files { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.files li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 8px 10px 12px; border: 1px solid var(--line); border-radius: 3px; background: var(--g2); }
+.files .ft { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 3px 7px; border: 1px solid var(--cy); color: var(--cy); border-radius: 2px; }
+.files .fn { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+.files .fs2 { display: block; font-family: var(--sans); font-size: 13px; color: var(--ink-3); }
+.icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid transparent; border-radius: 3px; background: none; color: var(--ink-2); }
+.icon-btn:hover { border-color: var(--line-2); color: var(--ink); }
+.icon-btn svg { width: 18px; height: 18px; }
+.form-foot { display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 20px; }
+.form-foot p { font-size: 14px; color: var(--ink-3); max-width: 34em; }
+.sim { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--warn); }
+.sim::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+
+/* Machbarkeits-Check */
+.radio-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.radio-row label { display: flex; gap: 10px; align-items: center; min-height: 48px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 3px; cursor: pointer; font-weight: 550; font-size: 15px; }
+.radio-row input { accent-color: var(--cy); width: 18px; height: 18px; margin: 0; }
+.radio-row label:has(input:checked) { border-color: var(--cy); background: rgba(69,201,242,.08); }
+.radio-row label:has(input:focus-visible) { outline: 2px solid var(--cy); outline-offset: 2px; }
+.ck-fields { display: grid; gap: 14px; margin-top: 16px; }
+.ck-vis { margin-top: 18px; border: 1px solid var(--line); }
+.ck-vis svg { display: block; width: 100%; height: auto; }
+.ck-res { margin-top: 16px; }
+.verdict { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-left: 3px solid var(--ok); background: rgba(98,214,158,.07); }
+.verdict.no { border-left-color: var(--warn); background: rgba(243,190,85,.07); }
+.verdict b { display: block; }
+.verdict span { color: var(--ink-2); font-size: 14.5px; }
+.fit { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 0; }
+.fit li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.fit li .m { font-size: 13px; color: var(--ink-2); }
+.fit .use { grid-column: 1 / -1; height: 4px; background: var(--g3); position: relative; }
+.fit .use i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--cy); }
+.fit .tag { font-size: 12.5px; font-weight: 650; color: var(--cy-ink); background: var(--cy); padding: 1px 7px; border-radius: 2px; margin-left: 8px; vertical-align: 1px; }
+.nofit { margin-top: 10px; font-size: 14px; color: var(--ink-3); }
+.nofit summary { cursor: pointer; padding: 6px 0; color: var(--ink-2); }
+.nofit ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* Bestätigung */
+.done { border: 1px solid var(--cy); background: var(--g1); }
+.done-h { padding: 22px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.done-h .no { font-family: var(--mono); font-size: clamp(26px, 4vw, 38px); font-weight: 600; color: var(--cy); letter-spacing: -.01em; }
+.done-b { padding: 22px; display: grid; gap: 18px; }
+.sum { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 18px; font-size: 15px; }
+.sum dt { color: var(--ink-3); }
+.sum dd { margin: 0; overflow-wrap: anywhere; }
+.hist { margin-top: 22px; }
+.hist h3 { font-size: 17px; margin-bottom: 8px; }
+.hist ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.hist li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.hist .m { color: var(--cy-2); font-size: 14px; }
+
+/* Karriere */
+.car { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 48px; align-items: start; }
+.car-facts { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.car-facts li { padding: 14px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.car-facts b { display: block; font-family: var(--mono); font-size: 22px; font-weight: 600; }
+.car-facts span { font-size: 14px; color: var(--ink-2); }
+.jobs { border-top: 1px solid var(--line); }
+.job { border-bottom: 1px solid var(--line); }
+.job summary { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 18px 0; cursor: pointer; align-items: center; }
+.job summary::-webkit-details-marker { display: none; }
+.job summary h3 { font-size: 19px; }
+.job summary .meta { color: var(--ink-3); font-size: 14.5px; grid-column: 1; }
+.job summary .pm { grid-row: 1 / span 2; grid-column: 2; width: 36px; height: 36px; border: 1px solid var(--line-2); border-radius: 50%; display: grid; place-items: center; transition: transform .2s; }
+.job summary .pm svg { width: 14px; height: 14px; }
+.job[open] summary .pm { transform: rotate(45deg); border-color: var(--cy); color: var(--cy); }
+.job summary:hover h3 { color: var(--cy-2); }
+.job-b { padding: 0 0 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; }
+.job-b h4 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: var(--ink-2); }
+.job-b ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15.5px; display: grid; gap: 4px; }
+.job-b .acts { grid-column: 1 / -1; }
+.tag-new { display: inline-block; font-size: 12.5px; font-weight: 600; color: var(--cy); border: 1px solid var(--cy); border-radius: 2px; padding: 0 6px; margin-left: 8px; vertical-align: 3px; }
+@media (max-width: 900px) { .car { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+@media (max-width: 560px) { .job-b { grid-template-columns: minmax(0, 1fr); } }
+
+/* Kontakt */
+.contact { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px; align-items: start; }
+.addr { font-style: normal; font-size: 18px; line-height: 1.5; }
+.addr b { font-weight: 600; }
+.cl-list { list-style: none; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.cl-list li { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; }
+.cl-list li span { color: var(--ink-3); font-size: 14.5px; }
+.cl-list li a { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-family: var(--mono); font-size: 14px; white-space: nowrap; }
+.hours { margin-top: 20px; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; font-size: 15px; }
+.hours dt { color: var(--ink-3); }
+.hours dd { margin: 0; font-family: var(--mono); font-size: 14px; }
+.plan { border: 1px solid var(--line); }
+.plan svg { display: block; width: 100%; height: auto; }
+.plan .hn { font-size: 15px; } .plan .sub { font-size: 12.5px; } .plan .lb { font-size: 12.5px; }
+@media (max-width: 640px) { .plan .hn { font-size: 27px; } .plan .hn.pk { font-size: 21px; } .plan .sub { display: none; } .plan .lb { font-size: 22px; } }
+.plan figcaption { padding: 10px 14px; font-size: 14px; color: var(--ink-3); border-top: 1px solid var(--line); }
+@media (max-width: 900px) { .contact { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) { .cl-list li { grid-template-columns: minmax(0, 1fr); } .cl-list li a { grid-column: 1; grid-row: auto; } }
+
+/* Fuß */
+.foot { background: var(--g0); padding: 40px 0 44px; font-size: 15px; color: var(--ink-2); }
+.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px 32px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; }
+.foot .lnk { color: var(--ink-2); font-weight: 500; font-size: 15px; min-height: 32px; }
+.foot .lnk:hover { color: var(--ink); }
+.foot small { display: block; color: var(--ink-3); font-size: 13.5px; margin-top: 6px; max-width: 46em; }
+
+/* Dialog */
+dialog.dlg { border: 1px solid var(--line-2); border-radius: 4px; background: var(--g2); color: var(--ink); padding: 0; width: min(720px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); box-shadow: 0 24px 60px rgba(0,0,0,.55); }
+dialog.dlg::backdrop { background: rgba(8, 11, 14, .72); }
+.dlg-h { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 18px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--g2); z-index: 1; }
+.dlg-h h2 { font-size: 22px; letter-spacing: -.015em; }
+.dlg-h p { color: var(--ink-2); font-size: 14.5px; margin-top: 2px; }
+.dlg-b { padding: 20px; display: grid; gap: 18px; }
+.dlg-b .bp { border: 1px solid var(--line); padding: 8px; }
+.dlg-b .bp svg { display: block; width: 100%; max-width: 560px; margin: 0 auto; height: auto; }
+.dlg-f { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; padding: 0 20px 20px; }
+dialog.dlg.sm { width: min(520px, calc(100vw - 32px)); }
+@media (max-width: 640px) {
+  dialog.dlg { width: 100vw; max-width: 100vw; max-height: 92dvh; margin: auto 0 0; border-radius: 10px 10px 0 0; border-width: 1px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  dialog.dlg.sm { width: 100vw; }
+  .dlg-f .btn { flex: 1; }
+}
+.menu-dlg nav { display: grid; }
+.menu-dlg nav a { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 550; font-size: 17px; }
+.menu-dlg nav a:last-child { border-bottom: 0; }
+
+/* Toast */
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 16px; padding: 12px 12px 12px 18px; background: var(--ink); color: var(--g0); border-radius: 4px; box-shadow: 0 12px 30px rgba(0,0,0,.45); font-weight: 550; font-size: 15px; max-width: calc(100vw - 32px); }
+.toast button { border: 1px solid rgba(0,0,0,.25); background: none; color: #0E3A4B; font-weight: 700; min-height: 36px; padding: 0 12px; border-radius: 3px; }
+@media (max-width: 760px) { .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: calc(100vw - 32px); justify-content: space-between; } }
+
+/* Handy-Leiste */
+.tabbar { display: none; }
+@media (max-width: 760px) {
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .tabbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(18,22,27,.97); border-top: 1px solid var(--line); padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 64px; color: var(--ink-3); text-decoration: none; font-size: 12.5px; font-weight: 600; position: relative; }
+  .tabbar a svg { width: 22px; height: 22px; }
+  .tabbar a[aria-current="true"] { color: var(--cy); }
+  .tabbar a[aria-current="true"]::before { content: ""; position: absolute; top: -1px; left: 26%; right: 26%; height: 2px; background: var(--cy); }
+  .tabbar a.cta { color: var(--ink); }
+  .tabbar a.cta svg { color: var(--cy); }
+}
+</style>
+</head>
+<body>
+<div class="demo-strip"><div class="wrap"><span>Beispiel-Website. Name, Personen und Daten sind aus Datenschutzgründen geändert.</span><a href="../de/websites.html">Zurück zu den Demos</a></div></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#start" aria-label="Muster Präzisionsteile, zum Seitenanfang">
+      <svg viewBox="0 0 34 34" aria-hidden="true" fill="none"><circle cx="17" cy="17" r="11.5" stroke="#45C9F2" stroke-width="1.6"/><circle cx="17" cy="17" r="4.5" stroke="#E6EDF3" stroke-width="1.6"/><path d="M17 1v9M17 24v9M1 17h9M24 17h9" stroke="#45C9F2" stroke-width="1.6"/></svg>
+      <span><b>Muster Präzisionsteile</b><small>GmbH, Musterstadt</small></span>
+    </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#leistungen">Leistungen</a><a href="#maschinen">Maschinenpark</a><a href="#qualitaet">Qualität</a><a href="#referenzen">Referenzen</a><a href="#karriere">Karriere</a><a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn pri sm" href="#anfrage">Zeichnung senden</a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-haspopup="dialog"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.8"/></svg>Menü</button>
+  </div>
+</header>
+
+<main id="start">
+<section class="hero bp" aria-labelledby="h-hero">
+  <div class="wrap">
+    <div class="sheet">
+      <div class="zones t" aria-hidden="true" id="zonesT"></div>
+      <div class="zones l" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h1 id="h-hero">Gedrehte und gefräste Teile, genau bis auf fünf Tausendstel.</h1>
+          <p class="lead">Wir fertigen Bauteile aus Edelstahl, Titan, Aluminium und Hochleistungskunststoffen für Automotive, Medizintechnik und Maschinenbau. Vom Prototyp bis zur Serie, geprüft im eigenen Messraum und auf Wunsch einbaufertig montiert.</p>
+          <div class="acts"><a class="btn pri" href="#anfrage">Zeichnung senden</a><a class="btn" href="#check">Machbarkeit prüfen</a></div>
+        </div>
+        <figure class="hero-drw" id="heroDrw" style="margin:0" aria-label="Technische Zeichnung einer Antriebswelle mit Flansch im Halbschnitt, bemaßt"></figure>
+        <div class="tblock" role="group" aria-label="Kennzahlen">
+          <div><span class="k">Toleranz bis</span><span class="v">±0,005 mm</span><span class="s">Rundlauf 0,003 mm</span></div>
+          <div><span class="k">Losgrößen</span><span class="v">1–50.000</span><span class="s">Prototyp bis Serie</span></div>
+          <div><span class="k">Liefertreue</span><span class="v">98,4 %</span><span class="s" id="otdNote">letzte 12 Monate</span></div>
+          <div><span class="k">Maschinenpark</span><span class="v" id="heroMach">38 CNC</span><span class="s">2 Schichten, 1 mannlos</span></div>
+          <dl class="meta">
+            <dt>Benennung</dt><dd>Antriebswelle mit Flansch</dd>
+            <dt>Werkstoff</dt><dd>1.4404</dd>
+            <dt>Allg.-Tol.</dt><dd>ISO 2768-mK</dd>
+            <dt>Mitarbeitende</dt><dd>140</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="leistungen" aria-labelledby="h-leis">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2 id="h-leis">Fertigung unter einem Dach</h2>
+      <p>Zerspanung, Schleifen und Montage machen wir selbst. Oberflächen und Wärmebehandlung vergeben wir an geprüfte Partner in der Region und liefern Ihnen das fertige Teil mit einem Prüfbericht.</p>
+    </div>
+    <div class="comp">
+      <div class="comp-row">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="1.6"><path d="M6 24h22v-8h14v8h16v16H42v8H28v-8H6z" stroke="#E6EDF3"/><path d="M2 32h60" stroke="#82909D" stroke-dasharray="8 2 2 2"/><path d="M50 8l-8 14" stroke="#45C9F2"/><path d="M47 6l6 3" stroke="#45C9F2"/></svg></div>
+        <div><h3>CNC-Drehen</h3><p>Lang- und Kurzdrehen von der Stange, Futterteile bis Ø 670 mm. Mit angetriebenen Werkzeugen, Y-Achse und Gegenspindel entstehen auch komplexe Teile in einer Aufspannung.</p></div>
+        <dl class="specs">
+          <dt>Stangendurchgang</dt><dd>Ø 42 mm</dd>
+          <dt>Langdrehen</dt><dd>Ø 1–32 mm</dd>
+          <dt>Max. Drehdurchmesser</dt><dd>Ø 670 mm</dd>
+          <dt>Max. Drehlänge</dt><dd>1.500 mm</dd>
+          <dt>Toleranz</dt><dd>±0,005 mm</dd>
+        </dl>
+      </div>
+      <div class="comp-row">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="1.6"><path d="M8 40h48v14H8z" stroke="#E6EDF3"/><path d="M20 40v-6h24v6" stroke="#E6EDF3"/><path d="M28 8h8v18h-8z" stroke="#45C9F2"/><path d="M30 26l2 6 2-6" stroke="#45C9F2"/></svg></div>
+        <div><h3>CNC-Fräsen, 3- bis 5-Achs</h3><p>Simultanes 5-Achs-Fräsen für Gehäuse, Blöcke und Freiformflächen. Palettenspeicher und eine Roboterzelle fahren die dritte Schicht mannlos.</p></div>
+        <dl class="specs">
+          <dt>5-Achs-Arbeitsraum</dt><dd>650 × 520 × 475 mm</dd>
+          <dt>Max. Verfahrwege</dt><dd>3.000 × 800 × 700 mm</dd>
+          <dt>Werkstückgewicht</dt><dd>bis 1.200 kg</dd>
+          <dt>Positioniergenauigkeit</dt><dd>0,004 mm</dd>
+          <dt>Toleranz</dt><dd>±0,005 mm</dd>
+        </dl>
+      </div>
+      <div class="comp-row">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="1.6"><circle cx="32" cy="20" r="13" stroke="#45C9F2"/><circle cx="32" cy="20" r="3" stroke="#45C9F2"/><path d="M6 42h52v10H6z" stroke="#E6EDF3"/><path d="M2 47h60" stroke="#82909D" stroke-dasharray="8 2 2 2"/></svg></div>
+        <div><h3>Schleifen und Erodieren</h3><p>Außenrund- und Spitzenlosschleifen für Lagersitze und Passungen. Drahterodieren für Konturen, die kein Fräser erreicht.</p></div>
+        <dl class="specs">
+          <dt>Außenrundschleifen</dt><dd>Ø 250 × 650 mm</dd>
+          <dt>Spitzenlos</dt><dd>Ø 1–40 mm</dd>
+          <dt>Drahterodieren</dt><dd>400 × 300 × 250 mm</dd>
+          <dt>Rauheit</dt><dd>bis Ra 0,1 µm</dd>
+          <dt>Toleranz</dt><dd>±0,002 mm</dd>
+        </dl>
+      </div>
+      <div class="comp-row">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="1.6"><path d="M4 26h16v12H4zM26 18h8v28h-8zM40 22h20v20H40z" stroke="#E6EDF3"/><path d="M2 32h60" stroke="#82909D" stroke-dasharray="8 2 2 2"/><circle cx="30" cy="8" r="4" stroke="#45C9F2"/><path d="M30 12v6" stroke="#45C9F2"/></svg></div>
+        <div><h3>Baugruppenmontage und Oberflächen</h3><p>Wir pressen Lager ein, verschrauben mit dokumentiertem Drehmoment und prüfen auf Dichtheit. Eloxieren, Passivieren, Härten und Beschichten übernehmen Partner, die wir auditieren.</p></div>
+        <dl class="specs">
+          <dt>Montageplätze (ESD)</dt><dd>12</dd>
+          <dt>Kennzeichnung</dt><dd>Laser, DMC</dd>
+          <dt>Dichtheitsprüfung</dt><dd>bis 10⁻³ mbar·l/s</dd>
+          <dt>Oberflächen über Partner</dt><dd>9 Verfahren</dd>
+          <dt>Sauberverpackung</dt><dd>ISO 14644 Kl. 7</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="mat-wrap">
+      <div>
+        <h3>Werkstoffe</h3>
+        <p class="muted">Wir halten gängige Stangen- und Plattenmaterialien auf Lager. Jede Charge ist mit Abnahmeprüfzeugnis 3.1 nach EN 10204 bis zum Teil rückverfolgbar.</p>
+      </div>
+      <div class="tbl-scroll" tabindex="0" role="region" aria-label="Werkstofftabelle">
+        <table class="t mat">
+          <thead><tr><th scope="col">Werkstoff</th><th scope="col">Bezeichnung</th><th scope="col">Typisch für</th></tr></thead>
+          <tbody>
+            <tr><td>Edelstahl</td><td class="m">1.4404, 1.4305, 1.4542</td><td>Medizin, Lebensmittel, Ventile</td></tr>
+            <tr><td>Titan</td><td class="m">Grade 5, Grade 23 ELI</td><td>Implantate, Instrumente</td></tr>
+            <tr><td>Aluminium</td><td class="m">EN AW-6082, EN AW-7075</td><td>Gehäuse, Halter, Leichtbau</td></tr>
+            <tr><td>Stahl</td><td class="m">42CrMo4, 16MnCr5, 11SMnPb30</td><td>Wellen, Zahnräder, Drehteile</td></tr>
+            <tr><td>Messing, Kupfer</td><td class="m">CW614N, CW004A</td><td>Steckverbinder, Elektrotechnik</td></tr>
+            <tr><td>Kunststoffe</td><td class="m">PEEK, POM-C, PTFE, PA 6</td><td>Isolatoren, Gleitteile, Medizin</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="asm" id="asm">
+      <div class="asm-h">
+        <div><h3>Baugruppe einbaufertig</h3><p>Lagereinheit für einen Kunden aus dem Maschinenbau: Wir fertigen Welle und Flansch, beschaffen Lager und Normteile und liefern montiert und geprüft.</p></div>
+        <div class="seg" role="group" aria-label="Darstellung der Baugruppe"><button type="button" id="asmOpen" aria-pressed="true">Explosionsansicht</button><button type="button" id="asmClose" aria-pressed="false">Montiert</button></div>
+      </div>
+      <div class="asm-b">
+        <div class="bp" id="asmDrw" aria-label="Explosionsansicht der Lagereinheit mit fünf Positionen"></div>
+        <div class="bom">
+          <table class="t">
+            <caption class="sr">Stückliste der Lagereinheit</caption>
+            <thead><tr><th scope="col">Pos.</th><th scope="col">Benennung</th><th scope="col">Menge</th></tr></thead>
+            <tbody>
+              <tr><td><span class="pos">1</span></td><td>Welle, 42CrMo4 vergütet<span class="sub muted small" style="display:block">eigene Fertigung</span></td><td class="m">1</td></tr>
+              <tr><td><span class="pos">2</span></td><td>Rillenkugellager 6205<span class="muted small" style="display:block">zugekauft</span></td><td class="m">1</td></tr>
+              <tr><td><span class="pos">3</span></td><td>Lagerflansch, EN AW-6082<span class="muted small" style="display:block">eigene Fertigung, eloxiert über Partner</span></td><td class="m">1</td></tr>
+              <tr><td><span class="pos">4</span></td><td>Sicherungsring DIN 471<span class="muted small" style="display:block">Normteil</span></td><td class="m">1</td></tr>
+              <tr><td><span class="pos">5</span></td><td>Nutmutter M20×1,5<span class="muted small" style="display:block">Normteil, Drehmoment dokumentiert</span></td><td class="m">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="maschinen" aria-labelledby="h-mas">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2 id="h-mas">Maschinenpark</h2>
+      <p>Alle Maschinen stehen in klimatisierten Hallen. Filtern Sie nach Verfahren oder suchen Sie nach Ausstattung, zum Beispiel Gegenspindel oder Palettenwechsler.</p>
+    </div>
+    <div class="tools">
+      <div class="chips" role="group" aria-label="Nach Verfahren filtern" id="mFilter"></div>
+      <div class="search"><label class="sr" for="mSearch">Maschinen durchsuchen</label><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l5 5" stroke="currentColor" stroke-width="1.8"/></svg><input class="in" id="mSearch" type="search" placeholder="Suchen, z. B. Gegenspindel" autocomplete="off"></div>
+    </div>
+    <div class="mt">
+      <div class="tbl-scroll">
+        <table>
+          <caption class="sr">Maschinenpark, sortierbar</caption>
+          <thead><tr>
+            <th scope="col" data-k="typ"><button type="button">Maschine <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></th>
+            <th scope="col" data-k="vf"><button type="button">Verfahren <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></th>
+            <th scope="col" data-k="ax"><button type="button">Achsen <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></th>
+            <th scope="col"><span>Arbeitsraum</span></th>
+            <th scope="col" data-k="tol"><button type="button">Genauigkeit <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></th>
+            <th scope="col" class="n" data-k="n"><button type="button">Anzahl <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></th>
+          </tr></thead>
+          <tbody id="mBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="mEmpty" hidden>Keine Maschine passt zu dieser Suche. <button type="button" class="lnk" id="mClear">Filter zurücksetzen</button></div>
+      <div class="mt-foot"><span id="mSum" aria-live="polite"></span><a href="#check">Passt Ihr Teil? Zum Machbarkeits-Check</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="qualitaet" aria-labelledby="h-qual">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2 id="h-qual">Branchen und Qualität</h2>
+      <p>Drei Branchen, drei Regelwerke. Wir sind nach allen dreien zertifiziert und bekommen jedes Jahr Besuch von Auditoren unserer Kunden.</p>
+    </div>
+    <div class="branches" id="branches"></div>
+
+    <div class="q-grid">
+      <div>
+        <h3>Messraum</h3>
+        <p>Klimatisiert auf 20 ±0,5 °C, direkt neben der Fertigung. Jedes Erstmuster und jede Serienstichprobe wird hier gemessen.</p>
+        <ul class="lab">
+          <li><b>Portal-Koordinatenmessgerät</b><span>Messvolumen 1.200 × 1.000 × 800 mm, scannender Taster</span><span class="m">MPE 1,5 + L/350 µm</span></li>
+          <li><b>Koordinatenmessgerät, kompakt</b><span>Messvolumen 500 × 500 × 400 mm, für Kleinteile</span><span class="m">MPE 0,9 + L/400 µm</span></li>
+          <li><b>Optisches Wellenmessgerät</b><span>Ø 120 × 650 mm, für Drehteile in der Serie</span><span class="m">± 1,5 µm</span></li>
+          <li><b>Kontur- und Rauheitsmessung</b><span>Profile, Radien, Ra und Rz nach ISO 21920</span><span class="m">Auflösung 0,01 µm</span></li>
+        </ul>
+        <div class="empb">
+          <div class="empb-h"><span><b>Auszug Erstmusterprüfbericht</b> nach VDA Band 2</span><span class="m" id="empbMeta">EMPB 0418</span></div>
+          <div class="tbl-scroll" tabindex="0" role="region" aria-label="Messwerte Erstmuster">
+            <table>
+              <thead><tr><th scope="col">Merkmal</th><th scope="col">Soll</th><th scope="col">Toleranz</th><th scope="col">Ist</th><th scope="col">Lage</th><th scope="col"><span class="sr">Bewertung</span></th></tr></thead>
+              <tbody id="empbBody"></tbody>
+            </table>
+          </div>
+          <p class="empb-f">Beispielwerte. Vollständige Berichte mit allen Merkmalen erhalten Kunden mit jeder Erstmusterlieferung.</p>
+        </div>
+      </div>
+      <div>
+        <h3>Vom Erstmuster zur Serie</h3>
+        <p>So läuft die Freigabe eines neuen Teils bei uns ab. Bei Automotive-Teilen nach PPAP, Level 3 ist Standard.</p>
+        <ol class="steps">
+          <li><b>Zeichnungsprüfung</b><span>Technik und Qualität prüfen Toleranzen, Werkstoff und Prüfmerkmale. Rückfragen klären wir vor dem Angebot.</span></li>
+          <li><b>Prüfplanung</b><span>Prüfplan, Prozess-FMEA und Produktionslenkungsplan. Für Medizinprodukte zusätzlich die Validierung der Reinigung.</span></li>
+          <li><b>Erstmuster</b><span>Fertigung unter Serienbedingungen, Messung aller Merkmale, EMPB oder PPAP-Dokumentation mit Fähigkeitsnachweis.</span></li>
+          <li><b>Freigabe durch Sie</b><span>Sie prüfen Muster und Bericht. Erst mit Ihrer Freigabe starten wir die Serie.</span></li>
+          <li><b>Serie mit SPC</b><span>Statistische Prozesslenkung an der Maschine. Für kritische Merkmale halten wir Cpk ≥ 1,67.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="referenzen" aria-labelledby="h-ref">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2 id="h-ref">Referenzteile</h2>
+      <p>Eine Auswahl aus der laufenden Fertigung. Zeichnungen vereinfacht, Kunden auf eigenen Wunsch nicht genannt.</p>
+    </div>
+    <div class="tools"><div class="chips" role="group" aria-label="Nach Branche filtern" id="rFilter"></div></div>
+    <div class="refs" id="refs"></div>
+  </div>
+</section>
+
+<section class="sec" id="anfrage" aria-labelledby="h-req">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2 id="h-req">Anfrage mit Zeichnung</h2>
+      <p>Senden Sie uns Zeichnung oder 3D-Modell. Sie erhalten innerhalb von drei Arbeitstagen ein Angebot mit Preis je Losgröße und Liefertermin.</p>
+    </div>
+    <div class="req">
+      <div id="formWrap">
+        <form class="panel" id="rq" novalidate>
+          <div class="panel-h"><h3>Angebot anfragen</h3><p>Pflichtfelder sind markiert. Ihre Eingaben bleiben in diesem Browser gespeichert, bis Sie senden.</p></div>
+          <div class="panel-b">
+            <fieldset class="fs">
+              <legend>Zeichnung und Modell</legend>
+              <div class="f">
+                <div class="drop" id="drop">
+                  <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M10 4h14l8 8v24H10z" stroke="currentColor" stroke-width="1.6"/><path d="M24 4v8h8" stroke="currentColor" stroke-width="1.6"/><path d="M21 31V18M16 23l5-5 5 5" stroke="#E6EDF3" stroke-width="1.6"/></svg>
+                  <p>Dateien hierher ziehen oder auswählen. STEP, PDF oder DXF, bis 25 MB je Datei.</p>
+                  <div class="acts">
+                    <label class="btn sm" for="fileIn">Dateien auswählen</label>
+                    <button type="button" class="btn sm" id="sampleFile">Beispieldatei verwenden</button>
+                  </div>
+                  <input id="fileIn" class="sr" type="file" multiple accept=".step,.stp,.pdf,.dxf" aria-describedby="fileIn-err fileHint">
+                  <span class="sim" id="fileHint">In der Demo wird nichts hochgeladen. Dateien bleiben auf Ihrem Gerät.</span>
+                </div>
+                <ul class="files" id="fileList" aria-label="Ausgewählte Dateien"></ul>
+                <label class="cb"><input type="checkbox" id="f-later" name="later"> Zeichnung folgt per E-Mail</label>
+                <span class="err" id="fileIn-err" role="alert"></span>
+              </div>
+            </fieldset>
+
+            <fieldset class="fs">
+              <legend>Bauteil</legend>
+              <div class="grid2">
+                <div class="f full"><label for="f-part">Bauteilbezeichnung *</label><input class="in" id="f-part" name="part" autocomplete="off" placeholder="z. B. Lagerwelle 4711, Rev. C" aria-describedby="f-part-err"><span class="err" id="f-part-err"></span></div>
+                <div class="f"><label for="f-mat">Werkstoff *</label><select class="in" id="f-mat" name="mat" aria-describedby="f-mat-err"></select><span class="err" id="f-mat-err"></span></div>
+                <div class="f"><label for="f-tol">Toleranzklasse *</label><select class="in" id="f-tol" name="tol" aria-describedby="f-tol-err"></select><span class="err" id="f-tol-err"></span></div>
+                <div class="f"><label for="f-qty">Stückzahl je Los *</label><div class="unit"><input class="in" id="f-qty" name="qty" inputmode="numeric" autocomplete="off" placeholder="500" aria-describedby="f-qty-hint f-qty-err"><span>Stk.</span></div><span class="hint" id="f-qty-hint">1 bis 50.000</span><span class="err" id="f-qty-err"></span></div>
+                <div class="f"><label for="f-year">Jahresbedarf <span class="opt">optional</span></label><div class="unit"><input class="in" id="f-year" name="year" inputmode="numeric" autocomplete="off" placeholder="6000"><span>Stk.</span></div></div>
+                <div class="f"><label for="f-date">Wunschtermin *</label><input class="in" id="f-date" name="date" type="date" aria-describedby="f-date-hint f-date-err"><span class="hint" id="f-date-hint"></span><span class="err" id="f-date-err"></span></div>
+                <div class="f"><label for="f-surf">Oberfläche <span class="opt">optional</span></label><select class="in" id="f-surf" name="surf"></select></div>
+                <div class="f full"><label for="f-dim">Abmessungen <span class="opt">optional</span></label><input class="in" id="f-dim" name="dim" autocomplete="off" placeholder="z. B. Ø 28 × 85 mm"></div>
+                <div class="f full"><span class="lbl" id="f-doc-l">Prüfdokumentation</span><div class="cbs" role="group" aria-labelledby="f-doc-l"><label class="cb"><input type="checkbox" name="doc" value="Messprotokoll"> Messprotokoll</label><label class="cb"><input type="checkbox" name="doc" value="EMPB (VDA)"> EMPB nach VDA</label><label class="cb"><input type="checkbox" name="doc" value="PPAP Level 3"> PPAP Level 3</label><label class="cb"><input type="checkbox" name="doc" value="Zeugnis 3.1"> Zeugnis 3.1</label></div></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="fs">
+              <legend>Ihre Kontaktdaten</legend>
+              <div class="grid2">
+                <div class="f"><label for="f-co">Firma *</label><input class="in" id="f-co" name="co" autocomplete="organization" placeholder="Fiktive GmbH 1" aria-describedby="f-co-err"><span class="err" id="f-co-err"></span></div>
+                <div class="f"><label for="f-br">Branche</label><select class="in" id="f-br" name="br"><option value="">Bitte wählen</option><option>Automotive</option><option>Medizintechnik</option><option>Maschinenbau</option><option>Andere</option></select></div>
+                <div class="f"><label for="f-name">Ansprechpartner *</label><input class="in" id="f-name" name="name" autocomplete="name" placeholder="Vor- und Nachname" aria-describedby="f-name-err"><span class="err" id="f-name-err"></span></div>
+                <div class="f"><label for="f-mail">E-Mail *</label><input class="in" id="f-mail" name="mail" type="email" autocomplete="email" spellcheck="false" placeholder="name@firma.de" aria-describedby="f-mail-err"><span class="err" id="f-mail-err"></span></div>
+                <div class="f"><label for="f-tel">Telefon <span class="opt">optional</span></label><input class="in" id="f-tel" name="tel" type="tel" autocomplete="tel" placeholder="0123 456789"></div>
+                <div class="f full"><label for="f-note">Bemerkung <span class="opt">optional</span></label><textarea class="in" id="f-note" name="note" placeholder="Besondere Anforderungen, Verpackung, Rahmenvertrag"></textarea></div>
+              </div>
+            </fieldset>
+
+            <div class="f" style="margin-bottom:22px">
+              <label class="cb"><input type="checkbox" id="f-priv" name="priv" aria-describedby="f-priv-err"> Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert werden. *</label>
+              <span class="err" id="f-priv-err"></span>
+            </div>
+            <div class="form-foot">
+              <p>Ihre Zeichnungen behandeln wir vertraulich. Auf Wunsch unterzeichnen wir vorab eine Geheimhaltungsvereinbarung.</p>
+              <button class="btn pri" type="submit">Anfrage senden</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside class="panel check" id="check" aria-labelledby="h-check">
+        <div class="panel-h"><h3 id="h-check">Machbarkeits-Check</h3><p>Geben Sie die Außenmaße ein. Wir zeigen, welche Maschinen Ihr Teil aufnehmen.</p></div>
+        <div class="panel-b">
+          <div class="radio-row" role="radiogroup" aria-label="Bauteilform">
+            <label><input type="radio" name="ck-kind" value="rund" checked> Drehteil, rund</label>
+            <label><input type="radio" name="ck-kind" value="prism"> Frästeil, prismatisch</label>
+          </div>
+          <div class="ck-fields">
+            <div class="grid2" id="ckRund">
+              <div class="f"><label for="ck-d">Durchmesser</label><div class="unit"><input class="in" id="ck-d" inputmode="decimal" autocomplete="off"><span>mm</span></div></div>
+              <div class="f"><label for="ck-l">Länge</label><div class="unit"><input class="in" id="ck-l" inputmode="decimal" autocomplete="off"><span>mm</span></div></div>
+            </div>
+            <div class="grid3" id="ckPrism" hidden>
+              <div class="f"><label for="ck-x">Länge</label><div class="unit"><input class="in" id="ck-x" inputmode="decimal" autocomplete="off"><span>mm</span></div></div>
+              <div class="f"><label for="ck-y">Breite</label><div class="unit"><input class="in" id="ck-y" inputmode="decimal" autocomplete="off"><span>mm</span></div></div>
+              <div class="f"><label for="ck-z">Höhe</label><div class="unit"><input class="in" id="ck-z" inputmode="decimal" autocomplete="off"><span>mm</span></div></div>
+            </div>
+            <div class="grid2">
+              <div class="f"><label for="ck-tol">Engste Toleranz</label><select class="in" id="ck-tol"><option value="0.1">±0,1 mm</option><option value="0.05">±0,05 mm</option><option value="0.02">±0,02 mm</option><option value="0.01">±0,01 mm</option><option value="0.005">±0,005 mm</option><option value="0.002">±0,002 mm</option></select></div>
+              <div class="f"><label for="ck-qty">Stückzahl</label><div class="unit"><input class="in" id="ck-qty" inputmode="numeric" autocomplete="off"><span>Stk.</span></div></div>
+            </div>
+            <span class="err" id="ck-err" role="alert"></span>
+          </div>
+          <div class="ck-vis bp" id="ckVis" aria-hidden="true"></div>
+          <div class="ck-res" id="ckRes"></div>
+          <p class="sr" id="ckLive" aria-live="polite"></p>
+          <div class="acts" style="margin-top:18px"><button type="button" class="btn" id="ckUse">Maße in Anfrage übernehmen</button></div>
+          <p class="small muted" style="margin-top:12px">Grobe Vorprüfung nach Arbeitsraum und Maschinengenauigkeit. Die verbindliche Prüfung machen wir anhand Ihrer Zeichnung.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="karriere" aria-labelledby="h-car">
+  <div class="wrap">
+    <div class="car">
+      <div>
+        <h2 id="h-car">Karriere</h2>
+        <p class="muted" style="margin-top:16px">Wir suchen Leute, die gerne an der Maschine stehen und wissen wollen, warum ein Maß wandert. Sie arbeiten an modernen Maschinen, mit festen Teams und planbaren Schichten.</p>
+        <ul class="car-facts">
+          <li><b>140</b><span>Mitarbeitende</span></li>
+          <li><b>18</b><span>Auszubildende</span></li>
+          <li><b>30</b><span>Tage Urlaub</span></li>
+          <li><b>100 %</b><span>Übernahme nach Ausbildung seit 2015</span></li>
+        </ul>
+        <p class="small muted" style="margin-top:18px">Schichtzulagen, Jobrad, betriebliche Altersvorsorge und Weiterbildung zum Techniker oder Meister mit Freistellung.</p>
+      </div>
+      <div class="jobs" id="jobs"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="kontakt" aria-labelledby="h-kon">
+  <div class="wrap">
+    <div class="sec-h"><h2 id="h-kon">Kontakt</h2><p>Für Anfragen nutzen Sie am besten das Formular mit Zeichnung. Für alles andere erreichen Sie uns direkt.</p></div>
+    <div class="contact">
+      <div>
+        <address class="addr"><b>Muster Präzisionsteile GmbH</b><br>Industriestraße 12<br>12345 Musterstadt</address>
+        <ul class="cl-list">
+          <li><b>Zentrale</b><span>Mo bis Fr, 7 bis 17 Uhr</span><a href="tel:+491234567890">0123 4567-0</a></li>
+          <li><b>Vertrieb Automotive</b><span>Jana Brehm</span><a href="mailto:j.brehm@muster-praezision.example">E-Mail</a></li>
+          <li><b>Vertrieb Medizintechnik</b><span>Dr. Tobias Kern</span><a href="mailto:t.kern@muster-praezision.example">E-Mail</a></li>
+          <li><b>Vertrieb Maschinenbau</b><span>Murat Aydın</span><a href="mailto:m.aydin@muster-praezision.example">E-Mail</a></li>
+          <li><b>Ausbildung und Personal</b><span>Sabine Wolf</span><a href="mailto:karriere@muster-praezision.example">E-Mail</a></li>
+        </ul>
+        <dl class="hours">
+          <dt>Warenannahme</dt><dd>Mo–Fr 6:00–15:30</dd>
+          <dt>Abholung</dt><dd>Mo–Fr 7:00–14:00, Tor 3</dd>
+        </dl>
+      </div>
+      <figure class="plan bp" style="margin:0">
+        <div id="plan"></div>
+        <figcaption>Werksplan. Besucher melden sich am Empfang in Halle A, Parkplätze direkt davor.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div><b style="color:var(--ink)">Muster Präzisionsteile GmbH</b><small>Fiktives Unternehmen. Diese Seite ist eine Beispiel-Website, alle Angaben sind erfunden.</small></div>
+    <nav aria-label="Rechtliches">
+      <button type="button" class="lnk" data-legal="imp">Impressum</button>
+      <button type="button" class="lnk" data-legal="ds">Datenschutz</button>
+      <button type="button" class="lnk" id="resetBtn">Demo zurücksetzen</button>
+      <a class="lnk" href="../de/websites.html">Weitere Demos</a>
+    </nav>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="Schnellzugriff">
+  <a href="#leistungen" data-sec="leistungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 10h8V6h4v4h6v6h-6v4h-4v-4H3z"/></svg>Leistungen</a>
+  <a href="#maschinen" data-sec="maschinen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/><path d="M7 8h5M7 12h8"/></svg>Maschinen</a>
+  <a href="#check" data-sec="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 7h18M3 17h18M7 4v6M17 14v6"/></svg>Prüfen</a>
+  <a href="#anfrage" data-sec="anfrage" class="cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M12 17v-7M9 13l3-3 3 3"/></svg>Anfrage</a>
+</nav>
+
+<dialog class="dlg sm menu-dlg" id="menuDlg" aria-labelledby="menuT">
+  <div class="dlg-h"><h2 id="menuT">Menü</h2><button type="button" class="icon-btn" data-close aria-label="Menü schließen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8"/></svg></button></div>
+  <nav aria-label="Menü"><a href="#leistungen">Leistungen</a><a href="#maschinen">Maschinenpark</a><a href="#qualitaet">Branchen und Qualität</a><a href="#referenzen">Referenzteile</a><a href="#anfrage">Anfrage mit Zeichnung</a><a href="#check">Machbarkeits-Check</a><a href="#karriere">Karriere</a><a href="#kontakt">Kontakt</a></nav>
+</dialog>
+
+<dialog class="dlg" id="refDlg" aria-labelledby="refT">
+  <div class="dlg-h"><div><h2 id="refT"></h2><p id="refSub"></p></div><button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8"/></svg></button></div>
+  <div class="dlg-b"><div class="bp big-t" id="refPic"></div><dl class="sum" id="refData"></dl></div>
+  <div class="dlg-f"><button type="button" class="btn" data-close>Schließen</button><button type="button" class="btn pri" id="refAsk">Ähnliches Teil anfragen</button></div>
+</dialog>
+
+<dialog class="dlg sm" id="jobDlg" aria-labelledby="jobT">
+  <form id="jobForm" novalidate>
+    <div class="dlg-h"><div><h2 id="jobT">Kurzbewerbung</h2><p id="jobSub"></p></div><button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8"/></svg></button></div>
+    <div class="dlg-b" id="jobBody">
+      <p class="muted small">Ohne Anschreiben. Frau Wolf aus der Personalabteilung ruft Sie zurück und klärt den Rest im Gespräch.</p>
+      <div class="f"><label for="j-name">Name *</label><input class="in" id="j-name" autocomplete="name" aria-describedby="j-name-err"><span class="err" id="j-name-err"></span></div>
+      <div class="f"><label for="j-tel">Telefon oder E-Mail *</label><input class="in" id="j-tel" autocomplete="tel" aria-describedby="j-tel-err"><span class="err" id="j-tel-err"></span></div>
+      <div class="f"><label for="j-exp">Berufserfahrung</label><select class="in" id="j-exp"><option>Schülerin oder Schüler</option><option>In Ausbildung</option><option selected>1 bis 5 Jahre</option><option>Mehr als 5 Jahre</option></select></div>
+      <div class="f"><label for="j-when">Erreichbar</label><select class="in" id="j-when"><option>Vormittags</option><option selected>Nachmittags</option><option>Abends nach 18 Uhr</option></select></div>
+      <span class="sim">In der Demo wird nichts gesendet.</span>
+    </div>
+    <div class="dlg-f" id="jobFoot"><button type="button" class="btn" data-close>Abbrechen</button><button type="submit" class="btn pri">Kurzbewerbung senden</button></div>
+  </form>
+</dialog>
+
+<dialog class="dlg sm" id="legalDlg" aria-labelledby="legalT">
+  <div class="dlg-h"><h2 id="legalT"></h2><button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8"/></svg></button></div>
+  <div class="dlg-b" id="legalB"></div>
+  <div class="dlg-f"><button type="button" class="btn" data-close>Schließen</button></div>
+</dialog>
+
+<div id="toastHost" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  try { if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion'); } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var NF = new Intl.NumberFormat('de-DE');
+  var NF1 = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+  var NF3 = function (v) { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(v); };
+  var DF = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  var DFL = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+  var MY = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
+  var MS = new Intl.DateTimeFormat('de-DE', { month: 'short', year: 'numeric' });
+  var TODAY = new Date(); TODAY.setHours(12, 0, 0, 0);
+  function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function addWorkdays(d, n) { var x = new Date(d); while (n > 0) { x.setDate(x.getDate() + 1); if (x.getDay() !== 0 && x.getDay() !== 6) n--; } return x; }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function mm(v) { return NF.format(v); }
+  function num(v) { if (v == null) return NaN; var s = String(v).trim().replace(/\s/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'); return s === '' ? NaN : Number(s); }
+
+  /* Speicher */
+  var KEY = 'fertigung-demo-v1';
+  function load() { try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') return s; } catch (e) {} return {}; }
+  var S = load();
+  S.draft = S.draft || {}; S.inquiries = S.inquiries || []; S.apps = S.apps || []; S.check = S.check || null;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  /* Toast */
+  var toastT = null;
+  function toast(msg, undo) {
+    var host = $('toastHost'); clearTimeout(toastT);
+    host.innerHTML = '<div class="toast"><span>' + esc(msg) + '</span>' + (undo ? '<button type="button">Rückgängig</button>' : '') + '</div>';
+    if (undo) host.querySelector('button').addEventListener('click', function () { host.innerHTML = ''; undo(); });
+    toastT = setTimeout(function () { host.innerHTML = ''; }, undo ? 7000 : 4000);
+  }
+
+  /* Dialoge */
+  var lastFocus = null;
+  function openDlg(d) { lastFocus = document.activeElement; if (d.showModal) d.showModal(); else d.setAttribute('open', ''); var f = d.querySelector('[autofocus], input, select, .btn.pri, a, button'); if (f && d.id !== 'refDlg') f.focus(); }
+  function closeDlg(d) { if (d.close) d.close(); else d.removeAttribute('open'); }
+  Array.prototype.forEach.call(document.querySelectorAll('dialog'), function (d) {
+    d.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) closeDlg(d); else if (e.target === d) closeDlg(d); });
+    d.addEventListener('close', function () { if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus(); });
+  });
+
+  /* Menü */
+  $('menuBtn').addEventListener('click', function () { openDlg($('menuDlg')); });
+  $('menuDlg').addEventListener('click', function (e) { if (e.target.closest('a')) { lastFocus = null; closeDlg($('menuDlg')); } });
+
+  /* SVG-Bausteine */
+  var uid = 0;
+  function defs(p) {
+    return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1.6 L10,5 L0,8.4z" style="fill:var(--cy)"/></marker>' +
+      '<pattern id="' + p + 'h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" class="hatch-l"/></pattern></defs>';
+  }
+  function dimH(p, x1, x2, y, t, ext, d, cls) {
+    var s = '<g class="dm ' + (cls || '') + '"' + (d != null ? ' style="--d:' + d + 's"' : '') + '>';
+    if (ext) { s += '<line class="ex" pathLength="1" x1="' + x1 + '" y1="' + ext[0] + '" x2="' + x1 + '" y2="' + (y + (y > ext[0] ? 5 : -5)) + '"/><line class="ex" pathLength="1" x1="' + x2 + '" y1="' + ext[1] + '" x2="' + x2 + '" y2="' + (y + (y > ext[1] ? 5 : -5)) + '"/>'; }
+    s += '<line class="dl" pathLength="1" x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" marker-start="url(#' + p + 'a)" marker-end="url(#' + p + 'a)"/>';
+    s += '<text class="halo" x="' + ((x1 + x2) / 2) + '" y="' + (y - 5) + '" text-anchor="middle">' + t + '</text></g>';
+    return s;
+  }
+  function dimV(p, x, y1, y2, t, d, cls, tx) {
+    var cy = (y1 + y2) / 2, xx = tx != null ? tx : x - 5;
+    return '<g class="dm ' + (cls || '') + '"' + (d != null ? ' style="--d:' + d + 's"' : '') + '><line class="dl" pathLength="1" x1="' + x + '" y1="' + y1 + '" x2="' + x + '" y2="' + y2 + '" marker-start="url(#' + p + 'a)" marker-end="url(#' + p + 'a)"/>' +
+      '<text class="halo" x="' + xx + '" y="' + cy + '" text-anchor="middle" transform="rotate(-90 ' + xx + ' ' + cy + ')">' + t + '</text></g>';
+  }
+  /* Drehteil-Profil: secs = [[Länge, Durchmesser], ...] in mm */
+  function turned(o) {
+    var p = o.p, s = o.s, cy = o.cy, c = o.ch == null ? 4 : o.ch, xs = [o.x0], rs = [];
+    o.secs.forEach(function (sc, i) { xs.push(xs[i] + sc[0] * s); rs.push(sc[1] * s / 2); });
+    var n = rs.length, xe = xs[n];
+    var top = 'M' + o.x0 + ',' + (cy - rs[0] + c) + ' L' + (o.x0 + c) + ',' + (cy - rs[0]);
+    for (var i = 0; i < n; i++) { top += ' H' + (i === n - 1 ? xe - c : xs[i + 1]); if (i < n - 1) top += ' V' + (cy - rs[i + 1]); }
+    top += ' L' + xe + ',' + (cy - rs[n - 1] + c);
+    var full = top + ' V' + (cy + rs[n - 1] - c) + ' L' + (xe - c) + ',' + (cy + rs[n - 1]);
+    for (var j = n - 1; j >= 0; j--) { full += ' H' + (j === 0 ? o.x0 + c : xs[j]); if (j > 0) full += ' V' + (cy + rs[j - 1]); }
+    full += ' L' + o.x0 + ',' + (cy + rs[0] - c) + ' Z';
+    var g = '';
+    if (o.half) {
+      g += '<clipPath id="' + p + 'c"><path d="' + top + ' V' + cy + ' H' + o.x0 + ' Z"/></clipPath>';
+      g += '<rect class="hz" x="' + o.x0 + '" y="' + (cy - 200) + '" width="' + (xe - o.x0) + '" height="200" fill="url(#' + p + 'h)" clip-path="url(#' + p + 'c)"/>';
+    }
+    if (o.bore) {
+      var bx = o.x0; o.bore.forEach(function (b) { var w = b[0] * s, r = b[1] * s / 2; if (r > 0) {
+        if (o.half) g += '<rect class="bg" x="' + bx + '" y="' + (cy - r) + '" width="' + w + '" height="' + r + '"/><path class="ol" pathLength="1" d="M' + bx + ',' + (cy - r) + ' H' + (bx + w) + '"/>';
+        g += '<path class="hid" pathLength="1" d="M' + bx + ',' + (cy + r) + ' H' + (bx + w) + (o.half ? '' : ' M' + bx + ',' + (cy - r) + ' H' + (bx + w)) + '"/>';
+      } bx += w; });
+    }
+    g += '<path class="ol" pathLength="1" d="' + full + '"/>';
+    var edges = '';
+    for (var k = 1; k < n; k++) { var m = Math.max(rs[k - 1], rs[k]); edges += 'M' + xs[k] + ',' + (o.half ? cy : cy - m) + ' V' + (cy + m) + ' '; }
+    edges += 'M' + (o.x0 + c) + ',' + (o.half ? cy : cy - rs[0]) + ' V' + (cy + rs[0]) + ' M' + (xe - c) + ',' + (o.half ? cy : cy - rs[n - 1]) + ' V' + (cy + rs[n - 1]);
+    g += '<path class="ol" pathLength="1" style="stroke-width:1.2" d="' + edges + '"/>';
+    g += '<line class="cl" x1="' + (o.x0 - 16) + '" y1="' + cy + '" x2="' + (xe + 16) + '" y2="' + cy + '"/>';
+    return { svg: g, xs: xs, rs: rs, xe: xe };
+  }
+
+  /* Hero-Zeichnung */
+  function heroSVG() {
+    var p = 'h' + (uid++) + '-', cy = 196;
+    var t = turned({ p: p, x0: 78, cy: cy, s: 2.8, secs: [[30, 25], [12, 70], [70, 40], [40, 30], [28, 20]], half: true, ch: 4 });
+    var xs = t.xs, rs = t.rs, o = '';
+    o += t.svg;
+    // Bohrungen im Flansch (Lochkreis)
+    var hy = cy - 78, hr = 11, fx1 = xs[1], fx2 = xs[2];
+    o += '<rect class="bg" x="' + fx1 + '" y="' + (hy - hr) + '" width="' + (fx2 - fx1) + '" height="' + (2 * hr) + '"/>';
+    o += '<path class="ol" pathLength="1" style="stroke-width:1.2" d="M' + fx1 + ',' + (hy - hr) + ' H' + fx2 + ' M' + fx1 + ',' + (hy + hr) + ' H' + fx2 + '"/>';
+    o += '<path class="hid" pathLength="1" d="M' + fx1 + ',' + (cy + 78 - hr) + ' H' + fx2 + ' M' + fx1 + ',' + (cy + 78 + hr) + ' H' + fx2 + '"/>';
+    o += '<line class="cl" x1="' + (fx1 - 8) + '" y1="' + hy + '" x2="' + (fx2 + 8) + '" y2="' + hy + '"/><line class="cl" x1="' + (fx1 - 8) + '" y1="' + (cy + 78) + '" x2="' + (fx2 + 8) + '" y2="' + (cy + 78) + '"/>';
+    // Gewinde
+    var gx = xs[4], ge = t.xe - 4, rm = 23;
+    o += '<path class="th" pathLength="1" d="M' + gx + ',' + (cy - rm) + ' H' + ge + ' M' + gx + ',' + (cy + rm) + ' H' + ge + ' M' + (gx + 62) + ',' + (cy - 28) + ' V' + (cy + 28) + '"/>';
+    // Durchmesser
+    o += dimV(p, 122, cy - rs[0], cy + rs[0], 'Ø25 h6', 1.2);
+    o += dimV(p, 184, cy - rs[1], cy + rs[1], 'Ø70', 1.35);
+    o += dimV(p, 318, cy - rs[2], cy + rs[2], 'Ø40 ±0,02', 1.5);
+    o += dimV(p, 462, cy - rs[3], cy + rs[3], 'Ø30 g6', 1.65);
+    o += dimV(p, 556, cy - rs[4], cy + rs[4], 'M20×1,5', 1.8, 'lg-only');
+    // Längen (Kette) und Gesamtlänge
+    var yC = 334, yG = 374;
+    for (var i = 0; i < 5; i++) {
+      var e1 = cy + Math.max(rs[i], rs[i - 1] || 0) + 4, e2 = cy + Math.max(rs[i], rs[i + 1] || 0) + 4;
+      o += dimH(p, xs[i], xs[i + 1], yC, ['30', '12', '70', '40', '28'][i], [e1, e2], 1.95 + i * .1, 'lg-only');
+    }
+    o += dimH(p, xs[0], t.xe, yG, '180 ±0,05', [cy + rs[0] + 4, cy + rs[4] + 4], 2.5);
+    // Bezug A
+    o += '<g class="dm" style="--d:2.7s"><path class="fl" d="M92,' + (cy - rs[0]) + ' L106,' + (cy - rs[0]) + ' L99,' + (cy - rs[0] - 9) + 'z"/><line class="dl" pathLength="1" x1="99" y1="' + (cy - rs[0] - 9) + '" x2="99" y2="128"/><rect class="gt" x="88" y="104" width="22" height="24"/><text x="99" y="121" text-anchor="middle">A</text></g>';
+    // Form- und Lagetoleranz: Rundlauf 0,005 zu A
+    var fx = 420, fy = 60;
+    o += '<g class="dm" style="--d:2.9s"><rect class="gt" x="' + fx + '" y="' + fy + '" width="124" height="26"/><line class="dl" pathLength="1" x1="' + (fx + 30) + '" y1="' + fy + '" x2="' + (fx + 30) + '" y2="' + (fy + 26) + '"/><line class="dl" pathLength="1" x1="' + (fx + 98) + '" y1="' + fy + '" x2="' + (fx + 98) + '" y2="' + (fy + 26) + '"/>' +
+      '<line class="dl" pathLength="1" x1="' + (fx + 9) + '" y1="' + (fy + 19) + '" x2="' + (fx + 21) + '" y2="' + (fy + 7) + '" marker-end="url(#' + p + 'a)"/>' +
+      '<text x="' + (fx + 64) + '" y="' + (fy + 17.5) + '" text-anchor="middle">0,005</text><text x="' + (fx + 111) + '" y="' + (fy + 17.5) + '" text-anchor="middle">A</text>' +
+      '<path class="dl" pathLength="1" d="M' + (fx + 15) + ',' + (fy + 26) + ' V' + (fy + 52) + ' H462 V' + (cy - rs[3]) + '" marker-end="url(#' + p + 'a)"/></g>';
+    // Rauheit
+    var ry = cy - rs[2];
+    o += '<g class="dm lg-only" style="--d:3.05s"><path class="dl" pathLength="1" d="M226,' + (ry - 13) + ' L233,' + ry + ' L247,' + (ry - 26) + ' H286 M226,' + (ry - 13) + ' H240"/><text x="252" y="' + (ry - 31) + '">Ra 0,4</text></g>';
+    return '<svg class="drw" viewBox="44 48 572 340" role="img" aria-label="Antriebswelle mit Flansch, Gesamtlänge 180 Millimeter, Lagersitz Ø25 h6, Rundlauf 0,005 Millimeter zu Bezug A">' + defs(p) + o + '</svg>';
+  }
+  $('heroDrw').innerHTML = heroSVG();
+  (function zones() { var z = $('zonesT'), n = window.innerWidth < 640 ? 4 : 8, s = ''; for (var i = 1; i <= n; i++) s += '<span>' + i + '</span>'; z.innerHTML = s; })();
+  $('otdNote').textContent = 'letzte 12 Monate, Stand ' + MS.format(TODAY);
+
+  /* Explosionsansicht */
+  function asmSVG() {
+    var p = 'x' + (uid++) + '-', cy = 160, o = '';
+    function part(dx, inner, ball) { return '<g class="part" data-dx="' + dx + '" style="transform:translateX(' + dx + 'px)">' + inner + (ball ? '<g class="ball"><line class="ex" x1="' + ball[0] + '" y1="' + ball[1] + '" x2="' + ball[2] + '" y2="' + ball[3] + '" style="opacity:1"/><circle cx="' + ball[2] + '" cy="' + (ball[3] - 13) + '" r="13" class="gt"/><text x="' + ball[2] + '" y="' + (ball[3] - 8.5) + '" text-anchor="middle">' + ball[4] + '</text></g>' : '') + '</g>'; }
+    // 1 Welle
+    var w = turned({ p: p + 'w', x0: 120, cy: cy, s: 2, secs: [[40, 30], [10, 44], [60, 25], [30, 20]], half: false, ch: 3 });
+    var wb = '<path class="th" d="M' + (w.xs[3]) + ',' + (cy - 16) + ' H' + (w.xe - 3) + ' M' + w.xs[3] + ',' + (cy + 16) + ' H' + (w.xe - 3) + '"/>';
+    o += part(-60, w.svg.replace(/<line class="cl"[^>]*>/, '') + wb, [160, cy - 30, 160, 70, 1]);
+    // 2 Lager
+    var lx = 222, lw = 30, ri = 25, ro = 52;
+    var lg = '';
+    [[cy - ro, cy - ri], [cy + ri, cy + ro]].forEach(function (yy) { lg += '<rect class="ol" x="' + lx + '" y="' + yy[0] + '" width="' + lw + '" height="' + (yy[1] - yy[0]) + '"/><path class="th" d="M' + (lx + lw / 2) + ',' + (yy[0] + 5) + ' V' + (yy[1] - 5) + ' M' + (lx + 6) + ',' + ((yy[0] + yy[1]) / 2) + ' H' + (lx + lw - 6) + '"/>'; });
+    o += part(158, lg, [lx + lw / 2, cy - ro, lx + lw / 2, 70, 2]);
+    // 3 Flansch
+    var fx = 217, fw = 40, fo = 100, fi = 52, fl = '';
+    fl += '<clipPath id="' + p + 'fc"><rect x="' + fx + '" y="' + (cy - fo) + '" width="' + fw + '" height="' + (fo - fi) + '"/><rect x="' + fx + '" y="' + (cy + fi) + '" width="' + fw + '" height="' + (fo - fi) + '"/></clipPath>';
+    fl += '<rect x="' + fx + '" y="' + (cy - fo) + '" width="' + fw + '" height="' + (2 * fo) + '" fill="url(#' + p + 'h)" clip-path="url(#' + p + 'fc)"/>';
+    fl += '<rect class="ol" x="' + fx + '" y="' + (cy - fo) + '" width="' + fw + '" height="' + (fo - fi) + '"/><rect class="ol" x="' + fx + '" y="' + (cy + fi) + '" width="' + fw + '" height="' + (fo - fi) + '"/>';
+    fl += '<line class="cl" x1="' + (fx - 6) + '" y1="' + (cy - 80) + '" x2="' + (fx + fw + 6) + '" y2="' + (cy - 80) + '"/><rect class="bg" x="' + fx + '" y="' + (cy - 87) + '" width="' + fw + '" height="14"/><path class="ol" style="stroke-width:1.1" d="M' + fx + ',' + (cy - 87) + ' H' + (fx + fw) + ' M' + fx + ',' + (cy - 73) + ' H' + (fx + fw) + '"/>';
+    o += part(223, fl, [fx + fw, cy - fo + 10, fx + fw + 26, 44, 3]);
+    // 4 Sicherungsring
+    var sx = 254, sr = '<rect class="ol" x="' + sx + '" y="' + (cy - 33) + '" width="4" height="' + 9 + '"/><rect class="ol" x="' + sx + '" y="' + (cy + 24) + '" width="4" height="9"/>';
+    o += part(256, sr, [sx + 2, cy - 33, sx + 2, 100, 4]);
+    // 5 Nutmutter
+    var nx = 350, nw = 20, nr = 34, nut = '';
+    nut += '<clipPath id="' + p + 'nc"><rect x="' + nx + '" y="' + (cy - nr) + '" width="' + nw + '" height="' + (nr - 20) + '"/><rect x="' + nx + '" y="' + (cy + 20) + '" width="' + nw + '" height="' + (nr - 20) + '"/></clipPath><rect x="' + nx + '" y="' + (cy - nr) + '" width="' + nw + '" height="' + (2 * nr) + '" fill="url(#' + p + 'h)" clip-path="url(#' + p + 'nc)"/>';
+    nut += '<rect class="ol" x="' + nx + '" y="' + (cy - nr) + '" width="' + nw + '" height="' + (nr - 20) + '"/><rect class="ol" x="' + nx + '" y="' + (cy + 20) + '" width="' + nw + '" height="' + (nr - 20) + '"/>';
+    o += part(210, nut, [nx + nw / 2, cy - nr, nx + nw / 2, 100, 5]);
+    o = '<line class="cl" x1="12" y1="' + cy + '" x2="628" y2="' + cy + '"/>' + o;
+    return '<svg class="drw" viewBox="0 4 640 268" role="img" aria-label="Lagereinheit: Welle, Rillenkugellager, Lagerflansch, Sicherungsring und Nutmutter">' + defs(p) + o + '</svg>';
+  }
+  $('asmDrw').innerHTML = asmSVG();
+  function asm(open) {
+    $('asm').classList.toggle('closed', !open);
+    $('asmOpen').setAttribute('aria-pressed', String(open)); $('asmClose').setAttribute('aria-pressed', String(!open));
+    Array.prototype.forEach.call($('asmDrw').querySelectorAll('.part'), function (g) { g.style.transform = 'translateX(' + (open ? g.getAttribute('data-dx') : 0) + 'px)'; });
+  }
+  $('asmOpen').addEventListener('click', function () { asm(true); });
+  $('asmClose').addEventListener('click', function () { asm(false); });
+
+  /* Maschinenpark */
+  var MACH = [
+    { typ: 'Langdrehautomat mit Gegenspindel', h: 'Hersteller A, Typ L32', vf: 'Drehen', ax: 7, raum: 'Ø 32 × 320 mm', env: { k: 'rund', d: 32, l: 320 }, tol: 0.005, n: 6, tag: 'Stangenlader, Gegenspindel, Hochdruck' },
+    { typ: 'Langdrehautomat', h: 'Hersteller A, Typ L20', vf: 'Drehen', ax: 6, raum: 'Ø 20 × 210 mm', env: { k: 'rund', d: 20, l: 210 }, tol: 0.005, n: 4, tag: 'Stangenlader, Gegenspindel' },
+    { typ: 'Kurzdrehautomat', h: 'Hersteller B, Typ K42', vf: 'Drehen', ax: 5, raum: 'Ø 42 × 150 mm', env: { k: 'rund', d: 42, l: 150 }, tol: 0.01, n: 3, tag: 'Stangenlader, angetriebene Werkzeuge' },
+    { typ: 'Drehzentrum mit Y-Achse', h: 'Hersteller C, Typ TC 320', vf: 'Drehen', ax: 5, raum: 'Ø 320 × 650 mm', env: { k: 'rund', d: 320, l: 650 }, tol: 0.01, n: 4, tag: 'Gegenspindel, Y-Achse, Teileentnahme' },
+    { typ: 'CNC-Drehmaschine für Großteile', h: 'Hersteller C, Typ TC 500', vf: 'Drehen', ax: 2, raum: 'Ø 500 × 1.000 mm', env: { k: 'rund', d: 500, l: 1000 }, tol: 0.02, n: 2, tag: 'Lünette, Reitstock' },
+    { typ: 'Dreh-Fräs-Zentrum mit B-Achse', h: 'Hersteller D, Typ MT 670', vf: 'Drehen', ax: 9, raum: 'Ø 670 × 1.500 mm', env: { k: 'rund', d: 670, l: 1500 }, tol: 0.01, n: 2, tag: 'Komplettbearbeitung, Gegenspindel, Werkzeugmagazin 120' },
+    { typ: '5-Achs-Bearbeitungszentrum', h: 'Hersteller E, Typ U 650', vf: 'Fräsen', ax: 5, raum: '650 × 520 × 475 mm', env: { k: 'prism', d: [650, 520, 475] }, tol: 0.005, n: 4, tag: 'Simultan, Palettenwechsler, Messtaster' },
+    { typ: '5-Achs-Zelle mit Roboter', h: 'Hersteller F, Typ U 500 R', vf: 'Fräsen', ax: 5, raum: '500 × 450 × 400 mm', env: { k: 'prism', d: [500, 450, 400] }, tol: 0.005, n: 3, tag: 'Roboterbeladung, mannlose Schicht' },
+    { typ: 'Vertikal-Bearbeitungszentrum', h: 'Hersteller G, Typ V 1020', vf: 'Fräsen', ax: 3, raum: '1.020 × 560 × 510 mm', env: { k: 'prism', d: [1020, 560, 510] }, tol: 0.01, n: 5, tag: '4. Achse nachrüstbar, Späneförderer' },
+    { typ: 'Horizontal-Bearbeitungszentrum', h: 'Hersteller H, Typ H 800', vf: 'Fräsen', ax: 4, raum: '800 × 800 × 900 mm', env: { k: 'prism', d: [800, 800, 900] }, tol: 0.008, n: 2, tag: 'Palettenspeicher 12-fach, Rundtisch' },
+    { typ: 'Fahrständermaschine', h: 'Hersteller G, Typ F 3000', vf: 'Fräsen', ax: 4, raum: '3.000 × 800 × 700 mm', env: { k: 'prism', d: [3000, 800, 700] }, tol: 0.02, n: 1, tag: 'Pendelbearbeitung, bis 1.200 kg' },
+    { typ: 'Außenrundschleifmaschine', h: 'Hersteller J, Typ R 250', vf: 'Schleifen', ax: 3, raum: 'Ø 250 × 650 mm', env: { k: 'rund', d: 250, l: 650 }, tol: 0.002, n: 2, tag: 'Innenschleifeinrichtung, Messsteuerung' },
+    { typ: 'Spitzenlos-Schleifmaschine', h: 'Hersteller J, Typ S 40', vf: 'Schleifen', ax: 2, raum: 'Ø 1–40 × 250 mm', env: { k: 'rund', d: 40, l: 250 }, tol: 0.002, n: 1, tag: 'Durchlauf- und Einstechschleifen' },
+    { typ: 'Drahterodiermaschine', h: 'Hersteller K, Typ W 400', vf: 'Erodieren', ax: 5, raum: '400 × 300 × 250 mm', env: { k: 'prism', d: [400, 300, 250] }, tol: 0.003, n: 1, tag: 'Konisch bis 30°, Drahtdurchmesser 0,1 mm' },
+    { typ: 'Portal-Koordinatenmessgerät', h: 'Hersteller M, Typ P 1210', vf: 'Messen', ax: 3, raum: '1.200 × 1.000 × 800 mm', env: null, tol: 0.0015, n: 1, tag: 'Scannender Taster, Klimaraum' },
+    { typ: 'Koordinatenmessgerät, kompakt', h: 'Hersteller M, Typ P 0504', vf: 'Messen', ax: 3, raum: '500 × 500 × 400 mm', env: null, tol: 0.0009, n: 1, tag: 'Dreh-Schwenk-Kopf, Klimaraum' },
+    { typ: 'Optisches Wellenmessgerät', h: 'Hersteller N, Typ O 120', vf: 'Messen', ax: 2, raum: 'Ø 120 × 650 mm', env: null, tol: 0.0015, n: 2, tag: 'In der Fertigung, Serienprüfung' }
+  ];
+  var CNC = MACH.filter(function (m) { return m.vf !== 'Messen'; }).reduce(function (a, m) { return a + m.n; }, 0);
+  $('heroMach').textContent = CNC + ' CNC';
+  function tolTxt(t) { return '±' + NF.format(t) + ' mm'; }
+  var mState = { vf: 'Alle', q: '', sort: null, dir: 1 };
+  var VFS = ['Alle', 'Drehen', 'Fräsen', 'Schleifen', 'Erodieren', 'Messen'];
+  $('mFilter').innerHTML = VFS.map(function (v) { var c = v === 'Alle' ? MACH.reduce(function (a, m) { return a + m.n; }, 0) : MACH.filter(function (m) { return m.vf === v; }).reduce(function (a, m) { return a + m.n; }, 0); return '<button type="button" class="chip" data-v="' + v + '" aria-pressed="' + (v === 'Alle') + '">' + v + ' <span class="m">' + c + '</span></button>'; }).join('');
+  $('mFilter').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (!b) return; mState.vf = b.getAttribute('data-v'); Array.prototype.forEach.call(this.children, function (c) { c.setAttribute('aria-pressed', String(c === b)); }); renderM(); });
+  $('mSearch').addEventListener('input', function () { mState.q = this.value.trim().toLowerCase(); renderM(); });
+  $('mClear').addEventListener('click', function () { mState.vf = 'Alle'; mState.q = ''; $('mSearch').value = ''; Array.prototype.forEach.call($('mFilter').children, function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-v') === 'Alle')); }); renderM(); });
+  Array.prototype.forEach.call(document.querySelectorAll('.mt th[data-k] button'), function (b) {
+    b.addEventListener('click', function () { var k = b.parentNode.getAttribute('data-k'); if (mState.sort === k) mState.dir *= -1; else { mState.sort = k; mState.dir = (k === 'n' || k === 'ax') ? -1 : 1; } renderM(); });
+  });
+  function renderM() {
+    var rows = MACH.filter(function (m) { return (mState.vf === 'Alle' || m.vf === mState.vf) && (!mState.q || (m.typ + ' ' + m.h + ' ' + m.tag + ' ' + m.raum + ' ' + m.vf).toLowerCase().indexOf(mState.q) >= 0); });
+    if (mState.sort) { var k = mState.sort, d = mState.dir; rows = rows.slice().sort(function (a, b) { var x = a[k], y = b[k]; return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'de')) * d; }); }
+    Array.prototype.forEach.call(document.querySelectorAll('.mt th'), function (th) { var k = th.getAttribute('data-k'); if (!k) return; if (k === mState.sort) th.setAttribute('aria-sort', mState.dir > 0 ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort'); });
+    $('mBody').innerHTML = rows.map(function (m) {
+      return '<tr><td class="c-typ"><b style="font-weight:600">' + esc(m.typ) + '</b><span class="sub">' + esc(m.h) + '. ' + esc(m.tag) + '</span></td><td class="c-vf"><span class="vf" data-v="' + m.vf + '">' + m.vf + '</span></td><td class="c-ax m" data-l="Achsen">' + m.ax + '</td><td class="m" data-l="Arbeitsraum">' + m.raum + '</td><td class="m" data-l="Genauigkeit">' + (m.vf === 'Messen' ? NF.format(m.tol * 1000) + ' µm' : tolTxt(m.tol)) + '</td><td class="n">' + m.n + '</td></tr>';
+    }).join('');
+    var tot = rows.reduce(function (a, m) { return a + m.n; }, 0);
+    $('mEmpty').hidden = rows.length > 0;
+    $('mSum').textContent = rows.length ? tot + ' Maschinen in ' + rows.length + ' Typen' + (mState.vf !== 'Alle' || mState.q ? ' (gefiltert)' : '') : 'Keine Treffer';
+  }
+  renderM();
+
+  /* Branchen mit Siegeln */
+  var certUntil = new Date(TODAY.getFullYear() + 2, (TODAY.getMonth() + 5) % 12, 1);
+  var BR = [
+    { n: 'Automotive', c: 'IATF', c2: '16949', ring: 'Zertifiziert Automotive', share: '46 % des Umsatzes', li: ['Sensor-, Ventil- und Getriebeteile in Großserie', 'PPAP Level 3, 8D-Reports binnen 24 Stunden', 'Rückverfolgbarkeit per DMC-Code bis zur Charge'] },
+    { n: 'Medizintechnik', c: 'ISO', c2: '13485', ring: 'Zertifiziert Medizinprodukte', share: '31 % des Umsatzes', li: ['Instrumente und Implantatkomponenten aus Titan und PEEK', 'Validierte Reinigung, Sauberverpackung über Partner', 'Lückenlose Chargendokumentation, Device History Record'] },
+    { n: 'Maschinenbau', c: 'ISO', c2: '9001', ring: 'Zertifiziertes QM-System', share: '23 % des Umsatzes', li: ['Wellen, Flansche, Hydraulikblöcke ab Losgröße 1', 'Baugruppen einbaufertig montiert', 'Ersatzteile auch nach alten Zeichnungen'] }
+  ];
+  function seal(b, i) {
+    var id = 'sl' + i;
+    return '<svg viewBox="0 0 140 140" role="img" aria-label="Zertifikat ' + b.c + ' ' + b.c2 + ', gültig bis ' + MY.format(certUntil) + '"><defs><path id="' + id + '" d="M70,70 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>' +
+      '<circle cx="70" cy="70" r="66" fill="none" stroke="#45C9F2" stroke-width="1.4"/><circle cx="70" cy="70" r="62" fill="none" stroke="#45C9F2" stroke-width=".7" stroke-dasharray="2 3"/><circle cx="70" cy="70" r="42" fill="rgba(69,201,242,.07)" stroke="#45C9F2" stroke-width="1"/>' +
+      '<text font-size="9.4"><textPath href="#' + id + '" startOffset="0" textLength="322" lengthAdjust="spacing">' + b.ring + ' • Muster Präzisionsteile •</textPath></text>' +
+      '<text x="70" y="64" text-anchor="middle" font-size="12" style="fill:var(--ink-2)">' + b.c + '</text><text x="70" y="84" text-anchor="middle" font-size="21" font-weight="700" style="fill:var(--ink)">' + b.c2 + '</text><text x="70" y="99" text-anchor="middle" font-size="7.5" style="fill:var(--ink-3)">bis ' + MS.format(certUntil) + '</text></svg>';
+  }
+  $('branches').innerHTML = BR.map(function (b, i) { return '<div class="branch"><div class="seal">' + seal(b, i) + '</div><h3>' + b.n + '</h3><span class="share">' + b.share + '</span><ul>' + b.li.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul></div>'; }).join('');
+
+  /* EMPB-Auszug */
+  var EM = [['1', 'Ø 25 h6', 25, 0, -0.013, 24.994], ['2', 'Ø 30 g6', 30, -0.007, -0.020, 29.988], ['3', 'Länge 180', 180, 0.05, -0.05, 180.012], ['4', 'Ø 40', 40, 0.02, -0.02, 40.006], ['5', 'Rundlauf zu A', 0, 0.005, 0, 0.002], ['6', 'Ra Ø 40', 0.4, 0, -0.4, 0.28]];
+  $('empbBody').innerHTML = EM.map(function (r) {
+    var lo = r[2] + r[4], hi = r[2] + r[3], pos = Math.max(0, Math.min(1, (r[5] - lo) / (hi - lo)));
+    var tol = r[0] === '5' ? '≤ 0,005' : r[0] === '6' ? '≤ 0,4 µm' : (r[3] >= 0 ? '+' : '') + NF3(r[3]) + ' / ' + (r[4] > 0 ? '+' : '') + NF3(r[4]);
+    var soll = r[0] === '5' ? '–' : r[0] === '6' ? '–' : NF3(r[2]);
+    var ist = r[0] === '6' ? NF.format(r[5]) + ' µm' : NF3(r[5]);
+    return '<tr><td>' + r[1] + '</td><td>' + soll + '</td><td>' + tol + '</td><td>' + ist + '</td><td><span class="bar" aria-label="' + Math.round(pos * 100) + ' % im Toleranzfeld"><i style="left:' + (pos * 100) + '%"></i></span></td><td class="ok">i. O.</td></tr>';
+  }).join('');
+  $('empbMeta').textContent = 'Prüfdatum ' + DF.format(addDays(TODAY, -12));
+
+  /* Referenzteile */
+  function refSVG(kind, big) {
+    var p = 'r' + (uid++) + '-', o = '', cy = 100;
+    if (kind === 'welle') {
+      var t = turned({ p: p, x0: 34, cy: cy, s: 1.6, secs: [[18, 14], [50, 20], [8, 28], [60, 20], [24, 15]], half: true, ch: 2.5 });
+      o += t.svg + '<path class="th" d="M' + (t.xs[1] + 18) + ',' + (cy + 8) + ' h44 a4,4 0 0 1 0,8 h-44 a4,4 0 0 1 0,-8z"/>';
+      o += dimH(p, t.xs[0], t.xe, 168, '160 ±0,05', [cy + 13, cy + 14]) + dimV(p, t.xs[3] + 50, cy - 16, cy + 16, 'Ø20 h5') + dimH(p, t.xs[2], t.xs[3], 44, '8', [cy - 22, cy - 22]);
+    } else if (kind === 'schraube') {
+      var x0 = 36, s = 4.4, hx = x0 + 9 * s, tipx = x0 + 55 * s, rmj = 3.25 * s, rmn = 2.3 * s, pitch = 2.8 * s;
+      o += '<path class="ol" d="M' + x0 + ',' + (cy - 14) + ' Q' + (x0 + 2) + ',' + (cy - 24) + ' ' + (x0 + 14) + ',' + (cy - 24) + ' H' + (hx - 6) + ' Q' + hx + ',' + (cy - 24) + ' ' + hx + ',' + (cy - 15) + ' V' + (cy + 15) + ' Q' + hx + ',' + (cy + 24) + ' ' + (hx - 6) + ',' + (cy + 24) + ' H' + (x0 + 14) + ' Q' + (x0 + 2) + ',' + (cy + 24) + ' ' + x0 + ',' + (cy + 14) + 'Z"/>';
+      o += '<path class="hid" d="M' + x0 + ',' + (cy - 9) + ' H' + (x0 + 22) + ' L' + (x0 + 28) + ',' + cy + ' L' + (x0 + 22) + ',' + (cy + 9) + ' H' + x0 + '"/>';
+      var up = 'M' + hx + ',' + (cy - rmn), dn = 'M' + hx + ',' + (cy + rmn), x = hx, k = 0;
+      while (x + pitch / 2 < tipx - 22) { up += ' L' + (x + pitch / 2) + ',' + (cy - rmj) + ' L' + (x + pitch) + ',' + (cy - rmn); dn += ' L' + (x + pitch / 2) + ',' + (cy + rmj) + ' L' + (x + pitch) + ',' + (cy + rmn); x += pitch; k++; }
+      up += ' L' + tipx + ',' + cy; dn += ' L' + tipx + ',' + cy;
+      o += '<path class="ol" d="' + up + '"/><path class="ol" d="' + dn + '"/><path class="th" d="M' + hx + ',' + (cy - rmn) + ' H' + (tipx - 22) + ' M' + hx + ',' + (cy + rmn) + ' H' + (tipx - 22) + '"/>';
+      o += '<line class="cl" x1="' + (x0 - 12) + '" y1="' + cy + '" x2="' + (tipx + 12) + '" y2="' + cy + '"/>';
+      o += dimH(p, hx, tipx, 160, '45 ±0,1', [cy + 18, cy + 4]) + dimV(p, hx + 74, cy - rmj, cy + rmj, 'Ø6,5') + dimH(p, x0, hx, 46, 'Ø10', [cy - 26, cy - 26]);
+    } else if (kind === 'flansch') {
+      var cx = 104, R = 74, rb = 25, bc = 58;
+      o += '<circle class="ol" cx="' + cx + '" cy="' + cy + '" r="' + R + '"/><circle class="ol" cx="' + cx + '" cy="' + cy + '" r="' + rb + '"/><circle class="th" cx="' + cx + '" cy="' + cy + '" r="' + (rb + 8) + '"/><circle class="cl" cx="' + cx + '" cy="' + cy + '" r="' + bc + '" fill="none"/>';
+      for (var i = 0; i < 6; i++) { var a = Math.PI / 6 + i * Math.PI / 3; o += '<circle class="ol" cx="' + (cx + bc * Math.cos(a)) + '" cy="' + (cy + bc * Math.sin(a)) + '" r="6.5"/>'; }
+      o += '<line class="cl" x1="' + (cx - R - 10) + '" y1="' + cy + '" x2="' + (cx + R + 10) + '" y2="' + cy + '"/><line class="cl" x1="' + cx + '" y1="' + (cy - R - 10) + '" x2="' + cx + '" y2="' + (cy + R + 10) + '"/>';
+      var sx = 228, sw = 26;
+      o += '<clipPath id="' + p + 'fc"><rect x="' + sx + '" y="' + (cy - R) + '" width="' + sw + '" height="' + (R - rb) + '"/><rect x="' + sx + '" y="' + (cy + rb) + '" width="' + sw + '" height="' + (R - rb) + '"/><rect x="' + (sx + sw) + '" y="' + (cy - rb - 8) + '" width="14" height="8"/><rect x="' + (sx + sw) + '" y="' + (cy + rb) + '" width="14" height="8"/></clipPath>';
+      o += '<rect x="' + sx + '" y="' + (cy - R) + '" width="' + (sw + 14) + '" height="' + (2 * R) + '" fill="url(#' + p + 'h)" clip-path="url(#' + p + 'fc)"/>';
+      o += '<path class="ol" d="M' + sx + ',' + (cy - R) + ' H' + (sx + sw) + ' V' + (cy - rb - 8) + ' H' + (sx + sw + 14) + ' V' + (cy - rb) + ' H' + sx + 'Z M' + sx + ',' + (cy + R) + ' H' + (sx + sw) + ' V' + (cy + rb + 8) + ' H' + (sx + sw + 14) + ' V' + (cy + rb) + ' H' + sx + 'Z"/>';
+      o += '<line class="cl" x1="' + (sx - 8) + '" y1="' + cy + '" x2="' + (sx + sw + 22) + '" y2="' + cy + '"/>';
+      o += dimV(p, sx + sw + 34, cy - R, cy + R, 'Ø140 h7', null, '', sx + sw + 44) + '<g class="dm"><line class="dl" x1="' + (cx + bc * Math.cos(-Math.PI / 6) + 5) + '" y1="' + (cy + bc * Math.sin(-Math.PI / 6) - 5) + '" x2="' + (cx + 70) + '" y2="22" marker-start="url(#' + p + 'a)"/><line class="dl" x1="' + (cx + 70) + '" y1="22" x2="' + (cx + 116) + '" y2="22"/><text class="halo" x="' + (cx + 72) + '" y="17">6× Ø11</text></g>';
+    } else if (kind === 'block') {
+      var S2 = 1.42, ox = 140, oy = 92;
+      var P = function (x, y, z) { return [ox + (x - y) * 0.866 * S2, oy + (x + y) * 0.5 * S2 - z * S2]; };
+      var L = 80, B = 50, H = 46;
+      var pts = { a: P(0, 0, H), b: P(L, 0, H), c: P(L, B, H), d: P(0, B, H), e: P(L, 0, 0), f: P(L, B, 0), g: P(0, B, 0) };
+      var pp = function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); };
+      o += '<path class="ol" d="M' + pp(pts.a) + ' L' + pp(pts.b) + ' L' + pp(pts.c) + ' L' + pp(pts.d) + 'Z M' + pp(pts.b) + ' L' + pp(pts.e) + ' L' + pp(pts.f) + ' L' + pp(pts.c) + ' M' + pp(pts.d) + ' L' + pp(pts.g) + ' L' + pp(pts.f) + '"/>';
+      var hid = P(0, 0, 0); o += '<path class="hid" d="M' + pp(pts.a) + ' L' + pp(hid) + ' L' + pp(pts.e) + ' M' + pp(hid) + ' L' + pp(pts.g) + '"/>';
+      [[20, 25, 8], [48, 15, 5], [60, 34, 6]].forEach(function (h) { var q = P(h[0], h[1], H); o += '<ellipse class="ol" cx="' + q[0] + '" cy="' + q[1] + '" rx="' + (h[2] * S2 * 1.22) + '" ry="' + (h[2] * S2 * 0.71) + '"/>'; });
+      [[40, 23, 9], [18, 16, 5]].forEach(function (h) { var q = P(L, h[0], h[1]); o += '<ellipse class="ol" cx="' + q[0] + '" cy="' + q[1] + '" rx="' + (h[2] * S2 * 0.71) + '" ry="' + (h[2] * S2 * 1.22) + '" transform="rotate(-30 ' + q[0] + ' ' + q[1] + ')"/>'; });
+      var q1 = P(0, B, 0), q2 = P(L, B, 0);
+      o += '<g class="dm"><line class="dl" x1="' + (q1[0] - 8) + '" y1="' + (q1[1] + 14) + '" x2="' + (q2[0] - 8) + '" y2="' + (q2[1] + 14) + '" marker-start="url(#' + p + 'a)" marker-end="url(#' + p + 'a)"/><text class="halo" x="' + ((q1[0] + q2[0]) / 2 - 18) + '" y="' + ((q1[1] + q2[1]) / 2 + 30) + '">80</text></g>';
+      var r1 = P(L, B, 0), r2 = P(L, B, H);
+      o += dimV(p, r1[0] + 16, r2[1], r1[1], '46', null, '', r1[0] + 28);
+      o += '<text x="16" y="24" style="fill:var(--ink-3)">Anschlüsse G 3/8</text>';
+    } else if (kind === 'gehaeuse') {
+      var t2 = turned({ p: p, x0: 70, cy: cy, s: 4.2, secs: [[4, 34], [36, 28]], bore: [[34, 22]], half: true, ch: 2 });
+      o += t2.svg;
+      o += '<path class="ol" style="stroke-width:1.2" d="M' + (70 + 34 * 4.2) + ',' + (cy - 22 * 2.1) + ' V' + cy + '"/><path class="hid" d="M' + (70 + 34 * 4.2) + ',' + cy + ' V' + (cy + 22 * 2.1) + '"/>';
+      o += dimH(p, t2.xs[0], t2.xe, 178, '40', [cy + 75, cy + 63]) + dimV(p, t2.xe + 22, cy - 59, cy + 59, 'Ø28 ±0,02', null, '', t2.xe + 32) + dimV(p, 150, cy - 46, cy + 46, 'Ø22 H7');
+    } else {
+      var t3 = turned({ p: p, x0: 54, cy: cy, s: 8, secs: [[3, 9.5], [19, 8]], bore: [[22, 6]], half: true, ch: 3 });
+      o += t3.svg + dimH(p, t3.xs[0], t3.xe, 168, '22 ±0,02', [cy + 42, cy + 36]) + dimV(p, t3.xe - 40, cy - 24, cy + 24, 'Ø6 H7') + dimV(p, t3.xe + 18, cy - 32, cy + 32, 'Ø8 ±0,008', null, '', t3.xe + 28);
+    }
+    return '<svg class="drw" viewBox="0 0 320 200" ' + (big ? 'role="img" aria-label="Zeichnung"' : 'aria-hidden="true"') + '>' + defs(p) + o + '</svg>';
+  }
+  var REFS = [
+    { id: 'welle', n: 'Getriebewelle', br: 'Automotive', mat: '42CrMo4 vergütet', tol: '±0,005 mm', lot: '25.000 Stk./Jahr', vf: 'Drehen, Außenrundschleifen', pr: 'PPAP Level 3, SPC an Lagersitzen', bes: 'Passfedernut gefräst in derselben Aufspannung' },
+    { id: 'schraube', n: 'Pedikelschraube', br: 'Medizintechnik', mat: 'Titan Grade 23 ELI', tol: '±0,01 mm', lot: '2.000 Stk.', vf: 'Langdrehen, Wirbeln, Laserbeschriftung', pr: 'Validierte Reinigung, 100 % Sichtprüfung', bes: 'Gewinde gewirbelt, Innensechsrund' },
+    { id: 'flansch', n: 'Lagerflansch Ø 140', br: 'Maschinenbau', mat: 'Edelstahl 1.4404', tol: '±0,02 mm', lot: '50 Stk.', vf: 'Drehen, Bohren auf Dreh-Fräs-Zentrum', pr: 'Messprotokoll, Zeugnis 3.1', bes: 'Zentrierbund h7 für Lagersitz' },
+    { id: 'block', n: 'Hydraulikblock', br: 'Maschinenbau', mat: 'EN AW-7075', tol: '±0,01 mm', lot: '400 Stk.', vf: '5-Achs-Fräsen, Tieflochbohren', pr: 'Dichtheitsprüfung 350 bar', bes: 'Kreuzende Bohrungen, gratfrei' },
+    { id: 'gehaeuse', n: 'Sensorgehäuse', br: 'Medizintechnik', mat: 'PEEK', tol: '±0,02 mm', lot: '800 Stk.', vf: 'Drehen, Fräsen', pr: 'EMPB, Sauberverpackung über Partner', bes: 'Dünne Wand 3 mm, spannungsarm gefertigt' },
+    { id: 'huelse', n: 'Sensorhülse', br: 'Automotive', mat: 'Edelstahl 1.4305', tol: '±0,008 mm', lot: '50.000 Stk./Jahr', vf: 'Langdrehen', pr: 'PPAP Level 3, optische 100 %-Prüfung', bes: 'Passung H7, Ra 0,4 innen' }
+  ];
+  var rBr = 'Alle';
+  $('rFilter').innerHTML = ['Alle', 'Automotive', 'Medizintechnik', 'Maschinenbau'].map(function (b) { return '<button type="button" class="chip" data-v="' + b + '" aria-pressed="' + (b === 'Alle') + '">' + b + '</button>'; }).join('');
+  $('rFilter').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (!b) return; rBr = b.getAttribute('data-v'); Array.prototype.forEach.call(this.children, function (c) { c.setAttribute('aria-pressed', String(c === b)); }); renderRefs(); });
+  function renderRefs() {
+    $('refs').innerHTML = REFS.filter(function (r) { return rBr === 'Alle' || r.br === rBr; }).map(function (r) {
+      return '<article class="ref"><div class="pic bp">' + refSVG(r.id) + '</div><div class="cap"><h3>' + r.n + '</h3><dl><dt>Werkstoff</dt><dd>' + r.mat + '</dd><dt>Toleranz</dt><dd>' + r.tol + '</dd><dt>Losgröße</dt><dd>' + r.lot + '</dd><dt>Branche</dt><dd>' + r.br + '</dd></dl><button type="button" class="open lnk" data-id="' + r.id + '" aria-label="' + r.n + ': Zeichnung und Details">Zeichnung und Details</button></div></article>';
+    }).join('');
+  }
+  renderRefs();
+  var curRef = null;
+  $('refs').addEventListener('click', function (e) {
+    var b = e.target.closest('.ref'); if (!b) return; b = b.querySelector('[data-id]');
+    var r = REFS.filter(function (x) { return x.id === b.getAttribute('data-id'); })[0]; curRef = r;
+    $('refT').textContent = r.n; $('refSub').textContent = r.br + ', ' + r.lot;
+    $('refPic').innerHTML = refSVG(r.id, true);
+    $('refData').innerHTML = [['Werkstoff', r.mat], ['Toleranz', r.tol], ['Losgröße', r.lot], ['Verfahren', r.vf], ['Prüfung', r.pr], ['Besonderheit', r.bes]].map(function (d) { return '<dt>' + d[0] + '</dt><dd>' + d[1] + '</dd>'; }).join('');
+    openDlg($('refDlg'));
+    $('refDlg').querySelector('.dlg-h .icon-btn').focus();
+  });
+
+  /* Formular: Optionen */
+  var MATS = ['Edelstahl 1.4404 (316L)', 'Edelstahl 1.4305 (303)', 'Edelstahl 1.4542 (17-4PH)', 'Titan Grade 5', 'Titan Grade 23 ELI', 'Aluminium EN AW-6082', 'Aluminium EN AW-7075', 'Stahl 42CrMo4', 'Stahl 16MnCr5', 'Automatenstahl 11SMnPb30', 'Messing CW614N', 'PEEK', 'POM-C', 'Anderer Werkstoff (siehe Bemerkung)'];
+  var TOLS = ['Allgemeintoleranz ISO 2768-m', 'Fein ISO 2768-f', 'Passungen bis IT7 (±0,02 mm)', 'Eng ±0,01 mm', 'Sehr eng ±0,005 mm', 'Enger als ±0,005 mm (nach Rücksprache)'];
+  var SURF = ['Keine', 'Eloxieren', 'Hartcoatieren', 'Passivieren', 'Galvanisch verzinken', 'Chemisch vernickeln', 'Einsatzhärten', 'Induktionshärten', 'Gleitschleifen', 'Strahlen'];
+  $('f-mat').innerHTML = '<option value="">Bitte wählen</option>' + MATS.map(function (m) { return '<option>' + m + '</option>'; }).join('');
+  $('f-tol').innerHTML = '<option value="">Bitte wählen</option>' + TOLS.map(function (m) { return '<option>' + m + '</option>'; }).join('');
+  $('f-surf').innerHTML = SURF.map(function (m) { return '<option>' + m + '</option>'; }).join('');
+  var minDate = addWorkdays(TODAY, 10);
+  $('f-date').min = iso(minDate);
+  $('f-date-hint').textContent = 'Frühestens ' + DF.format(minDate) + ', für Erstmuster';
+  var form = $('rq');
+  var FIELDS = ['part', 'mat', 'tol', 'qty', 'year', 'date', 'surf', 'dim', 'co', 'br', 'name', 'mail', 'tel', 'note'];
+  function fillDraft() {
+    FIELDS.forEach(function (k) { if (S.draft[k] != null) form.elements[k].value = S.draft[k]; });
+    if (S.draft.later) $('f-later').checked = true;
+    Array.prototype.forEach.call(form.querySelectorAll('[name="doc"]'), function (c) { c.checked = (S.draft.doc || []).indexOf(c.value) >= 0; });
+  }
+  function readForm() {
+    var d = {}; FIELDS.forEach(function (k) { d[k] = form.elements[k].value; });
+    d.later = $('f-later').checked;
+    d.doc = Array.prototype.filter.call(form.querySelectorAll('[name="doc"]'), function (c) { return c.checked; }).map(function (c) { return c.value; });
+    return d;
+  }
+  fillDraft();
+  var draftT;
+  form.addEventListener('input', function (e) { clearTimeout(draftT); draftT = setTimeout(function () { S.draft = readForm(); save(); }, 250); if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target.id, ''); });
+  form.addEventListener('change', function (e) { S.draft = readForm(); save(); if (e.target.id === 'f-later' && e.target.checked) setFileErr(''); if (e.target.id === 'f-priv' && e.target.checked) setErr('f-priv', ''); });
+
+  /* Dateien */
+  var FILES = [];
+  var OK_EXT = { step: '3D-Modell', stp: '3D-Modell', pdf: 'Zeichnung', dxf: '2D-CAD' };
+  function fmtSize(b) { return b >= 1048576 ? new Intl.NumberFormat('de-DE', { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }).format(b / 1048576) : new Intl.NumberFormat('de-DE', { style: 'unit', unit: 'kilobyte', maximumFractionDigits: 0 }).format(Math.max(1, Math.round(b / 1024))); }
+  function setFileErr(m) { $('fileIn-err').textContent = m; $('drop').classList.toggle('bad', !!m); }
+  function addFiles(list) {
+    var bad = [];
+    Array.prototype.forEach.call(list, function (f) {
+      var ext = (f.name.split('.').pop() || '').toLowerCase();
+      if (!OK_EXT[ext]) { bad.push(f.name + ': Format nicht unterstützt'); return; }
+      if (f.size > 25 * 1048576) { bad.push(f.name + ': größer als 25 MB'); return; }
+      if (FILES.length >= 10) { bad.push(f.name + ': höchstens 10 Dateien'); return; }
+      if (FILES.some(function (x) { return x.name === f.name && x.size === f.size; })) return;
+      FILES.push({ name: f.name, size: f.size, ext: ext });
+    });
+    setFileErr(bad.length ? bad.join('. ') + '. Erlaubt sind STEP, PDF und DXF bis 25 MB.' : '');
+    renderFiles();
+  }
+  function renderFiles() {
+    $('fileList').innerHTML = FILES.map(function (f, i) { return '<li><span class="ft">' + f.ext.toUpperCase() + '</span><span><span class="fn">' + esc(f.name) + '</span><span class="fs2">' + OK_EXT[f.ext] + ', ' + fmtSize(f.size) + (f.sample ? ', Beispieldatei' : '') + '</span></span><button type="button" class="icon-btn" data-i="' + i + '" aria-label="' + esc(f.name) + ' entfernen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8"/></svg></button></li>'; }).join('');
+  }
+  $('fileIn').addEventListener('change', function () { addFiles(this.files); this.value = ''; });
+  $('fileList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-i]'); if (!b) return; var i = +b.getAttribute('data-i'), f = FILES.splice(i, 1)[0]; renderFiles();
+    toast(f.name + ' entfernt', function () { FILES.splice(Math.min(i, FILES.length), 0, f); renderFiles(); });
+    var next = $('fileList').querySelector('[data-i]'); (next || $('sampleFile')).focus();
+  });
+  $('sampleFile').addEventListener('click', function () {
+    var samples = [{ name: 'Lagerwelle_4711_RevC.step', size: 2516582, ext: 'step', sample: true }, { name: 'Lagerwelle_4711_RevC.pdf', size: 412877, ext: 'pdf', sample: true }];
+    samples.forEach(function (s) { if (!FILES.some(function (f) { return f.name === s.name; })) FILES.push(s); });
+    setFileErr(''); renderFiles(); toast('Beispieldateien hinzugefügt');
+  });
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  /* Validierung */
+  function setErr(id, m) { var el = $(id), er = $(id + '-err'); if (!el || !er) return; er.textContent = m; if (m) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid'); }
+  function validate() {
+    var d = readForm(), first = null;
+    function chk(id, ok, m) { setErr(id, ok ? '' : m); if (!ok && !first) first = $(id); }
+    if (!FILES.length && !d.later) { setFileErr('Bitte eine Zeichnung oder ein Modell hinzufügen, oder ankreuzen, dass die Zeichnung per E-Mail folgt.'); first = first || $('sampleFile'); } else setFileErr('');
+    chk('f-part', d.part.trim().length >= 2, 'Bitte geben Sie eine Bezeichnung oder Zeichnungsnummer an.');
+    chk('f-mat', !!d.mat, 'Bitte wählen Sie einen Werkstoff.');
+    chk('f-tol', !!d.tol, 'Bitte wählen Sie die engste Toleranz auf der Zeichnung.');
+    var q = num(d.qty);
+    chk('f-qty', Number.isInteger(q) && q >= 1 && q <= 50000, isNaN(q) || q < 1 ? 'Bitte eine ganze Zahl ab 1 eingeben.' : q > 50000 ? 'Bis 50.000 Stück je Los. Größere Mengen beschreiben Sie bitte unter Bemerkung.' : 'Bitte eine ganze Zahl eingeben.');
+    var dt = d.date ? new Date(d.date + 'T12:00:00') : null;
+    chk('f-date', dt && dt >= minDate, !dt ? 'Bitte wählen Sie einen Wunschtermin.' : 'Frühestens ' + DF.format(minDate) + '. Für Eilaufträge rufen Sie uns bitte an.');
+    chk('f-co', d.co.trim().length >= 2, 'Bitte geben Sie Ihre Firma an.');
+    chk('f-name', d.name.trim().length >= 3, 'Bitte geben Sie Vor- und Nachnamen an.');
+    chk('f-mail', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.mail.trim()), d.mail.trim() ? 'Diese E-Mail-Adresse ist unvollständig, zum Beispiel name@firma.de.' : 'Bitte geben Sie Ihre E-Mail-Adresse an.');
+    chk('f-priv', $('f-priv').checked, 'Bitte stimmen Sie der Speicherung zu, sonst können wir die Anfrage nicht bearbeiten.');
+    return { ok: !first && (FILES.length || d.later), first: first, d: d };
+  }
+  var REP = { Automotive: 'Jana Brehm', Medizintechnik: 'Dr. Tobias Kern', Maschinenbau: 'Murat Aydın' };
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = validate();
+    if (!v.ok) { if (v.first) v.first.focus(); toast('Bitte prüfen Sie die markierten Felder.'); return; }
+    var d = v.d, seq = 1040 + S.inquiries.length + Math.floor(Math.random() * 9);
+    var no = 'AN-' + String(TODAY.getFullYear()).slice(2) + String(TODAY.getMonth() + 1).padStart(2, '0') + String(TODAY.getDate()).padStart(2, '0') + '-' + seq;
+    var rec = { no: no, at: Date.now(), part: d.part.trim(), mat: d.mat, tol: d.tol, qty: num(d.qty), date: d.date, co: d.co.trim(), name: d.name.trim(), mail: d.mail.trim(), br: d.br, files: FILES.map(function (f) { return f.name + ' (' + fmtSize(f.size) + ')'; }), later: d.later, doc: d.doc, dim: d.dim, surf: d.surf };
+    S.inquiries.unshift(rec); S.draft = {}; save();
+    showDone(rec);
+  });
+  function showDone(r) {
+    var due = addWorkdays(new Date(r.at), 3), rep = REP[r.br] || 'Jana Brehm';
+    $('formWrap').innerHTML = '<div class="done" tabindex="-1" id="doneBox"><div class="done-h"><span class="muted">Anfrage eingegangen. Ihre Vorgangsnummer</span><span class="no">' + esc(r.no) + '</span><span class="sim">In der Demo simuliert. Es wurde nichts gesendet.</span></div>' +
+      '<div class="done-b"><p>Danke, ' + esc(r.name) + '. ' + esc(rep) + ' aus dem Vertrieb prüft Ihre Zeichnung mit unserer Technik. Sie erhalten Ihr Angebot bis <b>' + DFL.format(due) + '</b> an ' + esc(r.mail) + '.</p>' +
+      '<dl class="sum"><dt>Bauteil</dt><dd>' + esc(r.part) + '</dd><dt>Werkstoff</dt><dd>' + esc(r.mat) + '</dd><dt>Toleranz</dt><dd>' + esc(r.tol) + '</dd><dt>Stückzahl</dt><dd class="m">' + NF.format(r.qty) + ' Stk.</dd><dt>Wunschtermin</dt><dd class="m">' + DF.format(new Date(r.date + 'T12:00:00')) + '</dd>' + (r.dim ? '<dt>Abmessungen</dt><dd>' + esc(r.dim) + '</dd>' : '') + (r.doc && r.doc.length ? '<dt>Prüfung</dt><dd>' + esc(r.doc.join(', ')) + '</dd>' : '') + '<dt>Dateien</dt><dd>' + (r.files.length ? esc(r.files.join(', ')) : 'folgen per E-Mail') + '</dd></dl>' +
+      '<div class="acts"><button type="button" class="btn pri" id="newReq">Weitere Anfrage stellen</button><button type="button" class="btn" id="resetBtn2">Demo zurücksetzen</button></div>' + histHTML() + '</div></div>';
+    $('newReq').addEventListener('click', function () { location.hash = ''; location.reload(); });
+    $('resetBtn2').addEventListener('click', resetDemo);
+    var box = $('doneBox'); box.focus({ preventScroll: true }); box.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    toast('Anfrage ' + r.no + ' gesendet');
+  }
+  function histHTML() {
+    if (S.inquiries.length < 2) return '';
+    return '<div class="hist"><h3>Ihre Anfragen in dieser Demo</h3><ul>' + S.inquiries.slice(0, 6).map(function (r) { return '<li><span>' + esc(r.part) + ', ' + NF.format(r.qty) + ' Stk.</span><span class="m">' + esc(r.no) + '</span></li>'; }).join('') + '</ul></div>';
+  }
+
+  /* Machbarkeits-Check */
+  var ck = S.check || { kind: 'rund', d: '28', l: '85', x: '180', y: '120', z: '60', tol: '0.01', qty: '5000' };
+  function ckLoad() { $('ck-d').value = ck.d; $('ck-l').value = ck.l; $('ck-x').value = ck.x; $('ck-y').value = ck.y; $('ck-z').value = ck.z; $('ck-tol').value = ck.tol; $('ck-qty').value = ck.qty; Array.prototype.forEach.call(document.querySelectorAll('[name="ck-kind"]'), function (r) { r.checked = r.value === ck.kind; }); }
+  ckLoad();
+  var liveT, lastRes = null;
+  function ckRun() {
+    ck = { kind: document.querySelector('[name="ck-kind"]:checked').value, d: $('ck-d').value, l: $('ck-l').value, x: $('ck-x').value, y: $('ck-y').value, z: $('ck-z').value, tol: $('ck-tol').value, qty: $('ck-qty').value };
+    S.check = ck; save();
+    $('ckRund').hidden = ck.kind !== 'rund'; $('ckPrism').hidden = ck.kind !== 'prism';
+    var tol = +ck.tol, qty = num(ck.qty), dims, err = '';
+    if (ck.kind === 'rund') { dims = [num(ck.d), num(ck.l)]; } else { dims = [num(ck.x), num(ck.y), num(ck.z)]; }
+    if (dims.some(function (v) { return isNaN(v) || v <= 0; })) err = 'Bitte alle Maße als positive Zahl in Millimetern eingeben.';
+    $('ck-err').textContent = err;
+    ['ck-d', 'ck-l', 'ck-x', 'ck-y', 'ck-z'].forEach(function (id) { var v = num($(id).value); if (isNaN(v) || v <= 0) $(id).setAttribute('aria-invalid', 'true'); else $(id).removeAttribute('aria-invalid'); });
+    if (err) { $('ckRes').innerHTML = ''; $('ckVis').innerHTML = ''; lastRes = null; return; }
+    var fit = [], no = [];
+    MACH.forEach(function (m) {
+      if (!m.env) return;
+      var reason = null, use = 0;
+      if (ck.kind === 'rund') {
+        if (m.env.k !== 'rund') return;
+        if (dims[0] > m.env.d) reason = 'Ø größer als ' + mm(m.env.d) + ' mm';
+        else if (dims[1] > m.env.l) reason = 'länger als ' + mm(m.env.l) + ' mm';
+        use = Math.max(dims[0] / m.env.d, dims[1] / m.env.l);
+      } else {
+        if (m.env.k !== 'prism') return;
+        var a = dims.slice().sort(function (x, y) { return y - x; }), b = m.env.d.slice().sort(function (x, y) { return y - x; });
+        if (a[0] > b[0] || a[1] > b[1] || a[2] > b[2]) reason = 'größer als ' + m.raum;
+        use = Math.max(a[0] / b[0], a[1] / b[1], a[2] / b[2]);
+      }
+      if (!reason && m.tol > tol) reason = 'Genauigkeit ' + tolTxt(m.tol);
+      if (reason) no.push({ m: m, r: reason }); else fit.push({ m: m, use: use });
+    });
+    fit.sort(function (a, b) {
+      var lotA = a.m.typ.indexOf('Langdreh') === 0 || a.m.typ.indexOf('Kurzdreh') === 0 || a.m.typ.indexOf('Roboter') >= 0, lotB = b.m.typ.indexOf('Langdreh') === 0 || b.m.typ.indexOf('Kurzdreh') === 0 || b.m.typ.indexOf('Roboter') >= 0;
+      if (!isNaN(qty) && qty >= 500 && lotA !== lotB) return lotA ? -1 : 1;
+      if (!isNaN(qty) && qty < 50 && lotA !== lotB) return lotA ? 1 : -1;
+      return b.use - a.use;
+    });
+    var best = fit[0];
+    var dimTxt = ck.kind === 'rund' ? 'Ø ' + mm(dims[0]) + ' × ' + mm(dims[1]) + ' mm' : mm(dims[0]) + ' × ' + mm(dims[1]) + ' × ' + mm(dims[2]) + ' mm';
+    var h = '';
+    if (best) {
+      var total = fit.reduce(function (a, f) { return a + f.m.n; }, 0);
+      h += '<div class="verdict"><div><b>Machbar auf ' + total + ' Maschinen</b><span>' + dimTxt + ', Toleranz ±' + NF.format(tol) + ' mm. Empfehlung: ' + esc(best.m.typ) + '.</span></div></div>';
+      h += '<ul class="fit">' + fit.slice(0, 4).map(function (f, i) { return '<li><span>' + esc(f.m.typ) + (i === 0 ? '<span class="tag">Empfehlung</span>' : '') + '<span class="m" style="display:block">' + f.m.raum + ', ' + tolTxt(f.m.tol) + '</span></span><span class="m">' + f.m.n + '×</span><span class="use" aria-hidden="true"><i style="width:' + Math.max(3, Math.round(f.use * 100)) + '%"></i></span></li>'; }).join('') + '</ul>';
+      if (fit.length > 4) h += '<p class="nofit">' + (fit.length === 5 ? 'Und ein weiterer Maschinentyp.' : 'Und ' + (fit.length - 4) + ' weitere Maschinentypen.') + '</p>';
+      if (best.m.typ.indexOf('Langdreh') === 0 && qty >= 500) h += '<p class="nofit">Bei ' + NF.format(qty) + ' Stück lohnt sich das Langdrehen von der Stange. Die Taktzeit sinkt deutlich.</p>';
+    } else {
+      var tolOnly = no.some(function (n) { return n.r.indexOf('Genauigkeit') === 0; });
+      h += '<div class="verdict no"><div><b>' + (tolOnly ? 'Toleranz nur nach Rücksprache' : 'Größer als unser Maschinenpark') + '</b><span>' + (tolOnly ? 'Die Maße passen in unseren Maschinenpark. ±' + NF.format(tol) + ' mm erreichen wir bei dieser Größe nur mit Nacharbeit. Senden Sie uns die Zeichnung, wir prüfen das.' : 'Senden Sie die Zeichnung trotzdem. Für Großteile arbeiten wir mit Partnerbetrieben zusammen.') + '</span></div></div>';
+    }
+    if (no.length) h += '<details class="nofit"><summary>' + (no.length === 1 ? 'Ein Maschinentyp passt nicht' : no.length + ' Maschinentypen passen nicht') + '</summary><ul>' + no.map(function (n) { return '<li>' + esc(n.m.typ) + ': ' + n.r + '</li>'; }).join('') + '</ul></details>';
+    $('ckRes').innerHTML = h;
+    $('ckVis').innerHTML = ckSVG(best ? best.m : null, dims, ck.kind);
+    lastRes = { dimTxt: dimTxt, best: best, tol: tol, qty: qty };
+    clearTimeout(liveT); liveT = setTimeout(function () { $('ckLive').textContent = best ? 'Machbar. Empfehlung ' + best.m.typ + '.' : 'Keine passende Maschine.'; }, 700);
+  }
+  function ckSVG(m, dims, kind) {
+    var W = 360, Hh = 170, pad = 30, s = '', p = 'c' + (uid++) + '-';
+    var env = m ? (kind === 'rund' ? [m.env.l, m.env.d] : m.env.d.slice().sort(function (a, b) { return b - a; }).slice(0, 2)) : null;
+    var part = kind === 'rund' ? [dims[1], dims[0]] : dims.slice().sort(function (a, b) { return b - a; }).slice(0, 2);
+    var ref = env ? env : part, k = Math.min((W - 2 * pad - 20) / ref[0], (Hh - 2 * pad) / ref[1]);
+    var ew = env ? env[0] * k : 0, eh = env ? env[1] * k : 0, pw = Math.max(2, part[0] * k), ph = Math.max(2, part[1] * k);
+    var ox = pad + 10, oy = (Hh - (env ? eh : ph)) / 2;
+    if (env) s += '<rect x="' + ox + '" y="' + oy + '" width="' + ew + '" height="' + eh + '" fill="rgba(69,201,242,.06)" stroke="#45C9F2" stroke-dasharray="6 4" stroke-width="1"/><text x="' + ox + '" y="' + (oy - 8) + '" style="font-size:11px">' + (kind === 'rund' ? 'Arbeitsraum ' + m.raum : 'Arbeitsraum ' + m.raum) + '</text>';
+    var py = env ? oy + (eh - ph) / 2 : oy;
+    if (kind === 'rund') s += '<rect x="' + ox + '" y="' + py + '" width="' + pw + '" height="' + ph + '" fill="rgba(230,237,243,.12)" stroke="#E6EDF3" stroke-width="1.4"/><line class="cl" x1="' + (ox - 8) + '" y1="' + (py + ph / 2) + '" x2="' + (ox + Math.max(pw, ew) + 8) + '" y2="' + (py + ph / 2) + '"/>';
+    else s += '<rect x="' + ox + '" y="' + py + '" width="' + pw + '" height="' + ph + '" fill="rgba(230,237,243,.12)" stroke="#E6EDF3" stroke-width="1.4"/>';
+    s += '<text x="' + (ox + 4) + '" y="' + (Math.min(py + ph + 16, Hh - 6)) + '" style="fill:var(--ink);font-size:11px">' + (kind === 'rund' ? 'Ø ' + mm(dims[0]) + ' × ' + mm(dims[1]) : mm(dims[0]) + ' × ' + mm(dims[1]) + ' × ' + mm(dims[2])) + ' mm</text>';
+    return '<svg class="drw" viewBox="0 0 ' + W + ' ' + Hh + '">' + s + '</svg>';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#check input, #check select'), function (el) { el.addEventListener('input', ckRun); el.addEventListener('change', ckRun); });
+  ckRun();
+  $('ckUse').addEventListener('click', function () {
+    if (!lastRes) { $('ck-err').textContent = 'Bitte zuerst gültige Maße eingeben.'; return; }
+    if (!form.elements || !form.elements.dim || !document.contains(form)) { toast('Bitte zuerst eine neue Anfrage öffnen.'); return; }
+    form.elements.dim.value = (ck.kind === 'rund' ? 'Drehteil ' : 'Frästeil ') + lastRes.dimTxt;
+    var tmap = { '0.1': 0, '0.05': 1, '0.02': 2, '0.01': 3, '0.005': 4, '0.002': 5 };
+    form.elements.tol.value = TOLS[tmap[ck.tol]];
+    if (!isNaN(lastRes.qty) && lastRes.qty >= 1) form.elements.qty.value = String(Math.min(50000, Math.round(lastRes.qty)));
+    S.draft = readForm(); save();
+    $('f-dim').scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    $('f-dim').focus({ preventScroll: true });
+    toast('Maße, Toleranz und Stückzahl übernommen');
+  });
+  $('refAsk').addEventListener('click', function () {
+    if (!curRef) return; closeDlg($('refDlg'));
+    if (document.contains(form)) {
+      var mi = MATS.filter(function (m) { return curRef.mat.indexOf(m.split(' (')[0].replace('Edelstahl ', '').replace('Stahl ', '')) >= 0 || m.indexOf(curRef.mat.replace(' vergütet', '')) >= 0; })[0];
+      if (mi) form.elements.mat.value = mi;
+      form.elements.br.value = curRef.br; form.elements.part.value = form.elements.part.value || ('Ähnlich ' + curRef.n);
+      S.draft = readForm(); save();
+    }
+    $('anfrage').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    setTimeout(function () { var el = $('f-part'); if (el) el.focus({ preventScroll: true }); }, 400);
+    toast('Werkstoff und Branche übernommen');
+  });
+
+  /* Karriere */
+  var sept = new Date(TODAY.getFullYear() + (TODAY.getMonth() >= 6 ? 1 : 0), 8, 1);
+  var JOBS = [
+    { t: 'Zerspanungsmechaniker/in Drehtechnik', m: 'Vollzeit, 2-Schicht, ab sofort', neu: true, a: ['Langdrehautomaten einrichten und Programme optimieren', 'Erstteile messen und freigeben', 'Werkzeugstandzeiten im Blick behalten'], b: ['Ausbildung als Zerspanungsmechaniker/in oder vergleichbar', 'Erfahrung mit Fanuc- oder Siemens-Steuerungen', 'Lust auf enge Toleranzen'] },
+    { t: 'Zerspanungsmechaniker/in Frästechnik 5-Achs', m: 'Vollzeit, Früh- und Spätschicht', a: ['5-Achs-Zentren und Roboterzelle einrichten', 'CAM-Programme an der Maschine anpassen', 'Vorrichtungen mitentwickeln'], b: ['Abgeschlossene Ausbildung in der Metallbearbeitung', 'Sicherer Umgang mit Zeichnungen und Messmitteln', 'Erfahrung im 5-Achs-Fräsen von Vorteil'] },
+    { t: 'Qualitätsprüfer/in Messraum', m: 'Vollzeit, Tagschicht', a: ['KMG-Messprogramme erstellen', 'Erstmusterprüfberichte und PPAP-Unterlagen erstellen', 'Prüfmittel überwachen'], b: ['Ausbildung in Metall oder als Qualitätsfachkraft', 'Kenntnisse in Form- und Lagetoleranzen', 'Sorgfalt und klare Dokumentation'] },
+    { t: 'Ausbildung Zerspanungsmechaniker/in', m: 'Start ' + DF.format(sept) + ', 3,5 Jahre', a: ['Drehen, Fräsen und Schleifen von Grund auf', 'Eigene Lehrwerkstatt mit zwei Ausbildern', 'Ab dem zweiten Jahr echte Kundenteile'], b: ['Guter Haupt- oder Realschulabschluss', 'Interesse an Technik und Mathe', 'Ein Praktikum vorab ist willkommen'] }
+  ];
+  $('jobs').innerHTML = JOBS.map(function (j, i) {
+    return '<details class="job"' + (i === 0 ? ' open' : '') + '><summary><h3>' + j.t + (j.neu ? '<span class="tag-new">Neu</span>' : '') + '</h3><span class="meta">' + j.m + '</span><span class="pm" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6"/></svg></span></summary>' +
+      '<div class="job-b"><div><h4>Ihre Aufgaben</h4><ul>' + j.a.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div><div><h4>Das bringen Sie mit</h4><ul>' + j.b.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="acts"><button type="button" class="btn pri sm" data-job="' + i + '">Kurzbewerbung senden</button></div></div></details>';
+  }).join('');
+  var curJob = 0;
+  var jobBodyHTML = $('jobBody').innerHTML, jobFootHTML = $('jobFoot').innerHTML;
+  $('jobs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-job]'); if (!b) return; curJob = +b.getAttribute('data-job');
+    $('jobBody').innerHTML = jobBodyHTML; $('jobFoot').innerHTML = jobFootHTML;
+    $('jobSub').textContent = JOBS[curJob].t;
+    if (JOBS[curJob].t.indexOf('Ausbildung') === 0) $('j-exp').value = 'Schülerin oder Schüler';
+    openDlg($('jobDlg')); $('j-name').focus();
+  });
+  $('jobForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = $('j-name'), t = $('j-tel'), first = null;
+    if (n.value.trim().length < 3) { setErr('j-name', 'Bitte geben Sie Ihren Namen an.'); first = n; } else setErr('j-name', '');
+    if (!/(@.+\.)|(\d[\d\s\/+-]{5,})/.test(t.value.trim())) { setErr('j-tel', 'Bitte eine Telefonnummer oder E-Mail-Adresse angeben.'); first = first || t; } else setErr('j-tel', '');
+    if (first) { first.focus(); return; }
+    S.apps.unshift({ job: JOBS[curJob].t, name: n.value.trim(), at: Date.now() }); save();
+    $('jobBody').innerHTML = '<div class="verdict" tabindex="-1" id="jobOk"><div><b>Kurzbewerbung gesendet</b><span>Danke, ' + esc(n.value.trim()) + '. Sabine Wolf ruft Sie bis ' + DFL.format(addWorkdays(TODAY, 2)) + ' ' + esc($('j-when').value.toLowerCase()) + ' zurück.</span></div></div><span class="sim">In der Demo simuliert.</span>';
+    $('jobFoot').innerHTML = '<button type="button" class="btn pri" data-close>Fertig</button>';
+    $('jobFoot').querySelector('button').focus();
+  });
+  $('jobForm').addEventListener('input', function (e) { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target.id, ''); });
+
+  /* Werksplan */
+  (function plan() {
+    var b = function (x, y, w, h, t, sub, hl) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + (hl ? 'rgba(69,201,242,.14)' : 'rgba(230,237,243,.04)') + '" stroke="' + (hl ? '#45C9F2' : '#A6B4C1') + '" stroke-width="1.3"/><text class="hn" x="' + (x + 12) + '" y="' + (y + 26) + '" style="fill:var(--ink);font-family:var(--sans);font-weight:600">' + t + '</text><text class="sub" x="' + (x + 12) + '" y="' + (y + 44) + '" style="fill:var(--ink-3);font-family:var(--sans)">' + sub + '</text>'; };
+    var s = '<svg class="drw" viewBox="0 0 640 380" role="img" aria-label="Werksplan mit Hallen A bis D, Empfang in Halle A, Warenannahme an Tor 3">';
+    s += '<path d="M20 350 H620" stroke="#82909D" stroke-width="10" opacity=".25"/><text x="24" y="372" class="lb" style="fill:var(--ink-3);font-family:var(--sans)">Industriestraße</text>';
+    s += b(30, 200, 200, 120, 'Halle A', 'Empfang, Vertrieb, Messraum', true);
+    s += b(250, 200, 170, 120, 'Halle B', 'Dreherei');
+    s += b(250, 40, 170, 140, 'Halle C', 'Fräserei, Roboterzelle');
+    s += b(440, 40, 170, 140, 'Halle D', 'Schleifen, Montage');
+    s += b(440, 200, 170, 120, 'Lager', 'Versand, Wareneingang');
+    s += '<g fill="none" stroke="#45C9F2" stroke-width="1"><rect x="30" y="40" width="200" height="140" stroke-dasharray="4 4" opacity=".6"/></g><text class="hn pk" x="42" y="66" style="fill:var(--ink-2);font-family:var(--sans);font-weight:600">Besucherparkplatz</text>';
+    for (var i = 0; i < 6; i++) s += '<line x1="' + (52 + i * 28) + '" y1="110" x2="' + (52 + i * 28) + '" y2="160" stroke="#82909D" stroke-width="1"/>';
+    s += '<path d="M600 320 V344" stroke="#45C9F2" stroke-width="2"/><text x="592" y="338" text-anchor="end" class="lb">Tor 3</text>';
+    s += '<circle cx="130" cy="320" r="6" fill="#45C9F2"/><path d="M130 326 V346" stroke="#45C9F2" stroke-width="2"/><text x="140" y="342" class="lb">Eingang</text>';
+    s += '<g transform="translate(620 42)"><path d="M0 18 L6 0 L12 18 L6 13z" fill="#45C9F2"/><text x="2" y="32" style="font-size:11px">N</text></g>';
+    $('plan').innerHTML = s + '</svg>';
+  })();
+
+  /* Rechtliches */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-legal]'), function (b) {
+    b.addEventListener('click', function () {
+      var imp = b.getAttribute('data-legal') === 'imp';
+      $('legalT').textContent = imp ? 'Impressum' : 'Datenschutz';
+      $('legalB').innerHTML = imp ? '<p>Platzhalter für das Impressum.</p><p class="muted">Muster Präzisionsteile GmbH, Industriestraße 12, 12345 Musterstadt. Geschäftsführung, Registergericht, Handelsregisternummer und USt-IdNr. stehen hier auf der echten Website.</p>' : '<p>Platzhalter für die Datenschutzerklärung.</p><p class="muted">Diese Beispiel-Website lädt keine externen Schriften oder Skripte und setzt keine Tracker ein. Eingaben im Formular bleiben im lokalen Speicher Ihres Browsers, bis Sie die Demo zurücksetzen.</p>';
+      openDlg($('legalDlg'));
+    });
+  });
+
+  /* Zurücksetzen mit Rückgängig */
+  function resetDemo() {
+    var prev = JSON.stringify(S);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = { draft: {}, inquiries: [], apps: [], check: null };
+    try { sessionStorage.setItem(KEY + '-undo', prev); } catch (e) {}
+    location.hash = '';
+    location.reload();
+  }
+  $('resetBtn').addEventListener('click', resetDemo);
+  (function undoAfterReset() {
+    var prev = null; try { prev = sessionStorage.getItem(KEY + '-undo'); sessionStorage.removeItem(KEY + '-undo'); } catch (e) {}
+    if (prev) setTimeout(function () { toast('Demo zurückgesetzt', function () { try { localStorage.setItem(KEY, prev); } catch (e) {} location.reload(); }); }, 300);
+  })();
+
+  /* Handy-Leiste: aktiver Abschnitt */
+  (function () {
+    var tabs = document.querySelectorAll('.tabbar a'), raf = 0;
+    function upd() {
+      raf = 0; if (window.innerWidth > 760) return;
+      var y = window.innerHeight * 0.4, cur = null;
+      ['leistungen', 'maschinen', 'anfrage'].forEach(function (id) { var r = $(id).getBoundingClientRect(); if (r.top < y && r.bottom > y) cur = id; });
+      var c = $('check').getBoundingClientRect(); if (c.top < y && c.bottom > y) cur = 'check';
+      Array.prototype.forEach.call(tabs, function (t) { if (t.getAttribute('data-sec') === cur) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+    }
+    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    window.addEventListener('resize', upd); upd();
+  })();
+})();
+</script>
+</body>
+</html>

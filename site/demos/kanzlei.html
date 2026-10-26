@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Muster &amp; Partner Rechtsanwälte – Beispiel-Website</title>
+<meta name="description" content="Beispiel-Website einer fiktiven Anwaltskanzlei: Rechtsgebiete, Fristenrechner, transparente Kosten und eine mehrstufige Anfrage zur Ersteinschätzung.">
+<meta name="theme-color" content="#172440">
+<style>
+/* Gestaltung: gesetzt wie ein juristischer Kommentar. Randspalte mit römischen Kapitelzahlen, Tintenblau auf Papier, Gold nur als Haarlinie. */
+@font-face { font-family: "Cormorant"; font-style: normal; font-weight: 500; font-display: swap; src: url(kanzlei-files/cormorant-garamond-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant"; font-style: normal; font-weight: 600; font-display: swap; src: url(kanzlei-files/cormorant-garamond-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant"; font-style: italic; font-weight: 500; font-display: swap; src: url(kanzlei-files/cormorant-garamond-latin-500-italic.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant"; font-style: italic; font-weight: 600; font-display: swap; src: url(kanzlei-files/cormorant-garamond-latin-600-italic.woff2) format("woff2"); }
+@font-face { font-family: "Schibsted"; font-style: normal; font-weight: 400 900; font-display: swap; src: url(kanzlei-files/schibsted-grotesk-latin-wght-normal.woff2) format("woff2"); }
+:root {
+  --paper: #F1ECE2;
+  --paper-2: #E6DFD0;
+  --sheet: #FBF8F2;
+  --ink: #172440;
+  --ink-2: #2C3B5E;
+  --text: #1C1F27;
+  --muted: #575C68;
+  --rule: #CDC2AE;
+  --rule-2: #B3A68E;
+  --bordeaux: #7B2333;
+  --bordeaux-bg: #F3E4E2;
+  --gold: #9A7737;
+  --gold-lt: #CFAE6A;
+  --on-ink: #EEE8DC;
+  --on-ink-2: #B4BACA;
+  --rule-ink: rgba(238, 232, 220, .22);
+  --ok: #24563B;
+  --serif: "Cormorant", "Cormorant Garamond", Garamond, "Times New Roman", serif;
+  --sans: "Schibsted", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --gut: max(20px, env(safe-area-inset-left, 0px));
+  --gut-r: max(20px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+body { margin: 0; background: var(--paper); color: var(--text); font-family: var(--sans); font-size: 17px; line-height: 1.6; font-feature-settings: "kern"; }
+a { color: inherit; text-underline-offset: .18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-color: var(--gold); }
+img, svg { max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button, label, a, select, input { touch-action: manipulation; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.ink :focus-visible, .foot :focus-visible { outline-color: var(--gold-lt); }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: var(--gut); padding-right: var(--gut-r); }
+.g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+.serif { font-family: var(--serif); }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; margin: 0; letter-spacing: -.005em; text-wrap: balance; }
+.kick { font-family: var(--serif); font-style: italic; font-size: 20px; line-height: 1.3; color: var(--muted); margin: 0; }
+.ink .kick { color: var(--on-ink-2); }
+.tnum { font-variant-numeric: tabular-nums lining-nums; }
+
+/* Knöpfe */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 0 24px; border: 1px solid var(--ink); background: var(--ink); color: var(--sheet); font-family: var(--sans); font-weight: 600; font-size: 16px; letter-spacing: .01em; text-decoration: none; border-radius: 0; transition: background-color .15s, color .15s, border-color .15s; }
+.btn:hover { background: var(--ink-2); border-color: var(--ink-2); }
+.btn.line { background: transparent; color: var(--ink); }
+.btn.line:hover { background: var(--ink); color: var(--sheet); }
+.btn.gold { background: var(--gold-lt); border-color: var(--gold-lt); color: var(--ink); }
+.btn.gold:hover { background: var(--on-ink); border-color: var(--on-ink); }
+.btn.ghost-inv { background: transparent; border-color: var(--on-ink-2); color: var(--on-ink); }
+.btn.ghost-inv:hover { background: var(--on-ink); color: var(--ink); }
+.btn.sm { min-height: 42px; padding: 0 16px; font-size: 15px; }
+.txtlink { background: none; border: 0; padding: 0; font-weight: 600; text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; text-decoration-color: var(--gold); color: inherit; min-height: 32px; }
+
+/* Hinweisleiste */
+.demo-strip { background: var(--ink); color: var(--on-ink); font-size: 13.5px; }
+.demo-strip .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 20px; padding-block: 7px; }
+.demo-strip a { color: var(--on-ink); font-weight: 600; text-decoration-color: var(--gold-lt); }
+
+/* Kopf */
+.top { position: sticky; top: 0; z-index: 30; background: rgba(241, 236, 226, .96); border-bottom: 1px solid var(--rule); }
+@supports (backdrop-filter: blur(6px)) { .top { background: rgba(241, 236, 226, .88); backdrop-filter: blur(8px); } }
+.top .wrap { display: flex; align-items: center; gap: 24px; min-height: 72px; }
+.brand { text-decoration: none; display: flex; flex-direction: column; line-height: 1; margin-right: auto; }
+.brand b { font-family: var(--serif); font-weight: 600; font-size: 29px; color: var(--ink); letter-spacing: -.01em; }
+.brand b i { font-style: italic; font-weight: 500; color: var(--gold); padding: 0 .04em; }
+.brand small { font-size: 12.5px; color: var(--muted); letter-spacing: .02em; margin-top: 4px; }
+.nav { display: flex; gap: 2px; }
+.nav a { padding: 8px 10px; text-decoration: none; font-size: 15px; font-weight: 500; color: var(--text); border-bottom: 1px solid transparent; }
+.nav a:hover { border-bottom-color: var(--gold); }
+.menu-btn { display: none; border: 1px solid var(--ink); background: none; min-height: 44px; padding: 0 16px; font-weight: 600; }
+.mnav { display: none; border-top: 1px solid var(--rule); background: var(--sheet); }
+.mnav a { display: flex; justify-content: space-between; padding: 14px var(--gut-r) 14px var(--gut); border-bottom: 1px solid var(--rule); text-decoration: none; font-family: var(--serif); font-size: 24px; color: var(--ink); }
+.mnav a span { font-style: italic; color: var(--gold); }
+@media (max-width: 1100px) { .nav a { padding: 8px 7px; font-size: 14.5px; } .index a { font-size: 22px; } }
+@media (max-width: 1020px) {
+  .nav, .top .top-cta { display: none; }
+  .menu-btn { display: inline-flex; align-items: center; }
+  .mnav.open { display: block; }
+}
+
+/* Hero */
+.hero { padding-block: 64px 0; }
+.hero .meta { grid-column: 1 / 3; padding-top: 18px; }
+.hero .meta p { margin: 0; font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.35; color: var(--muted); }
+.hero .meta p + p { margin-top: 12px; }
+.hero h1 { grid-column: 3 / 13; font-size: clamp(50px, 8.2vw, 124px); line-height: .94; color: var(--ink); letter-spacing: -.018em; font-weight: 500; }
+.hero h1 span { display: block; }
+.hero h1 span + span { padding-left: 1.35em; font-style: italic; }
+.hero-body { grid-column: 3 / 8; margin-top: 44px; }
+.lead { font-size: 19px; line-height: 1.62; margin: 0; max-width: 34em; }
+.lead::first-letter { font-family: var(--serif); font-weight: 600; float: left; font-size: 5.3em; line-height: .78; padding: .06em .09em 0 0; color: var(--ink); }
+.hero .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 30px; }
+.note-card { grid-column: 9 / 13; margin-top: 44px; align-self: start; border-top: 3px double var(--gold); border-bottom: 1px solid var(--rule); padding: 18px 0 20px; }
+.note-card h2 { font-size: 22px; font-style: italic; color: var(--muted); font-weight: 500; }
+.note-card p { margin: 10px 0 0; font-size: 15.5px; }
+.note-card .big { font-family: var(--serif); font-size: 34px; line-height: 1.1; color: var(--bordeaux); margin-top: 6px; font-weight: 600; }
+.note-card .fine { font-size: 13px; color: var(--muted); }
+.index { margin-top: 64px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.index .g12 { align-items: stretch; }
+.index .lbl { grid-column: 1 / 3; padding: 16px 0; }
+.index ul { grid-column: 3 / 13; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.index li { border-left: 1px solid var(--rule); }
+.index a { display: block; padding: 14px 16px 16px; text-decoration: none; font-family: var(--serif); font-size: 25px; line-height: 1.1; color: var(--ink); height: 100%; }
+.index a small { display: block; font-family: var(--sans); font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.35; }
+.index a:hover { background: var(--sheet); }
+
+/* Kapitel */
+.sec { padding-block: 96px; }
+.sec + .sec { border-top: 1px solid var(--rule); }
+.sec.ink { background: var(--ink); color: var(--on-ink); border-top: 0; }
+.sec.ink + .sec { border-top: 0; }
+.sh { margin-bottom: 48px; }
+.sh .num { grid-column: 1 / 3; font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 64px; line-height: .9; color: var(--gold); margin: 0; }
+.ink .sh .num { color: var(--gold-lt); }
+.sh .sh-main { grid-column: 3 / 10; }
+.sh h2 { font-size: clamp(42px, 5.4vw, 74px); line-height: .98; color: var(--ink); }
+.ink .sh h2 { color: var(--on-ink); }
+.sh p.intro { margin: 18px 0 0; max-width: 38em; color: var(--muted); font-size: 18px; }
+.ink .sh p.intro { color: var(--on-ink-2); }
+.sh .side { grid-column: 10 / 13; align-self: end; font-size: 14.5px; color: var(--muted); margin: 0; border-left: 1px solid var(--rule); padding-left: 16px; }
+.ink .sh .side { color: var(--on-ink-2); border-left-color: var(--rule-ink); }
+.body-col { grid-column: 3 / 13; min-width: 0; }
+
+/* Rechtsgebiete */
+.areas { border-top: 1px solid var(--ink); }
+.area { border-bottom: 1px solid var(--rule); }
+.area-h { width: 100%; background: none; border: 0; text-align: left; padding: 26px 0; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 2fr) minmax(0, 1.1fr) 44px; gap: 24px; align-items: baseline; color: inherit; }
+.area-h .nm { font-family: var(--serif); font-size: clamp(30px, 3.2vw, 42px); line-height: 1.02; color: var(--ink); }
+.area-h .sum { font-size: 16px; color: var(--text); }
+.area-h .who { font-size: 14px; color: var(--muted); line-height: 1.4; }
+.area-h .who b { display: block; color: var(--text); font-weight: 600; }
+.area-h .pm { align-self: center; justify-self: end; width: 40px; height: 40px; border: 1px solid var(--rule-2); display: grid; place-items: center; transition: background-color .15s, transform .25s; }
+.area-h .pm svg { width: 16px; height: 16px; transition: transform .25s; }
+.area-h[aria-expanded="true"] .pm { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.area-h[aria-expanded="true"] .pm svg { transform: rotate(45deg); }
+@media (hover: hover) { .area-h:hover .nm { text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: var(--gold); text-underline-offset: .14em; } }
+.area-b { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+.area-b.open { grid-template-rows: 1fr; }
+.area-b > div { overflow: hidden; }
+.area-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; padding: 4px 0 34px; }
+.area-in h3 { font-size: 23px; font-style: italic; color: var(--ink); margin-bottom: 10px; font-weight: 600; }
+.area-in ul { margin: 0; padding: 0; list-style: none; }
+.area-in li { padding: 7px 0 7px 22px; border-top: 1px solid var(--rule); position: relative; font-size: 15.5px; line-height: 1.5; }
+.area-in li::before { content: "§"; position: absolute; left: 0; top: 7px; font-family: var(--serif); color: var(--gold); font-size: 17px; }
+.fristbox { background: var(--sheet); border-left: 3px solid var(--bordeaux); padding: 16px 18px; }
+.fristbox h3 { color: var(--bordeaux); }
+.fristbox dl { margin: 0; }
+.fristbox dt { font-weight: 600; font-size: 15.5px; }
+.fristbox dd { margin: 2px 0 12px; font-size: 14.5px; color: var(--muted); }
+.fristbox dd:last-of-type { margin-bottom: 4px; }
+.area-acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; border-top: 1px solid var(--rule); padding-top: 18px; }
+.area-acts p { margin: 0; font-size: 14.5px; color: var(--muted); }
+
+/* Fristenrechner */
+.fr { grid-column: 3 / 13; display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.15fr); border: 1px solid var(--rule-ink); }
+.fr form { padding: 30px; border-right: 1px solid var(--rule-ink); display: grid; gap: 20px; align-content: start; }
+.f { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.f > label, .f > .lbl, fieldset > legend { font-size: 14.5px; font-weight: 600; }
+.f .help { font-size: 13.5px; color: var(--muted); margin: 0; }
+.ink .f .help { color: var(--on-ink-2); }
+.f input, .f select, .f textarea { width: 100%; min-width: 0; min-height: 50px; padding: 11px 13px; border: 1px solid var(--rule-2); background: var(--sheet); border-radius: 0; font-size: 16px; color: var(--text); }
+.f textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
+.f input:focus, .f select:focus, .f textarea:focus { outline: 2px solid var(--ink); outline-offset: 0; border-color: var(--ink); }
+.ink .f input, .ink .f select { background: #1F2E4F; border-color: rgba(238, 232, 220, .35); color: var(--on-ink); }
+.ink .f input:focus, .ink .f select:focus { outline-color: var(--gold-lt); border-color: var(--gold-lt); }
+.ink .f input[type="date"] { color-scheme: dark; }
+.f .err { color: var(--bordeaux); font-size: 14px; font-weight: 600; }
+.f [aria-invalid="true"] { border-color: var(--bordeaux); box-shadow: inset 3px 0 0 var(--bordeaux); }
+.chk { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; cursor: pointer; line-height: 1.45; }
+.chk input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--ink); }
+.ink .chk input { accent-color: var(--gold-lt); }
+.fr-out { padding: 30px; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.fr-res .kick { font-size: 19px; }
+.fr-date { font-family: var(--serif); font-weight: 500; font-size: clamp(40px, 4.6vw, 62px); line-height: 1; color: var(--on-ink); margin: 8px 0 0; }
+.fr-left { display: inline-block; margin-top: 12px; font-weight: 600; font-size: 15px; padding: 4px 10px; background: var(--gold-lt); color: var(--ink); }
+.fr-left.late { background: #E7B7B7; color: #4A0F18; }
+.fr-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; border-top: 1px solid var(--rule-ink); }
+.fr-steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--rule-ink); font-size: 15px; }
+.fr-steps li::before { content: counter(s, upper-roman) "."; font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--gold-lt); line-height: 1.2; }
+.fr-steps b { display: block; font-weight: 600; color: var(--on-ink); }
+.fr-steps span { color: var(--on-ink-2); }
+.cal { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14px; }
+.cal caption { text-align: left; font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--on-ink-2); padding-bottom: 8px; }
+.cal th { font-weight: 500; font-size: 12.5px; color: var(--on-ink-2); padding: 4px 0; text-align: center; }
+.cal td { text-align: center; padding: 2px; }
+.cal td span { display: grid; place-items: center; height: 34px; color: var(--on-ink); position: relative; }
+.cal td.we span { color: var(--on-ink-2); }
+.cal td.hol span { color: #F0B2B6; }
+.cal td.hol span::after { content: ""; position: absolute; bottom: 4px; width: 4px; height: 4px; background: #F0B2B6; border-radius: 50%; }
+.cal td.run span { background: rgba(207, 174, 106, .14); }
+.cal td.calc span { outline: 1px dashed var(--gold-lt); outline-offset: -2px; }
+.cal td.end span { background: var(--gold-lt); color: var(--ink); font-weight: 700; }
+.cal td.today span { text-decoration: underline; text-underline-offset: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--on-ink-2); margin-top: 8px; }
+.legend i { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 6px; }
+.disclaim { border: 1px solid #E7B7B7; background: rgba(123, 35, 51, .28); padding: 14px 16px; font-size: 14.5px; color: var(--on-ink); }
+.disclaim b { color: #FFD9DC; }
+.fr-acts { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Kosten */
+.cost { grid-column: 3 / 13; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--ink); }
+.cost > div { padding: 26px 26px 6px 0; min-width: 0; }
+.cost > div + div { padding-left: 26px; border-left: 1px solid var(--rule); }
+.cost h3 { font-size: 30px; line-height: 1.05; color: var(--ink); }
+.cost .price { font-family: var(--serif); font-size: 76px; line-height: .9; color: var(--ink); margin: 18px 0 4px; font-weight: 500; }
+.cost .price small { font-size: 24px; font-style: italic; color: var(--muted); }
+.cost p { margin: 12px 0 0; font-size: 15.5px; }
+.cost .fine { font-size: 13.5px; color: var(--muted); }
+.cost ul { margin: 12px 0 0; padding: 0; list-style: none; }
+.cost li { padding: 8px 0; border-top: 1px solid var(--rule); font-size: 15px; }
+.quote { grid-column: 3 / 11; margin: 64px 0 0; padding: 0; }
+.quote blockquote { margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(30px, 3.4vw, 46px); line-height: 1.16; color: var(--ink); text-indent: -.42em; }
+.quote figcaption { margin-top: 14px; font-size: 15px; color: var(--muted); }
+.quote figcaption::before { content: ""; display: inline-block; width: 40px; height: 1px; background: var(--gold); vertical-align: middle; margin-right: 12px; }
+
+/* Anfrage */
+.wiz { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+.wiz-nav { grid-column: 1 / 4; }
+.wiz-nav ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); position: sticky; top: 100px; }
+.wiz-nav li { border-bottom: 1px solid var(--rule); }
+.wiz-nav button { width: 100%; text-align: left; background: none; border: 0; padding: 13px 0; display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: baseline; color: var(--muted); min-height: 52px; }
+.wiz-nav button:disabled { cursor: default; }
+.wiz-nav .n { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--rule-2); }
+.wiz-nav .t { font-weight: 500; font-size: 15.5px; }
+.wiz-nav li.done button { color: var(--text); }
+.wiz-nav li.done .n { color: var(--gold); }
+.wiz-nav li.done .t::after { content: " ✓"; color: var(--ok); }
+.wiz-nav li.cur button { color: var(--ink); }
+.wiz-nav li.cur .n { color: var(--ink); }
+.wiz-nav li.cur .t { font-weight: 700; }
+.wiz-nav .saved { font-size: 13px; color: var(--muted); margin: 14px 0 0; min-height: 20px; }
+.wiz-mob { display: none; }
+.sheet { grid-column: 4 / 13; background: var(--sheet); border: 1px solid var(--rule); padding: 36px 40px 32px; min-width: 0; }
+.step { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 22px; }
+.step > legend { padding: 0; margin-bottom: 18px; font-family: var(--serif); font-size: 36px; line-height: 1.05; color: var(--ink); font-weight: 500; }
+.step .sub { margin: -8px 0 0; color: var(--muted); font-size: 15.5px; }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.choices.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choices.one { grid-template-columns: minmax(0, 1fr); }
+.choices legend { margin-bottom: 8px; padding: 0; }
+.opt { position: relative; display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--rule-2); background: var(--paper); padding: 14px 14px; cursor: pointer; min-height: 56px; line-height: 1.35; }
+.opt input { width: 19px; height: 19px; margin: 1px 0 0; accent-color: var(--ink); flex: none; }
+.opt b { display: block; font-weight: 600; font-size: 15.5px; }
+.opt small { display: block; color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+.opt:has(input:checked) { border-color: var(--ink); background: #fff; box-shadow: inset 0 0 0 1px var(--ink); }
+.opt:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.choices[aria-invalid="true"] .opt { border-color: var(--bordeaux); }
+.grp-err { color: var(--bordeaux); font-size: 14px; font-weight: 600; margin: 4px 0 0; }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.counter { font-size: 13px; color: var(--muted); text-align: right; }
+.calcline { background: var(--paper); border-left: 3px solid var(--ink); padding: 12px 14px; font-size: 15px; margin: 0; }
+.calcline.urgent { border-left-color: var(--bordeaux); background: var(--bordeaux-bg); color: #4A0F18; }
+.drop { display: grid; place-items: center; text-align: center; gap: 6px; border: 1px dashed var(--rule-2); background: var(--paper); padding: 30px 20px; cursor: pointer; }
+.drop.over { border-color: var(--ink); background: #fff; }
+.drop b { font-family: var(--serif); font-size: 26px; font-weight: 500; color: var(--ink); }
+.drop span { font-size: 14px; color: var(--muted); }
+.files { list-style: none; margin: 0; padding: 0; }
+.files li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.files li .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.files li .sz { color: var(--muted); font-size: 13.5px; white-space: nowrap; }
+.files li button { background: none; border: 1px solid var(--rule-2); min-height: 36px; padding: 0 12px; font-size: 14px; }
+.sim { font-size: 13.5px; color: var(--muted); margin: 0; font-style: normal; }
+.sim::before { content: "In der Demo simuliert. "; font-weight: 600; color: var(--text); }
+.slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.summary { border-top: 1px solid var(--ink); margin: 0; }
+.summary div { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; overflow-wrap: anywhere; }
+.wiz-acts { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 22px; }
+.wiz-acts .grow { flex: 1; }
+.done-card { display: grid; gap: 18px; }
+.done-card h3 { font-size: 40px; line-height: 1.05; color: var(--ink); }
+.done-card .ref { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--muted); margin: 0; }
+.done-card p { margin: 0; }
+.status-demo { background: var(--paper); border-left: 3px solid var(--gold); padding: 12px 14px; font-size: 14.5px; margin: 0; }
+
+/* Kanzlei */
+.people { grid-column: 3 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 56px; border-top: 1px solid var(--ink); }
+.person { padding: 28px 0 8px; min-width: 0; position: relative; }
+.person + .person::before { content: ""; position: absolute; left: -28px; top: 28px; bottom: 0; border-left: 1px solid var(--rule); }
+.lead-q { margin: 26px 0 0; padding: 4px 0 4px 20px; border-left: 1px solid var(--gold); font-family: var(--serif); font-style: italic; font-size: 26px; line-height: 1.25; color: var(--ink-2); max-width: 22em; }
+.plate { aspect-ratio: 4 / 5; border: 1px solid var(--rule-2); outline: 1px solid var(--rule); outline-offset: -8px; display: grid; place-items: center; background: var(--sheet); position: relative; overflow: hidden; }
+.plate span { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: clamp(96px, 11vw, 168px); line-height: 1; color: var(--ink); letter-spacing: -.04em; }
+.plate span i { font-style: normal; color: var(--gold); }
+.plate small { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--muted); }
+.person h3 { font-size: 32px; line-height: 1.05; color: var(--ink); margin-top: 22px; }
+.person .role { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
+.person ul { margin: 14px 0 0; padding: 0; list-style: none; }
+.person li { padding: 7px 0; border-top: 1px solid var(--rule); font-size: 15px; }
+.person .say { font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.3; margin: 16px 0 0; color: var(--ink-2); }
+.history { grid-column: 3 / 13; margin-top: 80px; }
+.history h3 { font-size: 34px; color: var(--ink); margin-bottom: 22px; }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--ink); position: relative; }
+.tl li { padding: 18px 16px 0 0; position: relative; min-width: 0; }
+.tl li::before { content: ""; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; background: var(--paper); border: 1px solid var(--ink); transform: rotate(45deg); }
+.tl li:last-child::before { background: var(--gold); border-color: var(--gold); }
+.tl .y { font-family: var(--serif); font-size: 36px; line-height: 1; color: var(--ink); font-variant-numeric: oldstyle-nums; display: block; }
+.tl p { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; }
+
+/* Ratgeber */
+.posts { grid-column: 3 / 13; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 0 40px; }
+.post { border-top: 1px solid var(--rule); padding: 20px 0 22px; }
+.post.lead-post { grid-row: span 3; border-top: 1px solid var(--ink); padding-top: 26px; }
+.post .kick { font-size: 18px; }
+.post h3 { font-size: 27px; line-height: 1.1; margin-top: 6px; color: var(--ink); }
+.post.lead-post h3 { font-size: clamp(36px, 3.8vw, 52px); line-height: 1.02; margin-top: 10px; }
+.post h3 button { all: unset; cursor: pointer; }
+.post h3 button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.post h3 button:hover { text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: var(--gold); text-underline-offset: .12em; }
+.post p { margin: 10px 0 0; font-size: 15.5px; }
+.post.lead-post p { font-size: 17.5px; max-width: 34em; }
+.post p.m { font-size: 13.5px; color: var(--muted); margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.posts-col { display: contents; }
+
+/* Kontakt */
+.contact { grid-column: 3 / 13; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 40px; align-items: start; }
+.addr { font-family: var(--serif); font-size: 30px; line-height: 1.2; color: var(--ink); margin: 0; font-style: normal; }
+.cinfo { margin: 22px 0 0; }
+.cinfo div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 15.5px; }
+.cinfo dt { color: var(--muted); }
+.cinfo dd { margin: 0; overflow-wrap: anywhere; }
+.hours { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 15.5px; }
+.hours caption { text-align: left; font-family: var(--serif); font-size: 26px; color: var(--ink); padding-bottom: 8px; }
+.hours th, .hours td { text-align: left; padding: 9px 0; border-top: 1px solid var(--rule); font-weight: 400; }
+.hours td { text-align: right; }
+.hours tr.today th, .hours tr.today td { font-weight: 700; color: var(--ink); }
+.open-now { display: inline-flex; gap: 8px; align-items: center; font-weight: 600; font-size: 15px; margin-top: 14px; }
+.open-now::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ok); }
+.open-now.closed::before { background: var(--bordeaux); }
+.map { border: 1px solid var(--rule-2); background: var(--sheet); }
+.map svg { display: block; width: 100%; height: auto; }
+.map figcaption { padding: 14px 18px; border-top: 1px solid var(--rule); font-size: 14.5px; display: grid; gap: 4px; }
+.map figcaption b { font-weight: 600; }
+
+/* Fuß */
+.foot { background: var(--ink); color: var(--on-ink-2); font-size: 14.5px; }
+.foot .wrap { padding-block: 56px calc(40px + env(safe-area-inset-bottom, 0px)); }
+.foot .g12 { row-gap: 28px; }
+.foot .fb { grid-column: 1 / 5; }
+.foot .fb b { font-family: var(--serif); font-weight: 600; font-size: 32px; color: var(--on-ink); display: block; line-height: 1; }
+.foot .fb b i { color: var(--gold-lt); font-weight: 500; }
+.foot .fb p { margin: 10px 0 0; }
+.foot .fl { grid-column: 6 / 13; display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: start; justify-content: flex-end; }
+.foot .fl a, .foot .fl button { color: var(--on-ink); background: none; border: 0; padding: 0; text-decoration: underline; text-decoration-color: var(--gold-lt); text-underline-offset: .2em; min-height: 32px; font-size: 15px; }
+.foot .fine { grid-column: 1 / 13; border-top: 1px solid var(--rule-ink); padding-top: 18px; font-size: 13px; }
+
+/* Dialoge */
+dialog { border: 0; padding: 0; background: var(--sheet); color: var(--text); width: min(720px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); box-shadow: 0 30px 80px rgba(23, 36, 64, .35); }
+dialog::backdrop { background: rgba(23, 36, 64, .55); }
+.dlg { display: flex; flex-direction: column; max-height: calc(100dvh - 48px); }
+.dlg-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px 14px 28px; border-bottom: 1px solid var(--rule); }
+.dlg-h .kick { font-size: 18px; }
+.dlg-x { background: none; border: 1px solid var(--rule-2); width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+.dlg-b { padding: 26px 28px 30px; overflow-y: auto; overscroll-behavior: contain; }
+.dlg-b h2 { font-size: clamp(32px, 4vw, 44px); line-height: 1.04; color: var(--ink); }
+.dlg-b .m { font-size: 14px; color: var(--muted); margin: 10px 0 0; }
+.dlg-b .art p { font-size: 17px; line-height: 1.68; margin: 16px 0 0; max-width: 36em; }
+.dlg-b .art p:first-child::first-letter { font-family: var(--serif); font-weight: 600; float: left; font-size: 4.4em; line-height: .8; padding: .06em .08em 0 0; color: var(--ink); }
+.dlg-b .art h3 { font-size: 26px; margin-top: 26px; color: var(--ink); }
+.dlg-b .art ul { padding-left: 1.2em; margin: 12px 0 0; }
+.dlg-b .art li { margin: 6px 0; }
+.dlg-b .fine { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 13.5px; color: var(--muted); }
+
+/* Toast */
+.toast { width: max-content; position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--ink); color: var(--on-ink); padding: 12px 14px 12px 18px; display: flex; gap: 16px; align-items: center; font-size: 15px; max-width: calc(100vw - 32px); box-shadow: 0 14px 40px rgba(23, 36, 64, .35); }
+.toast button { background: none; border: 1px solid var(--gold-lt); color: var(--on-ink); min-height: 38px; padding: 0 12px; font-weight: 600; }
+
+/* Handy-Leiste */
+.mbar { display: none; }
+
+/* Responsiv */
+@media (max-width: 1180px) {
+  .tl { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 28px; }
+  .area-h { grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) 44px; }
+  .area-h .who { display: none; }
+}
+@media (max-width: 1020px) {
+  .hero .meta { grid-column: 1 / 13; display: flex; flex-wrap: wrap; gap: 4px 24px; padding: 0 0 18px; }
+  .hero .meta p + p { margin-top: 0; }
+  .hero h1, .hero-body, .note-card, .index .lbl, .index ul { grid-column: 1 / 13; }
+  .index .lbl { padding-bottom: 0; }
+  .hero-body { margin-top: 32px; }
+  .note-card { margin-top: 32px; max-width: 560px; }
+  .sh .num { grid-column: 1 / 13; font-size: 48px; margin-bottom: 8px; }
+  .sh .sh-main { grid-column: 1 / 13; }
+  .sh .side { grid-column: 1 / 13; margin-top: 18px; }
+  .body-col, .fr, .cost, .quote, .people, .history, .posts, .contact { grid-column: 1 / 13; }
+  .wiz-nav { display: none; }
+  .wiz-mob { display: block; grid-column: 1 / 13; margin-bottom: 14px; }
+  .wiz-mob p { margin: 0 0 8px; font-size: 15px; display: flex; justify-content: space-between; gap: 10px; }
+  .wiz-mob p b { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+  .wiz-mob .bar { height: 3px; background: var(--rule); }
+  .wiz-mob .bar i { display: block; height: 100%; background: var(--ink); transition: width .25s; }
+  .sheet { grid-column: 1 / 13; }
+  .fr { grid-template-columns: minmax(0, 1fr); }
+  .fr form { border-right: 0; border-bottom: 1px solid var(--rule-ink); }
+}
+@media (max-width: 860px) {
+  .index ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .index li { border-left: 0; border-top: 1px solid var(--rule); }
+  .index li:nth-child(even) { border-left: 1px solid var(--rule); }
+  .index li:last-child { grid-column: 1 / -1; }
+  .index a { padding-left: 0; }
+  .index li:nth-child(even) a { padding-left: 16px; }
+  .area-in { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .cost { grid-template-columns: minmax(0, 1fr); }
+  .cost > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); }
+  .cost > div { padding-right: 0; }
+  .people { grid-template-columns: minmax(0, 1fr); }
+  .person + .person { border-top: 1px solid var(--rule); }
+  .person + .person::before { display: none; }
+  .person { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 0 24px; padding-right: 0; }
+  .person .plate { grid-row: span 5; }
+  .person .plate span { font-size: 72px; }
+  .person .plate small { display: none; }
+  .person h3 { margin-top: 0; }
+  .posts { grid-template-columns: minmax(0, 1fr); }
+  .post.lead-post { grid-row: auto; }
+  .contact { grid-template-columns: minmax(0, 1fr); }
+  .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  body { padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
+  .mbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--sheet); border-top: 1px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  .mbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 64px; text-decoration: none; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .mbar a + a { border-left: 1px solid var(--rule); }
+  .mbar a.pri { background: var(--ink); color: var(--sheet); }
+  .mbar svg { width: 22px; height: 22px; }
+  .toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .sec { padding-block: 64px; }
+  .hero { padding-top: 40px; }
+  .sheet { padding: 24px 18px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); border-left: 0; border-right: 0; }
+  .step > legend { font-size: 30px; }
+  .row2 { grid-template-columns: minmax(0, 1fr); }
+  .tl { grid-template-columns: minmax(0, 1fr); border-top: 0; border-left: 1px solid var(--ink); padding-left: 0; }
+  .tl li { padding: 0 0 22px 24px; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+  .tl li::before { top: 10px; left: -5px; }
+  .tl .y { font-size: 30px; }
+  .tl p { margin: 0; }
+  .fr form, .fr-out { padding: 22px 18px; }
+  .fr { margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); border-left: 0; border-right: 0; }
+  .summary div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .wiz-acts .btn { padding: 0 16px; }
+  .dlg-b { padding: 22px 20px 26px; }
+  .dlg-h { padding-left: 20px; }
+}
+@media (max-width: 520px) {
+  .hero h1 span + span { padding-left: .6em; }
+  .lead { font-size: 18px; }
+  .lead::first-letter { font-size: 4.6em; }
+  .choices, .choices.two, .slots { grid-template-columns: minmax(0, 1fr); }
+  .person { grid-template-columns: 96px minmax(0, 1fr); gap: 0 18px; }
+  .person .plate span { font-size: 46px; }
+  .person h3 { font-size: 27px; }
+  .cost .price { font-size: 64px; }
+  .cinfo div { grid-template-columns: 90px minmax(0, 1fr); }
+  .addr { font-size: 26px; }
+  .foot .fb, .foot .fl { grid-column: 1 / 13; justify-content: flex-start; }
+  .area-h { grid-template-columns: minmax(0, 1fr) 44px; gap: 6px 14px; padding: 22px 0; }
+  .area-h .sum { grid-column: 1 / 2; grid-row: 2; font-size: 15px; }
+  .area-h .pm { grid-row: 1 / 3; grid-column: 2; }
+  .cal td span { height: 30px; }
+}
+@media (max-width: 1020px) and (min-width: 521px) { .foot .fb { grid-column: 1 / 7; } .foot .fl { grid-column: 7 / 13; } }
+</style>
+</head>
+<body>
+<div class="demo-strip"><div class="wrap"><span>Beispiel-Website. Name, Personen und Daten sind aus Datenschutzgründen geändert.</span><a href="../de/websites.html">Zurück zu den Demos</a></div></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#start" aria-label="Muster und Partner Rechtsanwälte, zum Seitenanfang"><b>Muster <i>&amp;</i> Partner</b><small>Rechtsanwälte in Musterstadt</small></a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#rechtsgebiete">Rechtsgebiete</a><a href="#fristen">Fristenrechner</a><a href="#kosten">Kosten</a><a href="#kanzlei">Kanzlei</a><a href="#ratgeber">Ratgeber</a><a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn sm top-cta" href="#anfrage">Ersteinschätzung anfragen</a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav">Menü</button>
+  </div>
+  <nav class="mnav" id="mnav" aria-label="Menü">
+    <a href="#rechtsgebiete">Rechtsgebiete <span>I</span></a><a href="#fristen">Fristenrechner <span>II</span></a><a href="#kosten">Kosten <span>III</span></a><a href="#anfrage">Ersteinschätzung <span>IV</span></a><a href="#kanzlei">Kanzlei <span>V</span></a><a href="#ratgeber">Ratgeber <span>VI</span></a><a href="#kontakt">Kontakt <span>VII</span></a>
+  </nav>
+</header>
+
+<main id="start">
+<section class="hero" aria-labelledby="heroT">
+  <div class="wrap">
+    <div class="g12">
+      <div class="meta"><p>Musterstadt, seit 1987</p><p>Drei Partner, fünf Rechtsgebiete</p></div>
+      <h1 id="heroT"><span>Sorgfältig im Detail.</span><span>Deutlich in der Sache.</span></h1>
+      <div class="hero-body">
+        <p class="lead">Wir beraten und vertreten Privatpersonen und mittelständische Unternehmen in Musterstadt und der Region. Sie erfahren früh, welche Fristen laufen, wie die Aussichten sind und was Ihre Sache kostet. Danach entscheiden Sie in Ruhe.</p>
+        <div class="acts"><a class="btn" href="#anfrage">Ersteinschätzung anfragen</a><a class="txtlink" href="#fristen">Frist berechnen</a></div>
+      </div>
+      <aside class="note-card" aria-labelledby="noteT">
+        <h2 id="noteT">Fristnotiz für heute</h2>
+        <p id="noteLead">Wer heute eine Kündigung erhält, kann noch bis</p>
+        <p class="big" id="noteDate">in drei Wochen</p>
+        <p>Kündigungsschutzklage beim Arbeitsgericht erheben. Danach gilt die Kündigung in aller Regel als wirksam (§&nbsp;4, §&nbsp;7 KSchG).</p>
+        <p class="fine">Beispielrechnung für Nordrhein-Westfalen, keine Rechtsberatung. <a href="#fristen">Eigene Frist berechnen</a></p>
+      </aside>
+    </div>
+  </div>
+  <nav class="index" aria-label="Rechtsgebiete im Überblick">
+    <div class="wrap"><div class="g12">
+      <p class="lbl kick">Unsere Rechtsgebiete</p>
+      <ul>
+        <li><a href="#gebiet-arbeit" data-open="arbeit">Arbeitsrecht<small>Kündigung, Abfindung, Zeugnis</small></a></li>
+        <li><a href="#gebiet-miete" data-open="miete">Mietrecht<small>Mieterhöhung, Nebenkosten, Eigenbedarf</small></a></li>
+        <li><a href="#gebiet-erbe" data-open="erbe">Erbrecht<small>Testament, Pflichtteil, Erbengemeinschaft</small></a></li>
+        <li><a href="#gebiet-vertrag" data-open="vertrag">Vertrags- und Handelsrecht<small>AGB, Forderungen, Lieferverträge</small></a></li>
+        <li><a href="#gebiet-verkehr" data-open="verkehr">Verkehrsrecht<small>Unfall, Bußgeld, Fahrverbot</small></a></li>
+      </ul>
+    </div></div>
+  </nav>
+</section>
+
+<section class="sec" id="rechtsgebiete" aria-labelledby="rgT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">I.</p><div class="sh-main"><h2 id="rgT">Rechtsgebiete</h2><p class="intro">Fünf Gebiete, in denen wir täglich arbeiten. Öffnen Sie ein Gebiet: Sie sehen typische Fälle, welche Unterlagen Sie zum ersten Termin mitbringen sollten und welche Fristen häufig laufen.</p></div><p class="side">Jedes Gebiet betreut eine Partnerin oder ein Partner mit Fachanwaltstitel persönlich.</p></div>
+    <div class="g12"><div class="body-col areas" id="areas"></div></div>
+  </div>
+</section>
+
+<section class="sec ink" id="fristen" aria-labelledby="frT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">II.</p><div class="sh-main"><h2 id="frT">Fristenrechner</h2><p class="intro">Viele Rechte gehen verloren, weil eine Frist verstreicht. Wählen Sie die Art des Schreibens und den Tag, an dem es Sie erreicht hat. Der Rechner zeigt das Fristende nach der gesetzlichen Regel und erklärt jeden Schritt.</p></div><p class="side">Wochenenden und gesetzliche Feiertage des gewählten Bundeslands werden berücksichtigt.</p></div>
+    <div class="g12">
+      <div class="fr">
+        <form id="frForm" novalidate>
+          <div class="f"><label for="fr-type">Was haben Sie erhalten?</label><select id="fr-type" name="fr-type"></select><p class="help" id="fr-type-help"></p></div>
+          <div class="f"><label for="fr-date" id="fr-date-l">Zugang der Kündigung</label><input id="fr-date" name="fr-date" type="date" required aria-describedby="fr-date-help"><p class="help" id="fr-date-help"></p></div>
+          <label class="chk" id="fr-post-w"><input type="checkbox" id="fr-post" name="fr-post"> <span>Der Bescheid kam mit einfacher Post. Ich gebe das Datum im Bescheid ein (Viertagesfiktion).</span></label>
+          <label class="chk" id="fr-abroad-w"><input type="checkbox" id="fr-abroad" name="fr-abroad"> <span>Die verstorbene Person lebte nur im Ausland, oder ich war bei Fristbeginn im Ausland (sechs Monate).</span></label>
+          <div class="f"><label for="fr-land">Bundesland</label><select id="fr-land" name="fr-land"></select><p class="help">Maßgeblich sind die Feiertage am Ort des Gerichts oder der Behörde.</p></div>
+          <div class="disclaim" role="note"><b>Keine Rechtsberatung.</b> Der Rechner kennt nur die gesetzliche Grundregel. Sonderfälle wie Zugang während des Urlaubs, eine fehlerhafte Rechtsbehelfsbelehrung oder tarifliche Fristen kann er nicht prüfen. Verlassen Sie sich nicht allein auf dieses Ergebnis.</div>
+        </form>
+        <div class="fr-out" aria-live="polite" id="frOut">
+          <div class="fr-res"><p class="kick">Die Frist endet voraussichtlich am</p><p class="fr-date" id="frDate">–</p><span class="fr-left" id="frLeft">–</span></div>
+          <ol class="fr-steps" id="frSteps"></ol>
+          <div><table class="cal" id="frCal"></table><div class="legend" aria-hidden="true"><span><i style="background:var(--gold-lt)"></i>Fristende</span><span><i style="background:rgba(207,174,106,.25)"></i>Frist läuft</span><span><i style="outline:1px dashed var(--gold-lt);outline-offset:-2px"></i>rechnerisches Ende</span><span><i style="background:#F0B2B6;border-radius:50%;width:8px;height:8px"></i>Feiertag</span></div></div>
+          <div class="fr-acts"><button class="btn gold" type="button" id="frToForm">Frist in die Anfrage übernehmen</button><a class="btn ghost-inv" href="#kontakt">Lieber anrufen</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="kosten" aria-labelledby="koT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">III.</p><div class="sh-main"><h2 id="koT">Was es kostet</h2><p class="intro">Sie sollen vor dem ersten Schritt wissen, womit Sie rechnen müssen. Deshalb nennen wir den Preis der Erstberatung vorab und sagen Ihnen im Termin, welche Kosten bei einer Vertretung entstehen.</p></div></div>
+    <div class="g12">
+      <div class="cost">
+        <div>
+          <h3>Erstberatung</h3>
+          <p class="price tnum">190&nbsp;€ <small>netto</small></p>
+          <p class="fine">226,10&nbsp;€ einschließlich 19&nbsp;% Umsatzsteuer</p>
+          <p>Ein Gespräch von bis zu 60 Minuten in der Kanzlei, per Telefon oder Video. Für Verbraucher ist die Gebühr für ein erstes Beratungsgespräch gesetzlich auf diesen Betrag begrenzt (§&nbsp;34 RVG). Beauftragen Sie uns danach, rechnen wir die Gebühr an.</p>
+          <ul><li>Ersteinschätzung über dieses Formular: kostenlos und unverbindlich</li><li>Unternehmen: Honorar nach Vereinbarung, ab 240&nbsp;€ netto je Stunde</li></ul>
+        </div>
+        <div>
+          <h3>Vertretung nach RVG</h3>
+          <p>Vertreten wir Sie außergerichtlich oder vor Gericht, richten sich die Gebühren nach dem Rechtsanwaltsvergütungsgesetz. Grundlage ist der Gegenstandswert, also der Betrag, um den es geht.</p>
+          <ul><li>Wir nennen Ihnen die voraussichtlichen Gebühren schriftlich, bevor wir tätig werden.</li><li>Im Arbeitsrecht trägt in der ersten Instanz jede Seite ihre Anwaltskosten selbst (§&nbsp;12a ArbGG).</li><li>Abweichende Vereinbarungen sind möglich, etwa ein Pauschalhonorar.</li></ul>
+        </div>
+        <div>
+          <h3>Wer zahlt mit?</h3>
+          <p><b>Rechtsschutzversicherung.</b> Wir fragen die Deckungszusage für Sie an und rechnen direkt mit der Versicherung ab. Sie zahlen höchstens Ihre Selbstbeteiligung.</p>
+          <p><b>Beratungshilfe.</b> Bei geringem Einkommen erhalten Sie beim Amtsgericht einen Beratungsschein. Ihr Eigenanteil beträgt dann 15&nbsp;€.</p>
+          <p><b>Prozesskostenhilfe.</b> Für ein Gerichtsverfahren kann der Staat die Kosten ganz oder in Raten übernehmen. Den Antrag stellen wir mit Ihnen.</p>
+        </div>
+      </div>
+      <figure class="quote">
+        <blockquote>„Niemand sollte eine Kanzlei verlassen, ohne zu wissen, was die Sache kostet und wie es weitergeht.“</blockquote>
+        <figcaption>Dr. Johanna Muster, Partnerin</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="anfrage" aria-labelledby="anT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">IV.</p><div class="sh-main"><h2 id="anT">Ersteinschätzung anfragen</h2><p class="intro">Schildern Sie uns Ihr Anliegen in fünf kurzen Schritten. Eine Anwältin oder ein Anwalt meldet sich zur gewünschten Zeit und sagt Ihnen, ob und wie wir helfen können. Die Ersteinschätzung ist kostenlos.</p></div><p class="side">Ihr Entwurf bleibt in diesem Browser gespeichert, bis Sie ihn absenden oder die Demo zurücksetzen.</p></div>
+    <div class="g12">
+      <div class="wiz">
+        <nav class="wiz-nav" aria-label="Schritte der Anfrage"><ol id="wizNav"></ol><p class="saved" id="savedNote" aria-live="polite"></p></nav>
+        <div class="wiz-mob" id="wizMob" aria-hidden="true"><p><b id="wizMobT">Rechtsgebiet</b><span id="wizMobN">Schritt 1 von 5</span></p><div class="bar"><i id="wizMobBar" style="width:20%"></i></div></div>
+        <div class="sheet">
+          <form id="wiz" novalidate>
+            <fieldset class="step" data-step="1">
+              <legend>Worum geht es?</legend>
+              <fieldset class="choices" id="g-gebiet"><legend class="lbl">Rechtsgebiet</legend></fieldset>
+              <fieldset class="choices two" id="g-wer"><legend class="lbl">Sie fragen an als</legend>
+                <label class="opt"><input type="radio" name="wer" value="privat" checked><span><b>Privatperson</b></span></label>
+                <label class="opt"><input type="radio" name="wer" value="firma"><span><b>Unternehmen</b><small>oder Selbstständige</small></span></label>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="step" data-step="2" hidden>
+              <legend>Was ist passiert?</legend>
+              <p class="sub">Ein paar Sätze genügen. Was ist geschehen, seit wann, und was möchten Sie erreichen?</p>
+              <div class="f"><label for="w-text">Ihre Schilderung</label><textarea id="w-text" name="text" maxlength="3000" placeholder="z. B. Mir wurde am Freitag nach acht Jahren betriebsbedingt gekündigt. Ich möchte wissen, ob sich eine Klage lohnt…"></textarea><span class="counter" id="w-text-c">0 von mindestens 40 Zeichen</span></div>
+              <div class="f"><label for="w-gegner">Gegenseite <span style="font-weight:400;color:var(--muted)">(optional, für die Konfliktprüfung)</span></label><input id="w-gegner" name="gegner" autocomplete="off" placeholder="z. B. Fiktive GmbH 3 oder Vermieterin Frau Schulz…"></div>
+              <fieldset class="choices" id="g-rsv"><legend class="lbl">Haben Sie eine Rechtsschutzversicherung?</legend>
+                <label class="opt"><input type="radio" name="rsv" value="ja"><span><b>Ja</b></span></label>
+                <label class="opt"><input type="radio" name="rsv" value="nein"><span><b>Nein</b></span></label>
+                <label class="opt"><input type="radio" name="rsv" value="unklar" checked><span><b>Weiß ich nicht</b></span></label>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="step" data-step="3" hidden>
+              <legend>Wie eilig ist es?</legend>
+              <div class="f"><label for="w-frist">Haben Sie ein Schreiben mit Frist erhalten?</label><select id="w-frist" name="frist"></select></div>
+              <div class="f" id="w-fdate-w" hidden><label for="w-fdate">Erhalten am</label><input id="w-fdate" name="fdate" type="date"><p class="help">Der Tag, an dem das Schreiben bei Ihnen ankam.</p></div>
+              <p class="calcline" id="w-fcalc" aria-live="polite" hidden></p>
+              <fieldset class="choices one" id="g-eile"><legend class="lbl">Dringlichkeit</legend>
+                <label class="opt"><input type="radio" name="eile" value="hoch"><span><b>Sehr dringend</b><small>Eine Frist endet in den nächsten sieben Tagen oder ein Termin steht bevor.</small></span></label>
+                <label class="opt"><input type="radio" name="eile" value="mittel"><span><b>In den nächsten Wochen</b><small>Es läuft etwas, aber es bleibt Zeit für einen Termin.</small></span></label>
+                <label class="opt"><input type="radio" name="eile" value="niedrig"><span><b>Keine Eile</b><small>Ich möchte mich informieren oder vorsorgen.</small></span></label>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="step" data-step="4" hidden>
+              <legend>Unterlagen</legend>
+              <p class="sub">Optional. Schreiben, Verträge oder Fotos helfen uns, Ihre Lage schneller einzuschätzen.</p>
+              <label class="drop" id="drop" for="w-files"><b>Dateien auswählen</b><span>oder hierher ziehen. PDF, JPG, PNG oder Word, bis 10 MB je Datei.</span></label>
+              <input class="sr" id="w-files" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.heic">
+              <ul class="files" id="fileList" aria-live="polite"></ul>
+              <p class="sim">Es wird nichts hochgeladen. Die Seite zeigt nur Namen und Größe der Dateien an.</p>
+            </fieldset>
+
+            <fieldset class="step" data-step="5" hidden>
+              <legend>Wie erreichen wir Sie?</legend>
+              <div class="row2">
+                <div class="f"><label for="w-name">Name</label><input id="w-name" name="name" autocomplete="name" placeholder="z. B. Anna Becker…"></div>
+                <div class="f"><label for="w-mail">E-Mail</label><input id="w-mail" name="mail" type="email" autocomplete="email" spellcheck="false" placeholder="z. B. anna.becker@beispiel.de…"></div>
+              </div>
+              <div class="row2">
+                <div class="f"><label for="w-tel">Telefon</label><input id="w-tel" name="tel" type="tel" autocomplete="tel" inputmode="tel" placeholder="z. B. 0151 2345678…"></div>
+                <div class="f"><label for="w-day">Rückruf am</label><select id="w-day" name="day"></select></div>
+              </div>
+              <fieldset class="choices slots" id="g-slot"><legend class="lbl">Rückrufzeit</legend>
+                <label class="opt"><input type="radio" name="slot" value="9–12 Uhr" checked><span><b>Vormittags</b><small>9 bis 12 Uhr</small></span></label>
+                <label class="opt"><input type="radio" name="slot" value="12–14 Uhr"><span><b>Mittags</b><small>12 bis 14 Uhr</small></span></label>
+                <label class="opt"><input type="radio" name="slot" value="14–18 Uhr"><span><b>Nachmittags</b><small>14 bis 18 Uhr</small></span></label>
+                <label class="opt"><input type="radio" name="slot" value="mail"><span><b>Lieber per E-Mail</b><small>Kein Rückruf nötig</small></span></label>
+              </fieldset>
+              <label class="chk"><input type="checkbox" id="w-ds" name="ds"> <span>Ich bin einverstanden, dass die Kanzlei meine Angaben zur Bearbeitung der Anfrage verwendet. Die Anfrage begründet noch kein Mandat.</span></label>
+              <div><h3 class="serif" style="font-size:24px;color:var(--ink);margin:6px 0 10px;font-weight:600;font-style:italic">Ihre Angaben im Überblick</h3><dl class="summary" id="summary"></dl></div>
+            </fieldset>
+
+            <div class="wiz-acts" id="wizActs">
+              <button class="btn line" type="button" id="wBack">Zurück</button>
+              <span class="grow"></span>
+              <button class="btn" type="submit" id="wNext">Weiter</button>
+            </div>
+          </form>
+          <div class="done-card" id="doneCard" hidden tabindex="-1" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="kanzlei" aria-labelledby="kaT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">V.</p><div class="sh-main"><h2 id="kaT">Die Kanzlei</h2><p class="intro">Drei Partner, zwei angestellte Anwältinnen und sieben Mitarbeitende im Sekretariat. Sie haben vom ersten Gespräch bis zum Abschluss dieselbe Ansprechperson.</p></div></div>
+    <div class="g12">
+      <div class="people">
+        <article class="person">
+          <div class="plate" aria-hidden="true"><span>J<i>M</i></span><small>Partnerin seit 2014</small></div>
+          <h3>Dr. Johanna Muster</h3>
+          <p class="role">Partnerin, Fachanwältin für Arbeitsrecht</p>
+          <ul><li>Kündigungsschutz und Abfindungen</li><li>Aufhebungs- und Arbeitsverträge</li><li>Beratung von Betriebsräten</li><li>Sprachen: Deutsch, Englisch</li></ul>
+          <p class="say">„Die meisten Kündigungsschutzverfahren enden mit einem Vergleich. Gut vorbereitet ist er besser.“</p>
+        </article>
+        <article class="person">
+          <div class="plate" aria-hidden="true"><span>L<i>A</i></span><small>Partner seit 2019</small></div>
+          <h3>Levent Aydın</h3>
+          <p class="role">Partner, Fachanwalt für Miet- und Wohnungseigentumsrecht und für Verkehrsrecht</p>
+          <ul><li>Wohnraum- und Gewerbemiete</li><li>Wohnungseigentum und Verwaltung</li><li>Unfallregulierung und Bußgeldverfahren</li><li>Sprachen: Deutsch, Türkisch, Englisch</li></ul>
+          <p class="say">„Im Mietrecht hilft ein klärendes Schreiben oft mehr als ein Prozess.“</p>
+        </article>
+        <article class="person">
+          <div class="plate" aria-hidden="true"><span>C<i>W</i></span><small>Partnerin seit 2023</small></div>
+          <h3>Clara Wendt, LL.M.</h3>
+          <p class="role">Partnerin, Fachanwältin für Erbrecht und für Handels- und Gesellschaftsrecht</p>
+          <ul><li>Testamente und Erbverträge</li><li>Pflichtteil und Erbengemeinschaft</li><li>Unternehmensnachfolge, Verträge und AGB</li><li>Sprachen: Deutsch, Französisch</li></ul>
+          <p class="say">„Ein gutes Testament erspart den Erben Jahre. Es muss nicht lang sein, aber genau.“</p>
+        </article>
+      </div>
+      <div class="history">
+        <h3>Kanzleigeschichte</h3>
+        <ol class="tl">
+          <li><span class="y">1987</span><p>Dr. Heinrich Muster gründet die Kanzlei in zwei Zimmern über der Stadtapotheke.</p></li>
+          <li><span class="y">1998</span><p>Umzug an den Marktplatz 12. Das Team wächst auf sechs Personen.</p></li>
+          <li><span class="y">2009</span><p>Dr. Johanna Muster tritt ein und baut das Arbeitsrecht auf.</p></li>
+          <li><span class="y">2014</span><p>Gründung der Partnerschaft Muster &amp; Partner mbB.</p></li>
+          <li><span class="y">2019</span><p>Levent Aydın wird Partner. Miet- und Verkehrsrecht kommen hinzu.</p></li>
+          <li><span class="y">2023</span><p>Clara Wendt wird Partnerin. Heinrich Muster geht in den Ruhestand.</p></li>
+          <li><span class="y" id="yNow">Heute</span><p>Zwölf Menschen, eine digitale Mandantenakte und weiterhin persönliche Termine.</p></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="ratgeber" aria-labelledby="raT">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">VI.</p><div class="sh-main"><h2 id="raT">Ratgeber</h2><p class="intro">Kurze Beiträge zu Fragen, die uns oft gestellt werden. Sie ersetzen keine Beratung, helfen aber, die eigene Lage besser einzuordnen.</p></div></div>
+    <div class="g12"><div class="posts" id="posts"></div></div>
+  </div>
+</section>
+
+<section class="sec" id="kontakt" aria-labelledby="koT2">
+  <div class="wrap">
+    <div class="g12 sh"><p class="num" aria-hidden="true">VII.</p><div class="sh-main"><h2 id="koT2">Kontakt und Anfahrt</h2><p class="intro">Die Kanzlei liegt am Marktplatz, acht Minuten zu Fuß vom Bahnhof. Der Eingang ist ebenerdig, ein Aufzug führt in den zweiten Stock.</p></div></div>
+    <div class="g12">
+      <div class="contact">
+        <div>
+          <address class="addr">Muster &amp; Partner mbB<br>Marktplatz 12, 2. Stock<br>12345 Musterstadt</address>
+          <dl class="cinfo">
+            <div><dt>Telefon</dt><dd class="tnum">01234 56789-0</dd></div>
+            <div><dt>E-Mail</dt><dd>kanzlei@muster-partner.example</dd></div>
+            <div><dt>Notfall</dt><dd>Bei Fristablauf heute bitte immer anrufen, nicht mailen.</dd></div>
+          </dl>
+          <table class="hours" id="hours"><caption>Öffnungszeiten</caption><tbody></tbody></table>
+          <p class="open-now" id="openNow" aria-live="polite"></p>
+          <p style="font-size:14.5px;color:var(--muted);margin:10px 0 0">Termine nach Vereinbarung auch vor 8:30 Uhr und am Abend.</p>
+        </div>
+        <figure class="map" style="margin:0">
+          <svg viewBox="0 0 640 430" role="img" aria-labelledby="mapT mapD">
+            <title id="mapT">Lageplan der Kanzlei am Marktplatz in Musterstadt</title>
+            <desc id="mapD">Vom Bahnhof im Nordwesten führt die Bahnhofstraße zum Marktplatz. Die Kanzlei liegt an der Nordostseite des Platzes. Das Parkhaus Am Rathaus liegt östlich, die Bushaltestelle Marktplatz direkt am Platz.</desc>
+            <rect width="640" height="430" fill="#FBF8F2"/>
+            <g fill="#ECE5D7"><rect x="20" y="96" width="96" height="58"/><rect x="190" y="14" width="100" height="52"/><rect x="420" y="20" width="62" height="78"/><rect x="530" y="128" width="100" height="46"/><rect x="390" y="232" width="92" height="56"/><rect x="170" y="232" width="90" height="56"/><rect x="20" y="214" width="120" height="74"/><rect x="530" y="250" width="100" height="40"/></g>
+            <path d="M-10 352 C 110 318, 210 392, 330 362 S 520 316, 650 350" fill="none" stroke="#C9D3E2" stroke-width="30"/>
+            <text x="120" y="356" font-family="Cormorant, serif" font-style="italic" font-size="20" fill="#4C6286">Muster</text>
+            <g fill="none" stroke-linecap="square">
+              <g stroke="#B3A68E" stroke-width="20"><path d="M0 196 H640"/><path d="M355 0 V430"/><path d="M95 52 L330 172"/><path d="M505 0 V300"/><path d="M150 196 V320"/></g>
+              <g stroke="#FBF8F2" stroke-width="18"><path d="M0 196 H640"/><path d="M355 0 V430"/><path d="M95 52 L330 172"/><path d="M505 0 V300"/><path d="M150 196 V320"/></g>
+            </g>
+            <rect x="298" y="150" width="114" height="92" fill="#E6DFD0" stroke="#B3A68E"/>
+            <text x="355" y="226" text-anchor="middle" font-family="Cormorant, serif" font-style="italic" font-size="17" fill="#575C68">Marktplatz</text>
+            <rect x="24" y="26" width="104" height="40" fill="#172440"/>
+            <text x="76" y="51" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="14" font-weight="600" fill="#FBF8F2">Bahnhof</text>
+            <rect x="520" y="54" width="86" height="64" fill="none" stroke="#172440" stroke-width="1.5"/>
+            <text x="563" y="84" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="20" font-weight="700" fill="#172440">P</text>
+            <text x="563" y="104" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="11.5" fill="#575C68">Am Rathaus</text>
+            <path d="M118 66 L322 170 L410 160" fill="none" stroke="#7B2333" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+            <rect x="412" y="128" width="66" height="44" fill="#7B2333"/>
+            <text x="445" y="155" text-anchor="middle" font-family="Cormorant, serif" font-size="17" font-weight="600" fill="#FBF8F2">M &amp; P</text>
+            <text x="445" y="120" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="12.5" font-weight="600" fill="#7B2333">Marktplatz 12</text>
+            <circle cx="286" cy="258" r="11" fill="#FBF8F2" stroke="#172440" stroke-width="1.5"/>
+            <text x="286" y="263" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="12" font-weight="700" fill="#172440">H</text>
+            <text x="286" y="286" text-anchor="middle" font-family="Schibsted, sans-serif" font-size="11.5" fill="#575C68">Linien 3, 7</text>
+            <g font-family="Schibsted, sans-serif" font-size="11.5" fill="#575C68">
+              <text x="218" y="140" transform="rotate(27 218 140)">Bahnhofstraße</text>
+              <text x="22" y="200">Hauptstraße</text>
+              <text x="548" y="200">Hauptstraße</text>
+              <text x="359" y="100" transform="rotate(-90 359 100)" text-anchor="middle">Kirchgasse</text>
+              <text x="509" y="250" transform="rotate(-90 509 250)" text-anchor="middle">Am Rathaus</text>
+              <text x="154" y="270" transform="rotate(-90 154 270)" text-anchor="middle">Lindenweg</text>
+            </g>
+            <text x="172" y="76" transform="rotate(27 172 76)" font-family="Cormorant, serif" font-style="italic" font-size="16" font-weight="600" fill="#7B2333">8 Min. zu Fuß</text>
+            <g transform="translate(596 392)"><circle r="18" fill="none" stroke="#B3A68E"/><path d="M0 -14 L5 4 L0 0 L-5 4 Z" fill="#172440"/><text y="-22" text-anchor="middle" font-family="Cormorant, serif" font-size="14" font-weight="600" fill="#172440">N</text></g>
+          </svg>
+          <figcaption><span><b>Bahn:</b> Vom Bahnhof über die Bahnhofstraße, acht Minuten zu Fuß.</span><span><b>Bus:</b> Haltestelle Marktplatz, Linien 3 und 7.</span><span><b>Auto:</b> Parkhaus Am Rathaus, 150 Meter. Parkticket bitte mitbringen, wir übernehmen es.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap"><div class="g12">
+    <div class="fb"><b>Muster <i>&amp;</i> Partner</b><p>Rechtsanwälte, Partnerschaft mbB<br>Marktplatz 12, 12345 Musterstadt</p></div>
+    <div class="fl"><button type="button" data-dlg="impressum">Impressum</button><button type="button" data-dlg="datenschutz">Datenschutz</button><button type="button" id="resetBtn">Demo zurücksetzen</button><a href="../de/websites.html">Zurück zu den Demos</a></div>
+    <p class="fine">Beispiel-Website. Kanzlei, Personen, Adressen und Rufnummern sind erfunden. Die Inhalte sind allgemeine Informationen und keine Rechtsberatung.</p>
+  </div></div>
+</footer>
+
+<nav class="mbar" aria-label="Schnellzugriff">
+  <a href="#fristen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13.5v3l2 1.2"/></svg>Frist</a>
+  <a href="#anfrage" class="pri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 3.5h10l4 4V20.5H5z"/><path d="M15 3.5v4h4M8.5 12h7M8.5 15.5h7"/></svg>Anfrage</a>
+  <a href="#kontakt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Kontakt</a>
+</nav>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <div class="dlg">
+    <div class="dlg-h"><p class="kick" id="dlgK"></p><button class="dlg-x" type="button" id="dlgX" aria-label="Schließen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+    <div class="dlg-b"><h2 id="dlgT"></h2><div id="dlgBody"></div></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastT"></span><button type="button" id="toastUndo">Rückgängig</button></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'kanzlei-demo-v1';
+  var DL = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  var DM = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+  var DS = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: 'numeric', month: 'long' });
+  var MY = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
+  var NF = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+
+  /* Speicher */
+  var state = { fr: null, draft: null, step: 1, sent: [] };
+  function load() { try { var r = localStorage.getItem(KEY); if (r) { var p = JSON.parse(r); if (p && typeof p === 'object') state = Object.assign(state, p); } } catch (e) {} }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); return true; } catch (e) { return false; } }
+  load();
+
+  /* Datumshilfen (Mittag, damit Sommerzeit nicht stört) */
+  function D(y, m, d) { return new Date(y, m, d, 12); }
+  function today() { var n = new Date(); return D(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function addDays(d, n) { return D(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function parseIso(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); if (!m) return null; var d = D(+m[1], +m[2] - 1, +m[3]); return isNaN(d) ? null : d; }
+  function lastDay(y, m) { return new Date(y, m + 1, 0).getDate(); }
+  function diffDays(a, b) { return Math.round((b - a) / 864e5); }
+
+  /* Feiertage */
+  var LAND = { BW: 'Baden-Württemberg', BY: 'Bayern', BE: 'Berlin', BB: 'Brandenburg', HB: 'Bremen', HH: 'Hamburg', HE: 'Hessen', MV: 'Mecklenburg-Vorpommern', NI: 'Niedersachsen', NW: 'Nordrhein-Westfalen', RP: 'Rheinland-Pfalz', SL: 'Saarland', SN: 'Sachsen', ST: 'Sachsen-Anhalt', SH: 'Schleswig-Holstein', TH: 'Thüringen' };
+  function easter(y) { var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return D(y, mo - 1, da); }
+  var holCache = {};
+  function holidays(y, land) {
+    var k = y + land; if (holCache[k]) return holCache[k];
+    var H = {}, E = easter(y), add = function (d, n, lands) { if (!lands || lands.indexOf(land) >= 0) H[iso(d)] = n; };
+    add(D(y, 0, 1), 'Neujahr');
+    add(D(y, 0, 6), 'Heilige Drei Könige', ['BW', 'BY', 'ST']);
+    add(D(y, 2, 8), 'Internationaler Frauentag', ['BE', 'MV']);
+    add(addDays(E, -2), 'Karfreitag');
+    add(addDays(E, 1), 'Ostermontag');
+    add(D(y, 4, 1), 'Tag der Arbeit');
+    add(addDays(E, 39), 'Christi Himmelfahrt');
+    add(addDays(E, 50), 'Pfingstmontag');
+    add(addDays(E, 60), 'Fronleichnam', ['BW', 'BY', 'HE', 'NW', 'RP', 'SL']);
+    add(D(y, 7, 15), 'Mariä Himmelfahrt', ['SL']);
+    add(D(y, 8, 20), 'Weltkindertag', ['TH']);
+    add(D(y, 9, 3), 'Tag der Deutschen Einheit');
+    add(D(y, 9, 31), 'Reformationstag', ['BB', 'HB', 'HH', 'MV', 'NI', 'SN', 'ST', 'SH', 'TH']);
+    add(D(y, 10, 1), 'Allerheiligen', ['BW', 'BY', 'NW', 'RP', 'SL']);
+    var n22 = D(y, 10, 22); add(addDays(n22, -((n22.getDay() + 4) % 7)), 'Buß- und Bettag', ['SN']);
+    add(D(y, 11, 25), '1. Weihnachtstag');
+    add(D(y, 11, 26), '2. Weihnachtstag');
+    return (holCache[k] = H);
+  }
+  function holName(d, land) { return holidays(d.getFullYear(), land)[iso(d)] || null; }
+  function isFree(d, land) { var w = d.getDay(); return w === 0 || w === 6 || !!holName(d, land); }
+  function freeReason(d, land) { var h = holName(d, land); if (h) return h; return d.getDay() === 6 ? 'ein Samstag' : d.getDay() === 0 ? 'ein Sonntag' : null; }
+  function nextWorkday(d, land) { var x = d; while (isFree(x, land)) x = addDays(x, 1); return x; }
+
+  /* Fristarten */
+  var FR = {
+    kschg: { name: 'Kündigung vom Arbeitgeber', act: 'Kündigungsschutzklage', law: '§\u00a04 KSchG', unit: 'w', n: 3, ev: 'Zugang der Kündigung', evHelp: 'Der Tag, an dem die Kündigung in Ihrem Briefkasten lag oder Ihnen übergeben wurde. Nicht das Datum im Schreiben.', shift: '§\u00a0222 Abs.\u00a02 ZPO', where: 'Die Klage muss bis zum Ende dieses Tages beim Arbeitsgericht eingehen.', late: 'Eine verspätete Klage wird nur ausnahmsweise nachträglich zugelassen (§\u00a05 KSchG). Rufen Sie uns heute noch an.', area: 'arbeit' },
+    bescheid: { name: 'Bescheid einer Behörde', act: 'Widerspruch', law: '§\u00a070 VwGO, §\u00a084 SGG', unit: 'm', n: 1, ev: 'Bekanntgabe des Bescheids', evHelp: 'Bei Übergabe der Tag des Erhalts. Kam der Bescheid mit einfacher Post, geben Sie das Datum im Bescheid ein und setzen den Haken.', shift: '§\u00a0222 Abs.\u00a02 ZPO', where: 'Der Widerspruch muss bis zum Ende dieses Tages bei der Behörde eingehen. Für Steuerbescheide gilt dieselbe Monatsfrist für den Einspruch (§\u00a0355 AO).', late: 'Fehlt im Bescheid die Rechtsbehelfsbelehrung oder ist sie falsch, gilt oft eine Frist von einem Jahr (§\u00a058 VwGO).', area: 'sonst', post: true },
+    owi: { name: 'Bußgeldbescheid', act: 'Einspruch', law: '§\u00a067 OWiG', unit: 'w', n: 2, ev: 'Zustellung des Bescheids', evHelp: 'Das Zustelldatum steht auf dem gelben Umschlag. Bewahren Sie ihn auf.', shift: '§\u00a046 OWiG, §\u00a043 Abs.\u00a02 StPO', where: 'Der Einspruch muss bis zum Ende dieses Tages bei der Bußgeldbehörde eingehen, schriftlich oder zur Niederschrift.', late: 'Nach Ablauf wird der Bescheid rechtskräftig. Nur bei unverschuldeter Versäumung hilft die Wiedereinsetzung (§\u00a052 OWiG).', area: 'verkehr' },
+    erbe: { name: 'Erbschaft, die ich ausschlagen möchte', act: 'Ausschlagung der Erbschaft', law: '§\u00a01944 BGB', unit: 'w', n: 6, ev: 'Kenntnis vom Erbfall', evHelp: 'Der Tag, an dem Sie vom Tod und davon erfahren haben, dass Sie Erbin oder Erbe sind. Bei Testamenten oft erst mit der Eröffnung durch das Nachlassgericht.', shift: '§\u00a0193 BGB', where: 'Die Erklärung muss bis zum Ende dieses Tages beim Nachlassgericht eingehen, mit öffentlicher Beglaubigung.', late: 'Nach Fristablauf gilt die Erbschaft als angenommen. Eine Anfechtung ist nur in engen Grenzen möglich.', area: 'erbe', abroad: true },
+    mahn: { name: 'Mahnbescheid vom Gericht', act: 'Widerspruch gegen den Mahnbescheid', law: '§\u00a0692 Abs.\u00a01 Nr.\u00a03 ZPO', unit: 'w', n: 2, ev: 'Zustellung des Mahnbescheids', evHelp: 'Das Zustelldatum steht auf dem gelben Umschlag.', shift: '§\u00a0222 Abs.\u00a02 ZPO', where: 'Der Widerspruch sollte bis zum Ende dieses Tages beim Mahngericht eingehen. Nutzen Sie den beiliegenden Vordruck.', late: 'Ein späterer Widerspruch wirkt noch, solange kein Vollstreckungsbescheid erlassen ist (§\u00a0694 ZPO). Danach bleibt der Einspruch.', area: 'vertrag' },
+    miete: { name: 'Mieterhöhung vom Vermieter', act: 'Zustimmung oder Ablehnung der Mieterhöhung', law: '§\u00a0558b Abs.\u00a02 BGB', unit: 'mEnd', n: 2, ev: 'Zugang des Erhöhungsverlangens', evHelp: 'Der Tag, an dem das Schreiben bei Ihnen ankam.', shift: '§\u00a0193 BGB', where: 'Bis dahin können Sie in Ruhe prüfen lassen, ob die Erhöhung berechtigt ist. Danach kann der Vermieter auf Zustimmung klagen.', late: 'Nach Ablauf der Überlegungsfrist hat der Vermieter drei Monate Zeit, auf Zustimmung zu klagen.', area: 'miete' }
+  };
+
+  function calcDeadline(type, evDate, land, opt) {
+    var f = FR[type]; opt = opt || {};
+    var steps = [], ev = evDate, unit = f.unit, n = f.n;
+    if (f.post && opt.post) {
+      var b4 = addDays(evDate, 4), b = nextWorkday(b4, land);
+      steps.push({ t: 'Bekanntgabe', d: 'Bescheid vom ' + DM.format(evDate) + '. Mit einfacher Post gilt er am vierten Tag danach als bekanntgegeben (Viertagesfiktion, §\u00a041 Abs.\u00a02 VwVfG): ' + DL.format(b4) + '.' + (+b !== +b4 ? ' Das ist ' + freeReason(b4, land) + ', daher zählt nach der Rechtsprechung erst der nächste Werktag: ' + DL.format(b) + '.' : '') });
+      ev = b;
+    } else {
+      steps.push({ t: f.ev, d: DL.format(ev) + '. Dieser Tag zählt nicht mit (§\u00a0187 Abs.\u00a01 BGB). Die Frist läuft ab ' + DL.format(addDays(ev, 1)) + '.' });
+    }
+    if (f.abroad && opt.abroad) { unit = 'm'; n = 6; }
+    var end, how;
+    if (unit === 'w') {
+      end = addDays(ev, 7 * n);
+      how = (n === 1 ? 'Eine Woche' : ['', '', 'Zwei', 'Drei', 'Vier', 'Fünf', 'Sechs'][n] + ' Wochen') + ' später, am selben Wochentag wie das Ereignis (§\u00a0188 Abs.\u00a02 BGB): ' + DL.format(end) + '.';
+    } else if (unit === 'm') {
+      var y = ev.getFullYear(), m = ev.getMonth() + n, ty = y + Math.floor(m / 12), tm = m % 12, ld = lastDay(ty, tm), clip = ev.getDate() > ld;
+      end = D(ty, tm, Math.min(ev.getDate(), ld));
+      how = (n === 1 ? 'Ein Monat' : (n === 6 ? 'Sechs' : n) + ' Monate') + ' später, am Tag mit derselben Zahl (§\u00a0188 Abs.\u00a02 BGB): ' + DL.format(end) + '.' + (clip ? ' Den ' + ev.getDate() + '. gibt es in diesem Monat nicht, daher gilt der letzte Tag des Monats (§\u00a0188 Abs.\u00a03 BGB).' : '');
+    } else {
+      var mm = ev.getMonth() + n + 1; end = D(ev.getFullYear() + Math.floor(mm / 12), mm % 12, 0);
+      how = 'Die Überlegungsfrist endet mit Ablauf des zweiten Kalendermonats nach dem Zugang: ' + DL.format(end) + '.';
+    }
+    steps.push({ t: 'Rechnerisches Ende', d: how });
+    var fin = nextWorkday(end, land);
+    if (+fin !== +end) steps.push({ t: 'Wochenende und Feiertage', d: DM.format(end) + ' ist ' + freeReason(end, land) + (holName(end, land) ? ' in ' + LAND[land] : '') + '. Die Frist endet deshalb erst am nächsten Werktag (' + f.shift + '): ' + DL.format(fin) + '.' });
+    else steps.push({ t: 'Wochenende und Feiertage', d: 'Der Tag ist in ' + LAND[land] + ' ein Werktag. Es gibt keine Verschiebung.' });
+    steps.push({ t: 'Bis wann genau', d: f.where });
+    return { end: end, fin: fin, ev: ev, steps: steps, f: f };
+  }
+
+  /* Rechtsgebiete */
+  var AREAS = [
+    { id: 'arbeit', nm: 'Arbeitsrecht', sum: 'Für Beschäftigte und Arbeitgeber. Kündigung, Abfindung, Aufhebungsvertrag, Zeugnis und Vergütung.', who: 'Dr. Johanna Muster', whoR: 'Fachanwältin für Arbeitsrecht',
+      cases: ['Sie haben eine Kündigung erhalten und wollen wissen, ob sie wirksam ist.', 'Ihnen liegt ein Aufhebungsvertrag mit Abfindung vor.', 'Abmahnung, Versetzung oder Streit um Überstunden.', 'Das Arbeitszeugnis klingt freundlich, aber nicht gut.', 'Als Arbeitgeber: Arbeitsverträge und Kündigungen sauber vorbereiten.'],
+      bring: ['Kündigung mit Umschlag, damit das Zugangsdatum klar ist', 'Arbeitsvertrag mit allen Nachträgen', 'Die letzten drei Gehaltsabrechnungen', 'Abmahnungen, Zeugnisse, wichtiger Schriftverkehr'],
+      fr: [['Kündigungsschutzklage', 'Drei Wochen ab Zugang der Kündigung (§\u00a04 KSchG). Danach gilt die Kündigung fast immer als wirksam.'], ['Meldung bei der Agentur für Arbeit', 'Innerhalb von drei Tagen nach Kenntnis des Beendigungszeitpunkts (§\u00a038 SGB III), sonst droht eine Sperrzeit.'], ['Ausschlussfristen', 'Viele Arbeits- und Tarifverträge verlangen, Ansprüche binnen drei Monaten geltend zu machen.']] },
+    { id: 'miete', nm: 'Mietrecht', sum: 'Für Mieter und Vermieter. Mieterhöhung, Nebenkosten, Mängel, Kaution und Eigenbedarf.', who: 'Levent Aydın', whoR: 'Fachanwalt für Miet- und WEG-Recht',
+      cases: ['Die Miete soll steigen und Sie fragen sich, ob das zulässig ist.', 'Die Nebenkostenabrechnung ist hoch oder unverständlich.', 'Schimmel, Heizungsausfall oder Lärm: Wann ist eine Minderung möglich?', 'Kündigung wegen Eigenbedarfs.', 'Die Kaution wird nach dem Auszug nicht zurückgezahlt.'],
+      bring: ['Mietvertrag mit Nachträgen und Hausordnung', 'Das Schreiben, um das es geht, mit Datum des Zugangs', 'Nebenkostenabrechnungen der letzten Jahre', 'Fotos von Mängeln, Übergabeprotokolle'],
+      fr: [['Zustimmung zur Mieterhöhung', 'Bis zum Ende des zweiten Kalendermonats nach Zugang (§\u00a0558b BGB).'], ['Einwendungen gegen die Nebenkostenabrechnung', 'Zwölf Monate nach Zugang der Abrechnung (§\u00a0556 Abs.\u00a03 BGB).'], ['Widerspruch gegen eine Kündigung', 'Spätestens zwei Monate vor Ende des Mietverhältnisses (§\u00a0574b BGB).']] },
+    { id: 'erbe', nm: 'Erbrecht', sum: 'Vorsorgen und regeln. Testament, Erbvertrag, Pflichtteil, Erbengemeinschaft und Ausschlagung.', who: 'Clara Wendt, LL.M.', whoR: 'Fachanwältin für Erbrecht',
+      cases: ['Sie möchten ein Testament aufsetzen, das später keinen Streit auslöst.', 'Sie wurden enterbt und fragen nach dem Pflichtteil.', 'Die Erbengemeinschaft kann sich über das Haus nicht einigen.', 'Der Nachlass ist womöglich überschuldet.', 'Vorsorgevollmacht und Patientenverfügung.'],
+      bring: ['Testamente oder Erbverträge, auch ältere Fassungen', 'Sterbeurkunde und Schreiben des Nachlassgerichts', 'Übersicht über Vermögen und Schulden', 'Grundbuchauszüge, Kontoauszüge, Versicherungen'],
+      fr: [['Ausschlagung der Erbschaft', 'Sechs Wochen ab Kenntnis, bei Auslandsbezug sechs Monate (§\u00a01944 BGB).'], ['Pflichtteilsanspruch', 'Verjährt in drei Jahren, gerechnet ab Ende des Jahres der Kenntnis (§§\u00a0195, 199 BGB).'], ['Anzeige beim Finanzamt', 'Erwerb von Todes wegen innerhalb von drei Monaten anzeigen (§\u00a030 ErbStG).']] },
+    { id: 'vertrag', nm: 'Vertrags- und Handelsrecht', sum: 'Für Unternehmen und Selbstständige. Verträge, AGB, offene Forderungen und Gewährleistung.', who: 'Clara Wendt, LL.M.', whoR: 'Fachanwältin für Handels- und Gesellschaftsrecht',
+      cases: ['Verträge und AGB prüfen oder neu aufsetzen.', 'Ein Kunde zahlt nicht, etwa die Fiktive GmbH 2 seit vier Monaten.', 'Ein Lieferant liefert mangelhaft oder zu spät.', 'Gesellschaftsvertrag, Gesellschafterwechsel, Nachfolge.', 'Streit mit Handelsvertretern über Provision und Ausgleich.'],
+      bring: ['Vertrag, Angebot, Auftragsbestätigung und AGB', 'Rechnungen, Mahnungen und Zahlungsübersicht', 'Lieferscheine, Mängelanzeigen, Fotos', 'Den E-Mail-Verlauf als PDF'],
+      fr: [['Mängelrüge unter Kaufleuten', 'Unverzüglich nach Ablieferung (§\u00a0377 HGB). Sonst gilt die Ware als genehmigt.'], ['Widerspruch gegen einen Mahnbescheid', 'Zwei Wochen ab Zustellung (§\u00a0692 ZPO).'], ['Verjährung von Forderungen', 'Regelmäßig drei Jahre zum Jahresende (§§\u00a0195, 199 BGB). Offene Rechnungen von 2023 verjähren am 31. Dezember 2026.']] },
+    { id: 'verkehr', nm: 'Verkehrsrecht', sum: 'Nach dem Unfall und bei Bußgeld. Schadensregulierung, Schmerzensgeld, Punkte und Fahrverbot.', who: 'Levent Aydın', whoR: 'Fachanwalt für Verkehrsrecht',
+      cases: ['Nach einem Unfall zahlt die gegnerische Versicherung nur einen Teil.', 'Ein Bußgeldbescheid droht mit Fahrverbot.', 'Schmerzensgeld und Verdienstausfall nach einer Verletzung.', 'Punkte in Flensburg und drohender Führerscheinentzug.', 'Streit mit der Werkstatt oder dem Gutachter.'],
+      bring: ['Unfallbericht, Fotos, Namen von Zeugen', 'Anhörungsbogen oder Bußgeldbescheid mit Umschlag', 'Versicherungsschein und Schadennummer', 'Gutachten, Kostenvoranschlag, Arztberichte'],
+      fr: [['Einspruch gegen den Bußgeldbescheid', 'Zwei Wochen ab Zustellung (§\u00a067 OWiG).'], ['Schadensmeldung bei der eigenen Versicherung', 'In der Regel innerhalb einer Woche, je nach Vertrag.'], ['Ansprüche gegen den Unfallgegner', 'Verjähren in drei Jahren zum Jahresende.']] }
+  ];
+  var AREA_NAME = { arbeit: 'Arbeitsrecht', miete: 'Mietrecht', erbe: 'Erbrecht', vertrag: 'Vertrags- und Handelsrecht', verkehr: 'Verkehrsrecht', sonst: 'Etwas anderes' };
+  var AREA_WHO = { arbeit: 'Dr. Johanna Muster', miete: 'Levent Aydın', erbe: 'Clara Wendt', vertrag: 'Clara Wendt', verkehr: 'Levent Aydın', sonst: 'Dr. Johanna Muster' };
+  var plus = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>';
+  $('areas').innerHTML = AREAS.map(function (a) {
+    return '<div class="area" id="gebiet-' + a.id + '"><h3 style="font:inherit;margin:0"><button class="area-h" type="button" aria-expanded="false" aria-controls="ab-' + a.id + '" data-area="' + a.id + '"><span class="nm">' + a.nm + '</span><span class="sum">' + a.sum + '</span><span class="who"><b>' + a.who + '</b>' + a.whoR + '</span><span class="pm">' + plus + '</span></button></h3>'
+      + '<div class="area-b" id="ab-' + a.id + '" role="region" aria-label="' + a.nm + ' im Detail"><div><div class="area-in">'
+      + '<div><h4 class="serif" style="font-size:23px;font-style:italic;color:var(--ink);margin-bottom:10px;font-weight:600">Typische Fälle</h4><ul>' + a.cases.map(function (c) { return '<li>' + c + '</li>'; }).join('') + '</ul></div>'
+      + '<div><h4 class="serif" style="font-size:23px;font-style:italic;color:var(--ink);margin-bottom:10px;font-weight:600">Bitte mitbringen</h4><ul>' + a.bring.map(function (c) { return '<li>' + c + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="fristbox"><h4 class="serif" style="font-size:23px;font-style:italic;color:var(--bordeaux);margin-bottom:10px;font-weight:600">Fristen im Blick</h4><dl>' + a.fr.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + f[1] + '</dd>'; }).join('') + '</dl></div>'
+      + '<div class="area-acts"><button class="btn sm" type="button" data-ask="' + a.id + '">Zu ' + (a.id === 'vertrag' ? 'diesem Gebiet' : a.nm) + ' anfragen</button><p>Ansprechperson: ' + a.who + ', ' + a.whoR + '</p></div>'
+      + '</div></div></div></div>';
+  }).join('');
+  function setArea(id, open) {
+    var btn = document.querySelector('.area-h[data-area="' + id + '"]'); if (!btn) return;
+    btn.setAttribute('aria-expanded', String(open)); $('ab-' + id).classList.toggle('open', open);
+    $('ab-' + id).querySelectorAll('button, a').forEach(function (el) { el.tabIndex = open ? 0 : -1; });
+  }
+  AREAS.forEach(function (a) { setArea(a.id, false); });
+  document.querySelectorAll('.area-h').forEach(function (b) { b.addEventListener('click', function () { setArea(b.dataset.area, b.getAttribute('aria-expanded') !== 'true'); }); });
+  document.querySelectorAll('[data-open]').forEach(function (l) { l.addEventListener('click', function () { setArea(l.dataset.open, true); }); });
+  document.addEventListener('click', function (e) { var t = e.target.closest('[data-ask]'); if (!t) return; prefill({ gebiet: t.dataset.ask }); toast('Rechtsgebiet ' + AREA_NAME[t.dataset.ask] + ' in die Anfrage übernommen.'); });
+
+  /* Fristenrechner */
+  var ftype = $('fr-type'), fdate = $('fr-date'), fland = $('fr-land');
+  ftype.innerHTML = Object.keys(FR).map(function (k) { return '<option value="' + k + '">' + FR[k].name + '</option>'; }).join('');
+  fland.innerHTML = Object.keys(LAND).map(function (k) { return '<option value="' + k + '">' + LAND[k] + '</option>'; }).join('');
+  var fs = state.fr || {};
+  ftype.value = FR[fs.type] ? fs.type : 'kschg'; fland.value = LAND[fs.land] ? fs.land : 'NW';
+  fdate.value = parseIso(fs.date) ? fs.date : iso(today());
+  $('fr-post').checked = !!fs.post; $('fr-abroad').checked = !!fs.abroad;
+  var lastFr = null;
+  function renderCal(r, land) {
+    var y = r.fin.getFullYear(), m = r.fin.getMonth(), first = D(y, m, 1), off = (first.getDay() + 6) % 7, nd = lastDay(y, m), t = today();
+    var h = '<caption>' + MY.format(first) + '</caption><thead><tr>' + ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(function (d) { return '<th scope="col">' + d + '</th>'; }).join('') + '</tr></thead><tbody><tr>';
+    for (var i = 0; i < off; i++) h += '<td></td>';
+    for (var d = 1; d <= nd; d++) {
+      var dt = D(y, m, d), c = [], w = dt.getDay(), hn = holName(dt, land), lbl = DL.format(dt);
+      if (w === 0 || w === 6) c.push('we'); if (hn) { c.push('hol'); lbl += ', ' + hn; }
+      if (dt > r.ev && dt < r.fin) c.push('run');
+      if (+dt === +r.end && +r.end !== +r.fin) { c.push('calc'); lbl += ', rechnerisches Ende'; }
+      if (+dt === +r.fin) { c.push('end'); lbl += ', Fristende'; }
+      if (+dt === +t) { c.push('today'); lbl += ', heute'; }
+      h += '<td class="' + c.join(' ') + '"><span aria-label="' + lbl + '" title="' + lbl + '">' + d + '</span></td>';
+      if ((off + d) % 7 === 0 && d < nd) h += '</tr><tr>';
+    }
+    $('frCal').innerHTML = h + '</tr></tbody>';
+  }
+  function runFr() {
+    var f = FR[ftype.value];
+    $('fr-type-help').textContent = f.act + ': ' + (f.unit === 'w' ? (f.n === 2 ? 'zwei' : f.n === 3 ? 'drei' : 'sechs') + ' Wochen' : f.unit === 'm' ? 'ein Monat' : 'bis Ende des zweiten Folgemonats') + ' (' + f.law + ').';
+    $('fr-date-l').textContent = f.post && $('fr-post').checked ? 'Datum im Bescheid' : f.ev;
+    $('fr-date-help').textContent = f.evHelp;
+    $('fr-post-w').hidden = !f.post; $('fr-abroad-w').hidden = !f.abroad;
+    var ev = parseIso(fdate.value);
+    state.fr = { type: ftype.value, date: fdate.value, land: fland.value, post: $('fr-post').checked, abroad: $('fr-abroad').checked }; save();
+    if (!ev) { $('frDate').textContent = '–'; $('frLeft').textContent = 'Bitte ein gültiges Datum eingeben.'; $('frLeft').className = 'fr-left'; $('frSteps').innerHTML = ''; $('frCal').innerHTML = ''; lastFr = null; return; }
+    var r = calcDeadline(ftype.value, ev, fland.value, { post: $('fr-post').checked, abroad: $('fr-abroad').checked });
+    lastFr = r;
+    $('frDate').textContent = DL.format(r.fin);
+    var left = diffDays(today(), r.fin), L = $('frLeft');
+    L.className = 'fr-left' + (left < 0 ? ' late' : '');
+    L.textContent = left > 1 ? 'Noch ' + left + ' Tage' : left === 1 ? 'Morgen ist der letzte Tag' : left === 0 ? 'Heute ist der letzte Tag' : 'Seit ' + (-left) + (left === -1 ? ' Tag' : ' Tagen') + ' abgelaufen';
+    var steps = r.steps.slice(); if (left < 0) steps.push({ t: 'Frist versäumt?', d: r.f.late });
+    $('frSteps').innerHTML = steps.map(function (s) { return '<li><div><b>' + s.t + '</b><span>' + s.d + '</span></div></li>'; }).join('');
+    renderCal(r, fland.value);
+  }
+  [ftype, fdate, fland, $('fr-post'), $('fr-abroad')].forEach(function (el) { el.addEventListener('change', runFr); el.addEventListener('input', runFr); });
+  $('frForm').addEventListener('submit', function (e) { e.preventDefault(); });
+  runFr();
+  $('frToForm').addEventListener('click', function () {
+    if (!lastFr) { fdate.focus(); return; }
+    prefill({ gebiet: FR[ftype.value].area, frist: ftype.value, fdate: fdate.value });
+    toast('Frist übernommen. Sie finden sie in Schritt 3 der Anfrage.');
+  });
+
+  /* Fristnotiz im Kopfbereich */
+  (function () { var r = calcDeadline('kschg', today(), 'NW'); $('noteT').textContent = 'Fristnotiz für ' + DL.format(today()); $('noteDate').textContent = DL.format(r.fin); })();
+  $('yNow').textContent = String(new Date().getFullYear());
+
+  /* Anfrage in Schritten */
+  var STEPS = ['Rechtsgebiet', 'Sachverhalt', 'Frist und Dringlichkeit', 'Unterlagen', 'Kontakt und Rückruf'];
+  var wiz = $('wiz'), step = 1, files = [];
+  var gGeb = $('g-gebiet');
+  gGeb.insertAdjacentHTML('beforeend', Object.keys(AREA_NAME).map(function (k) { return '<label class="opt"><input type="radio" name="gebiet" value="' + k + '"><span><b>' + AREA_NAME[k] + '</b>' + (k === 'sonst' ? '<small>Wir sagen Ihnen, wer helfen kann</small>' : '') + '</span></label>'; }).join(''));
+  $('w-frist').innerHTML = '<option value="">Nein, keine Frist bekannt</option>' + Object.keys(FR).map(function (k) { return '<option value="' + k + '">' + FR[k].name + '</option>'; }).join('') + '<option value="andere">Ein anderes Schreiben mit Frist</option>';
+  (function () { var d = addDays(today(), 1), out = [], i = 0; while (out.length < 6 && i < 20) { if (!isFree(d, 'NW')) out.push(d); d = addDays(d, 1); i++; } $('w-day').innerHTML = out.map(function (x) { return '<option value="' + iso(x) + '">' + DS.format(x) + '</option>'; }).join(''); })();
+  $('wizNav').innerHTML = STEPS.map(function (s, i) { return '<li data-i="' + (i + 1) + '"><button type="button" data-go="' + (i + 1) + '"><span class="n" aria-hidden="true">' + ['I', 'II', 'III', 'IV', 'V'][i] + '</span><span class="t">' + s + '</span></button></li>'; }).join('');
+
+  function val(name) { var el = wiz.elements[name]; if (!el) return ''; if (el instanceof RadioNodeList) return el.value; if (el.type === 'checkbox') return el.checked; return el.value; }
+  function setVal(name, v) { var el = wiz.elements[name]; if (!el) return; if (el instanceof RadioNodeList) { Array.prototype.forEach.call(el, function (r) { r.checked = r.value === v; }); } else if (el.type === 'checkbox') el.checked = !!v; else el.value = v == null ? '' : v; }
+  var FIELDS = ['gebiet', 'wer', 'text', 'gegner', 'rsv', 'frist', 'fdate', 'eile', 'name', 'mail', 'tel', 'day', 'slot', 'ds'];
+  function collect() { var o = {}; FIELDS.forEach(function (k) { o[k] = val(k); }); o.files = files.map(function (f) { return { n: f.n, s: f.s }; }); return o; }
+  function applyDraft(d) { if (!d) return; FIELDS.forEach(function (k) { if (k in d) setVal(k, d[k]); }); if (d.day && !Array.prototype.some.call($('w-day').options, function (o) { return o.value === d.day; })) $('w-day').selectedIndex = 0; files = (d.files || []).slice(0, 8); }
+  var saveT;
+  function saveDraft() { clearTimeout(saveT); if (!$('doneCard').hidden) return; saveT = setTimeout(function () { state.draft = collect(); state.step = step; $('savedNote').textContent = save() ? 'Entwurf gespeichert' : 'Speichern im Browser ist nicht möglich. Die Anfrage funktioniert trotzdem.'; }, 300); }
+
+  function clearErrs(scope) { scope.querySelectorAll('[aria-invalid]').forEach(function (el) { el.removeAttribute('aria-invalid'); }); scope.querySelectorAll('.err, .grp-err').forEach(function (e) { e.remove(); }); }
+  function fieldErr(el, msg, first) {
+    var e = document.createElement(el.tagName === 'FIELDSET' ? 'p' : 'span');
+    e.className = el.tagName === 'FIELDSET' ? 'grp-err' : 'err'; e.id = (el.id || el.name) + '-err'; e.textContent = msg;
+    el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', e.id);
+    if (el.tagName === 'FIELDSET') el.appendChild(e); else el.parentNode.appendChild(e);
+    if (first) { var foc = el.tagName === 'FIELDSET' ? el.querySelector('input') : el; foc.focus({ preventScroll: true }); foc.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
+  }
+  function validate(s) {
+    var fsEl = wiz.querySelector('.step[data-step="' + s + '"]'), errs = [];
+    clearErrs(fsEl);
+    if (s === 1 && !val('gebiet')) errs.push([gGeb, 'Bitte wählen Sie ein Rechtsgebiet. Wenn Sie unsicher sind, wählen Sie „Etwas anderes“.']);
+    if (s === 2 && val('text').trim().length < 40) errs.push([$('w-text'), 'Bitte schildern Sie Ihr Anliegen in mindestens 40 Zeichen. Noch ' + (40 - val('text').trim().length) + ' Zeichen.']);
+    if (s === 3) {
+      if (FR[val('frist')] && !parseIso(val('fdate'))) errs.push([$('w-fdate'), 'Bitte geben Sie an, wann Sie das Schreiben erhalten haben.']);
+      if (!val('eile')) errs.push([$('g-eile'), 'Bitte wählen Sie, wie dringend Ihr Anliegen ist.']);
+    }
+    if (s === 5) {
+      if (val('name').trim().length < 2) errs.push([$('w-name'), 'Bitte geben Sie Ihren Namen ein.']);
+      var m = $('w-mail'); if (!m.value.trim() || !m.checkValidity() || !/\.[a-z]{2,}$/i.test(m.value.trim())) errs.push([m, 'Bitte geben Sie eine gültige E-Mail-Adresse ein, z. B. name@beispiel.de.']);
+      var tel = val('tel').replace(/[^\d+]/g, '');
+      if (val('slot') !== 'mail' && tel.length < 6) errs.push([$('w-tel'), 'Für einen Rückruf brauchen wir Ihre Telefonnummer. Oder wählen Sie „Lieber per E-Mail“.']);
+      if (!val('ds')) errs.push([$('w-ds').closest('.chk'), 'Bitte bestätigen Sie, dass wir Ihre Angaben verwenden dürfen.']);
+    }
+    errs.forEach(function (e, i) {
+      if (e[0].classList.contains('chk')) { var p = document.createElement('p'); p.className = 'grp-err'; p.id = 'w-ds-err'; p.textContent = e[1]; e[0].after(p); $('w-ds').setAttribute('aria-invalid', 'true'); $('w-ds').setAttribute('aria-describedby', 'w-ds-err'); if (i === 0) $('w-ds').focus(); }
+      else fieldErr(e[0], e[1], i === 0);
+    });
+    return errs.length === 0;
+  }
+  var maxDone = 0;
+  function show(s, focus) {
+    step = s;
+    wiz.querySelectorAll('.step').forEach(function (f) { f.hidden = +f.dataset.step !== s; });
+    $('wBack').style.visibility = s === 1 ? 'hidden' : 'visible';
+    $('wNext').textContent = s === 5 ? 'Ersteinschätzung anfragen' : s === 4 && !files.length ? 'Ohne Unterlagen weiter' : 'Weiter';
+    document.querySelectorAll('#wizNav li').forEach(function (li) {
+      var i = +li.dataset.i, b = li.querySelector('button');
+      li.className = i === s ? 'cur' : i <= maxDone ? 'done' : '';
+      b.disabled = !(i <= maxDone + 1); if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    $('wizMobT').textContent = STEPS[s - 1]; $('wizMobN').textContent = 'Schritt ' + s + ' von 5'; $('wizMobBar').style.width = (s * 20) + '%';
+    if (s === 3) fristLine(); if (s === 5) summary(); if (s === 4) renderFiles();
+    if (focus) { var lg = wiz.querySelector('.step[data-step="' + s + '"] > legend'); lg.tabIndex = -1; lg.focus({ preventScroll: true }); var top = wiz.closest('.sheet').getBoundingClientRect().top; if (top < 60 || top > innerHeight * .5) wiz.closest('.sheet').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
+    if (focus) saveDraft();
+  }
+  document.getElementById('wizNav').addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (!b || b.disabled) return; var g = +b.dataset.go; if (g > step && !validate(step)) return; if (g > step) maxDone = Math.max(maxDone, step); show(g, true); });
+  $('wBack').addEventListener('click', function () { if (step > 1) show(step - 1, true); });
+  wiz.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validate(step)) return;
+    maxDone = Math.max(maxDone, step);
+    if (step < 5) return show(step + 1, true);
+    finish();
+  });
+  wiz.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.getAttribute('aria-invalid') === 'true' || (t.type === 'radio' && t.closest('fieldset[aria-invalid]')) || t.id === 'w-ds') {
+      var holder = t.type === 'radio' ? t.closest('fieldset') : t; holder.removeAttribute('aria-invalid'); t.removeAttribute('aria-invalid');
+      var er = $((holder.id || holder.name) + '-err'); if (er) er.remove();
+    }
+    if (t.id === 'w-text') { var n = t.value.trim().length; $('w-text-c').textContent = n < 40 ? n + ' von mindestens 40 Zeichen' : n + ' Zeichen'; }
+    if (t.name === 'frist' || t.name === 'fdate') fristLine();
+    if (t.name === 'slot') $('w-tel').required = t.value !== 'mail';
+    if (step === 5) summary();
+    saveDraft();
+  });
+  wiz.addEventListener('change', function (e) { if (e.target.name === 'frist' || e.target.name === 'fdate') fristLine(); saveDraft(); });
+  function fristLine() {
+    var k = val('frist'), w = $('w-fdate-w'), out = $('w-fcalc');
+    w.hidden = !(FR[k]); out.hidden = true; out.className = 'calcline';
+    if (k === 'andere') { out.hidden = false; out.textContent = 'Nennen Sie die Frist bitte in Ihrer Schilderung. Wir prüfen sie beim Rückruf zuerst.'; return; }
+    if (!FR[k]) return;
+    var d = parseIso(val('fdate')); if (!d) return;
+    var r = calcDeadline(k, d, 'NW'), left = diffDays(today(), r.fin);
+    out.hidden = false;
+    if (left < 0) { out.classList.add('urgent'); out.textContent = 'Nach der Grundregel ist die Frist für ' + r.f.act + ' am ' + DL.format(r.fin) + ' abgelaufen. ' + r.f.late; }
+    else if (left <= 7) { out.classList.add('urgent'); out.textContent = 'Ihre Frist für ' + r.f.act + ' endet voraussichtlich am ' + DL.format(r.fin) + ', also in ' + (left === 0 ? 'weniger als einem Tag' : left === 1 ? 'einem Tag' : left + ' Tagen') + '. Bitte rufen Sie zusätzlich an: 01234 56789-0.'; if (!val('eile')) setVal('eile', 'hoch'); }
+    else out.textContent = 'Ihre Frist für ' + r.f.act + ' endet voraussichtlich am ' + DL.format(r.fin) + ' (noch ' + left + ' Tage). Beispielrechnung für Nordrhein-Westfalen, keine Rechtsberatung.';
+  }
+
+  /* Dateien (nur Namen) */
+  var KB = function (b) { return b < 1048576 ? NF.format(Math.max(1, Math.round(b / 1024))) + ' KB' : NF.format(b / 1048576) + ' MB'; };
+  function addFiles(list) {
+    var msg = [];
+    Array.prototype.forEach.call(list, function (f) {
+      if (files.length >= 8) { msg.push('Höchstens acht Dateien.'); return; }
+      if (f.size > 10 * 1048576) { msg.push(f.name + ' ist größer als 10 MB.'); return; }
+      if (!/\.(pdf|jpe?g|png|docx?|heic)$/i.test(f.name)) { msg.push(f.name + ' hat ein Format, das wir nicht annehmen.'); return; }
+      files.push({ n: f.name, s: f.size });
+    });
+    show(4); renderFiles(msg.join(' ')); saveDraft();
+  }
+  function renderFiles(msg) {
+    var ul = $('fileList');
+    ul.innerHTML = files.map(function (f, i) { return '<li><span class="nm">' + esc(f.n) + '</span><span class="sz">' + KB(f.s) + '</span><button type="button" data-rm="' + i + '" aria-label="' + esc(f.n) + ' entfernen">Entfernen</button></li>'; }).join('') + (msg ? '<li style="color:var(--bordeaux);font-weight:600">' + esc(msg) + '</li>' : '');
+  }
+  $('w-files').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  $('fileList').addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (!b) return; var f = files.splice(+b.dataset.rm, 1)[0]; renderFiles(); saveDraft(); show(4); toast(f.n + ' entfernt.', function () { files.splice(+b.dataset.rm, 0, f); renderFiles(); saveDraft(); show(4); }); $('drop').focus(); });
+  var drop = $('drop');
+  drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('w-files').click(); } });
+  drop.tabIndex = 0; drop.setAttribute('role', 'button');
+  ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); });
+
+  function deadlineText() { var k = val('frist'); if (k === 'andere') return 'Anderes Schreiben mit Frist'; if (!FR[k]) return 'Keine Frist bekannt'; var d = parseIso(val('fdate')); if (!d) return FR[k].name; var r = calcDeadline(k, d, 'NW'); return FR[k].act + ', endet voraussichtlich ' + DL.format(r.fin); }
+  function cbText() { if (val('slot') === 'mail') return 'Antwort per E-Mail'; var d = parseIso(val('day')); return (d ? DL.format(d) : '') + ', ' + val('slot'); }
+  function summary() {
+    var eile = { hoch: 'Sehr dringend', mittel: 'In den nächsten Wochen', niedrig: 'Keine Eile' }[val('eile')] || '–';
+    var rows = [['Rechtsgebiet', (AREA_NAME[val('gebiet')] || '–') + (val('wer') === 'firma' ? ', als Unternehmen' : ', als Privatperson')], ['Schilderung', val('text').trim().slice(0, 160) + (val('text').trim().length > 160 ? ' …' : '')], ['Frist', deadlineText()], ['Dringlichkeit', eile], ['Unterlagen', files.length ? files.length + (files.length === 1 ? ' Datei' : ' Dateien') : 'keine'], ['Rückruf', cbText()]];
+    $('summary').innerHTML = rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + esc(r[1] || '–') + '</dd></div>'; }).join('');
+  }
+  function finish() {
+    var d = collect(), ref = 'MP-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000));
+    state.sent = (state.sent || []).concat([{ ref: ref, at: new Date().toISOString(), gebiet: d.gebiet }]).slice(-10);
+    clearTimeout(saveT); state.draft = null; state.step = 1; save();
+    var who = AREA_WHO[d.gebiet] || 'Dr. Johanna Muster', first = d.name.trim().split(/\s+/)[0];
+    var urgent = /endet voraussichtlich/.test(deadlineText()) && d.eile === 'hoch';
+    var card = $('doneCard');
+    card.innerHTML = '<p class="ref">Vorgang ' + ref + '</p><h3>Danke, ' + esc(first) + '. Ihre Anfrage ist vorbereitet.</h3>'
+      + '<p>' + (d.slot === 'mail' ? esc(who) + ' antwortet Ihnen per E-Mail an ' + esc(d.mail) + ', in der Regel am nächsten Werktag.' : esc(who) + ' ruft Sie am ' + esc(cbText()) + ' unter ' + esc(d.tel) + ' an.') + ' Zuvor prüfen wir, ob wir die Gegenseite bereits vertreten.</p>'
+      + (urgent ? '<p class="calcline urgent">Wegen der kurzen Frist würden wir Sie heute noch zurückrufen.</p>' : '')
+      + '<dl class="summary">' + $('summary').innerHTML + '</dl>'
+      + '<p class="status-demo" role="status"><b>Demo:</b> Es wurde nichts gesendet. Auf einer echten Website ginge die Anfrage jetzt verschlüsselt an die Kanzlei, und Sie erhielten eine Eingangsbestätigung per E-Mail.</p>'
+      + '<div><button class="btn line" type="button" id="newReq">Neue Anfrage beginnen</button></div>';
+    wiz.hidden = true; card.hidden = false; $('wizNav').closest('nav').style.visibility = 'hidden'; $('wizMob').hidden = true;
+    card.focus({ preventScroll: true }); card.closest('.sheet').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    $('newReq').addEventListener('click', function () { resetWizard(); show(1, true); });
+  }
+  function resetWizard() {
+    wiz.reset(); files = []; maxDone = 0; clearErrs(wiz); $('w-text-c').textContent = '0 von mindestens 40 Zeichen';
+    wiz.hidden = false; $('doneCard').hidden = true; $('wizNav').closest('nav').style.visibility = ''; $('wizMob').hidden = false; $('w-day').selectedIndex = 0;
+  }
+  function prefill(o) {
+    if (!$('doneCard').hidden) resetWizard();
+    Object.keys(o).forEach(function (k) { setVal(k, o[k]); });
+    $('anfrage').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    show(1); saveDraft();
+    setTimeout(function () { var r = wiz.querySelector('input[name="gebiet"]:checked'); if (r) r.focus({ preventScroll: true }); }, 450);
+  }
+  /* Entwurf laden */
+  if (state.draft) { applyDraft(state.draft); var tl = val('text').trim().length; $('w-text-c').textContent = tl < 40 ? tl + ' von mindestens 40 Zeichen' : tl + ' Zeichen'; }
+  (function () { var s = Math.min(5, Math.max(1, +state.step || 1)); maxDone = s - 1; show(s); $('savedNote').textContent = state.draft ? 'Entwurf aus Ihrem letzten Besuch geladen' : ''; })();
+
+  /* Ratgeber */
+  var POSTS = [
+    { k: 'Arbeitsrecht', t: 'Kündigung erhalten: Was Sie in den ersten drei Wochen tun sollten', by: 'Dr. Johanna Muster', ago: 6, min: 6, tease: 'Die Uhr läuft ab dem Tag, an dem die Kündigung im Briefkasten liegt. Was jetzt wichtig ist, was warten kann, und warum Sie nichts vorschnell unterschreiben sollten.',
+      body: '<p>Eine Kündigung trifft die meisten Menschen unvorbereitet. Umso wichtiger ist ein kühler Kopf, denn das Gesetz lässt nur drei Wochen Zeit, um sich vor dem Arbeitsgericht zu wehren. Diese Frist beginnt mit dem Zugang, also wenn das Schreiben in Ihren Machtbereich gelangt ist. Bei einem Einwurf in den Briefkasten ist das in der Regel der Tag des Einwurfs, wenn mit einer Leerung noch zu rechnen war.</p><h3>Die ersten Tage</h3><ul><li>Notieren Sie, wann und wie Sie die Kündigung erhalten haben. Heben Sie den Umschlag auf.</li><li>Melden Sie sich innerhalb von drei Tagen bei der Agentur für Arbeit arbeitsuchend.</li><li>Unterschreiben Sie keine Ausgleichsquittung und keinen Aufhebungsvertrag, ohne ihn prüfen zu lassen.</li></ul><p>Ob sich eine Klage lohnt, hängt unter anderem davon ab, wie lange Sie beschäftigt sind, wie groß der Betrieb ist und welchen Grund der Arbeitgeber nennt. Viele Verfahren enden mit einem Vergleich und einer Abfindung. Eine feste Regel dafür gibt es nicht, aber eine gut begründete Klage verbessert die Verhandlungsposition deutlich.</p><h3>Die Kosten</h3><p>In der ersten Instanz trägt jede Seite ihre eigenen Anwaltskosten, auch wenn sie gewinnt. Eine Rechtsschutzversicherung übernimmt diese Kosten meist. Ohne Versicherung kann Prozesskostenhilfe in Frage kommen.</p>' },
+    { k: 'Mietrecht', t: 'Nebenkostenabrechnung prüfen: die fünf häufigsten Fehler', by: 'Levent Aydın', ago: 19, min: 5, tease: 'Fast jede zweite Abrechnung, die wir sehen, enthält mindestens einen Fehler. Diese Punkte können Sie selbst prüfen.',
+      body: '<p>Die Betriebskostenabrechnung muss Ihnen spätestens zwölf Monate nach Ende des Abrechnungszeitraums zugehen. Kommt sie später, kann der Vermieter in der Regel keine Nachzahlung mehr verlangen. Ein Guthaben müssen Sie trotzdem erhalten.</p><h3>Darauf sollten Sie achten</h3><ul><li>Stimmt der Abrechnungszeitraum, und umfasst er genau zwölf Monate?</li><li>Sind nur Kosten enthalten, die im Mietvertrag als umlagefähig vereinbart sind?</li><li>Ist der Verteilerschlüssel nachvollziehbar, etwa nach Wohnfläche?</li><li>Wurden Verwaltungs- oder Reparaturkosten eingerechnet? Diese gehören nicht hinein.</li><li>Sind Ihre Vorauszahlungen vollständig abgezogen?</li></ul><p>Sie haben das Recht, die Belege einzusehen. Einwendungen müssen Sie innerhalb von zwölf Monaten nach Zugang der Abrechnung erheben. Formulieren Sie diese schriftlich und konkret.</p>' },
+    { k: 'Erbrecht', t: 'Das handschriftliche Testament: Formfehler, die es unwirksam machen', by: 'Clara Wendt', ago: 34, min: 4, tease: 'Ein Testament ohne Notar ist erlaubt. Es muss aber vollständig von Hand geschrieben und unterschrieben sein.',
+      body: '<p>Das eigenhändige Testament ist die häufigste Form, den eigenen Nachlass zu regeln. Es kostet nichts, ist aber anfällig für Fehler, die erst nach dem Tod auffallen, wenn niemand mehr nachfragen kann.</p><h3>Die Regeln</h3><ul><li>Der gesamte Text muss von Hand geschrieben sein. Ein Computerausdruck mit Unterschrift genügt nicht.</li><li>Unterschreiben Sie am Ende mit Vor- und Nachnamen.</li><li>Ort und Datum sind nicht zwingend, verhindern aber Streit, wenn es mehrere Fassungen gibt.</li><li>Ein gemeinschaftliches Testament von Ehepaaren schreibt einer, beide unterschreiben.</li></ul><p>Klarheit ist wichtiger als Länge. Formulierungen wie „mein Sohn soll das Haus bekommen“ werfen Fragen auf: Ist er Alleinerbe, oder erhält er ein Vermächtnis? Lassen Sie den Entwurf prüfen und das Original beim Amtsgericht hinterlegen.</p>' },
+    { k: 'Verkehrsrecht', t: 'Bußgeldbescheid im Briefkasten: Einspruch, ja oder nein?', by: 'Levent Aydın', ago: 52, min: 4, tease: 'Zwei Wochen bleiben für den Einspruch. Wann er sich lohnt und was mit Punkten und Fahrverbot passiert.',
+      body: '<p>Der Bußgeldbescheid kommt meist im gelben Umschlag. Das Datum darauf ist entscheidend: Ab dieser Zustellung haben Sie zwei Wochen Zeit für den Einspruch. Danach wird der Bescheid rechtskräftig.</p><h3>Wann ein Einspruch sinnvoll ist</h3><ul><li>Ihnen droht ein Fahrverbot, und Sie sind beruflich auf den Führerschein angewiesen.</li><li>Das Messverfahren oder die Fahreridentifizierung ist zweifelhaft.</li><li>Der Bescheid enthält falsche Angaben zu Ort, Zeit oder Fahrzeug.</li></ul><p>Ein Einspruch kann zunächst ohne Begründung eingelegt werden. Wir beantragen dann Akteneinsicht und prüfen die Messung. Sie können den Einspruch später zurücknehmen, wenn er keine Aussicht hat. Mit Verkehrsrechtsschutz trägt die Versicherung in der Regel die Kosten.</p>' }
+  ];
+  $('posts').innerHTML = POSTS.map(function (p, i) {
+    var d = addDays(today(), -p.ago);
+    return '<article class="post' + (i === 0 ? ' lead-post' : '') + '"><p class="kick">' + p.k + '</p><h3><button type="button" data-post="' + i + '">' + p.t + '</button></h3><p>' + p.tease + '</p>' + (i === 0 ? '<p class="lead-q">„Unterschreiben Sie keinen Aufhebungsvertrag, ohne ihn prüfen zu lassen.“</p>' : '') + '<p class="m"><span>' + p.min + ' Minuten Lesezeit</span><span>' + p.by + '</span><time datetime="' + iso(d) + '">' + DM.format(d) + '</time></p></article>';
+  }).join('');
+
+  /* Dialog */
+  var dlg = $('dlg'), opener = null;
+  function openDlg(k, t, html) {
+    opener = document.activeElement;
+    $('dlgK').textContent = k; $('dlgT').textContent = t; $('dlgBody').innerHTML = html;
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    dlg.querySelector('.dlg-b').scrollTop = 0; $('dlgX').focus();
+  }
+  function closeDlg() { if (dlg.open) { if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); } }
+  dlg.addEventListener('close', function () { if (opener && opener.focus) opener.focus(); });
+  $('dlgX').addEventListener('click', closeDlg);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) closeDlg(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && dlg.open && typeof dlg.showModal !== 'function') closeDlg(); });
+  $('posts').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-post]'); if (!b) return; var p = POSTS[+b.dataset.post], d = addDays(today(), -p.ago);
+    openDlg('Ratgeber, ' + p.k, p.t, '<p class="m">' + p.by + ', ' + DM.format(d) + ', ' + p.min + ' Minuten Lesezeit</p><div class="art">' + p.body + '</div><p class="fine">Allgemeine Information, keine Rechtsberatung im Einzelfall. Beispieltext für diese Demo.</p><p style="margin-top:18px"><button class="btn sm" type="button" data-ask-close="' + ({ Arbeitsrecht: 'arbeit', Mietrecht: 'miete', Erbrecht: 'erbe', Verkehrsrecht: 'verkehr' }[p.k]) + '">Dazu eine Ersteinschätzung anfragen</button></p>');
+  });
+  $('dlgBody').addEventListener('click', function (e) { var b = e.target.closest('[data-ask-close]'); if (!b) return; opener = null; closeDlg(); prefill({ gebiet: b.dataset.askClose }); });
+  var LEGAL = {
+    impressum: ['Pflichtangaben', 'Impressum', '<p style="margin-top:14px">Platzhalter. Auf einer echten Kanzlei-Website stünden hier die Angaben nach §\u00a05 DDG:</p><ul style="margin-top:10px;padding-left:1.2em"><li>Name und Anschrift der Partnerschaft, Partnerschaftsregister und Registernummer</li><li>Vertretungsberechtigte Partnerinnen und Partner</li><li>Berufsbezeichnung „Rechtsanwalt“, verliehen in der Bundesrepublik Deutschland</li><li>Zuständige Rechtsanwaltskammer</li><li>Berufsrechtliche Regelungen: BRAO, BORA, FAO, RVG, CCBE-Berufsregeln</li><li>Berufshaftpflichtversicherung mit Geltungsbereich</li><li>Umsatzsteuer-Identifikationsnummer</li></ul><p class="fine">Beispiel-Website. Alle Angaben sind erfunden.</p>'],
+    datenschutz: ['Hinweise', 'Datenschutz', '<p style="margin-top:14px">Platzhalter für die Datenschutzerklärung. Für diese Beispiel-Website gilt:</p><ul style="margin-top:10px;padding-left:1.2em"><li>Es werden keine Inhalte von fremden Servern geladen, auch keine Schriften.</li><li>Es gibt keine Cookies und keine Statistik-Werkzeuge.</li><li>Formulareingaben und der Fristenrechner werden nur in Ihrem Browser gespeichert (localStorage) und nie gesendet.</li><li>Über „Demo zurücksetzen“ im Fußbereich löschen Sie diese Daten.</li></ul><p class="fine">Eine echte Kanzlei-Website bräuchte hier eine vollständige Erklärung nach Art. 13 DSGVO.</p>']
+  };
+  document.querySelectorAll('[data-dlg]').forEach(function (b) { b.addEventListener('click', function () { var L = LEGAL[b.dataset.dlg]; openDlg(L[0], L[1], L[2]); }); });
+
+  /* Öffnungszeiten */
+  var HOURS = [['Montag', 1, '8:30', '18:00'], ['Dienstag', 2, '8:30', '18:00'], ['Mittwoch', 3, '8:30', '18:00'], ['Donnerstag', 4, '8:30', '18:00'], ['Freitag', 5, '8:30', '15:00'], ['Samstag und Sonntag', 6, null, null]];
+  function hm(s) { var p = s.split(':'); return +p[0] * 60 + +p[1]; }
+  function renderHours() {
+    var n = new Date(), wd = n.getDay(), mins = n.getHours() * 60 + n.getMinutes(), hol = holName(today(), 'NW');
+    $('hours').querySelector('tbody').innerHTML = HOURS.map(function (h) { var cur = h[1] === wd || (h[1] === 6 && wd === 0); return '<tr' + (cur ? ' class="today"' : '') + '><th scope="row">' + h[0] + (cur ? ' (heute)' : '') + '</th><td>' + (h[2] ? h[2] + ' bis ' + h[3] + ' Uhr' : 'geschlossen') + '</td></tr>'; }).join('');
+    var row = HOURS.filter(function (h) { return h[1] === wd; })[0], o = $('openNow');
+    if (hol) { o.className = 'open-now closed'; o.textContent = 'Heute geschlossen (' + hol + ')'; return; }
+    if (row && row[2] && mins >= hm(row[2]) && mins < hm(row[3])) { o.className = 'open-now'; o.textContent = 'Jetzt geöffnet, bis ' + row[3] + ' Uhr'; }
+    else { o.className = 'open-now closed'; var nx = addDays(today(), row && row[2] && mins < hm(row[2]) ? 0 : 1); while (isFree(nx, 'NW')) nx = addDays(nx, 1); o.textContent = 'Jetzt geschlossen. Wieder geöffnet ' + (diffDays(today(), nx) === 0 ? 'heute' : diffDays(today(), nx) === 1 ? 'morgen' : 'am ' + DS.format(nx)) + ' ab 8:30 Uhr'; }
+  }
+  renderHours(); setInterval(renderHours, 60000);
+
+  /* Menü */
+  var mb = $('menuBtn'), mn = $('mnav');
+  function menu(o) { mn.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o)); mb.textContent = o ? 'Schließen' : 'Menü'; }
+  mb.addEventListener('click', function () { menu(!mn.classList.contains('open')); });
+  mn.addEventListener('click', function (e) { if (e.target.closest('a')) menu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && mn.classList.contains('open')) { menu(false); mb.focus(); } });
+
+  /* Toast mit Rückgängig */
+  var toastT, undoFn;
+  function toast(msg, undo) {
+    $('toastT').textContent = msg; undoFn = undo || null; $('toastUndo').hidden = !undo; $('toast').hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { $('toast').hidden = true; undoFn = null; }, undo ? 8000 : 4000);
+  }
+  $('toastUndo').addEventListener('click', function () { if (undoFn) undoFn(); undoFn = null; $('toast').hidden = true; });
+
+  /* Demo zurücksetzen */
+  $('resetBtn').addEventListener('click', function () {
+    var prev = JSON.stringify(state);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    state = { fr: null, draft: null, step: 1, sent: [] };
+    resetWizard(); show(1);
+    ftype.value = 'kschg'; fland.value = 'NW'; fdate.value = iso(today()); $('fr-post').checked = false; $('fr-abroad').checked = false; runFr();
+    AREAS.forEach(function (a) { setArea(a.id, false); });
+    $('savedNote').textContent = '';
+    toast('Demo zurückgesetzt. Eingaben und Entwurf sind gelöscht.', function () {
+      try { state = JSON.parse(prev); } catch (e) {}
+      save(); location.reload();
+    });
+  });
+})();
+</script>
+</body>
+</html>

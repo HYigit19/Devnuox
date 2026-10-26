@@ -8,9 +8,11 @@
 <title>Arbeitsschutz</title>
 <meta name="theme-color" content="#F3F4FA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1117" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 300 900; font-display: swap; src: url(shared-files/figtree-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(shared-files/geist-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(shared-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2-variations"); }
+</style>
 <style>
 /* Layout: Navigation links (farbige Kacheln), Inhalt in der Mitte; Startseite und Listen breit, Detail mit Seitenspalte.
    Themes: data-skin (bunt | klar) × data-mode (auto | light | dark) × data-density (normal | kompakt); Firmenfarbe setzt --accent per Script. */
@@ -479,7 +481,7 @@ a.linkbtn { display: inline-flex; align-items: center; gap: 4px; align-self: fle
 <div class="bell-panel" id="bellPanel" role="region" aria-label="Benachrichtigungen" hidden></div>
 <div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="shared-files/xlsx.full.min.js"></script>
 <script>
 /* Arbeitsschutz: Unterweisungen, Audits und Nachweise. Demo mit Beispieldaten, gespeichert nur im Browser. */
 document.documentElement.lang = 'de';
@@ -1346,7 +1348,7 @@ function xlMassn() {
 }
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 async function needPdf() {
-  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('shared-files/jspdf.umd.min.js');
   return window.jspdf.jsPDF;
 }
 const pdfTxt = s => String(s ?? '').replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/[→]/g, '->').replace(/[•✕]/g, '-').replace(/ /g, ' ').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');

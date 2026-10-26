@@ -1,0 +1,2300 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="AnlagenCheck: Prüfungen und Wartung per QR-Code am Handy, mit Leitstand für Instandhaltung und Büro.">
+<meta name="theme-color" content="#E4E7E5">
+<title>AnlagenCheck</title>
+<style>
+/* Gestaltung: Hallengrau (RAL-7035-Anmutung) als Grund, Wasserblau als Arbeitsfarbe.
+   Das prägende Element ist das Anlagen-Typenschild (gebürstetes Aluminium, Nieten, QR) und die Prüfplakette.
+   Atkinson Hyperlegible Next für alles Lesbare (Handschuh, Hallenlicht), Sofia Sans Condensed für Anlagen-Nummern und Zahlen. */
+@font-face{font-family:"AH Next";src:url("anlagencheck-files/atkinson-hyperlegible-next.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Sofia Cond";src:url("anlagencheck-files/sofia-sans-condensed.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+:root{
+  color-scheme:light;
+  --bg:#E4E7E5; --bg-2:#D8DCDA; --surface:#FBFCFB; --surface-2:#F1F3F2; --line:#C9D0CD; --line-2:#E0E5E2;
+  --ink:#172024; --ink-2:#46545A; --ink-3:#5F6C71;
+  --accent:#00727A; --accent-strong:#005A61; --accent-soft:#D3EAEA; --accent-ink:#FFFFFF;
+  --ok:#2C7329; --ok-fill:#3E9638; --ok-soft:#DDEFD8;
+  --due:#835500; --due-fill:#E0A11B; --due-soft:#FBEBC5;
+  --over:#AD241C; --over-fill:#D2392E; --over-soft:#F8DEDA;
+  --def:#62399F; --def-fill:#7B50C6; --def-soft:#EAE1F7;
+  --off:#283035; --off-fill:#3A4449; --off-soft:#DCE0E1;
+  --low:#3F5862; --low-fill:#6A8792; --low-soft:#E0E8EB;
+  --alu-1:#EEF1F1; --alu-2:#C7CDCE; --alu-ink:#253034;
+  --app-bg:#EDF0EF;
+  --f-ui:"AH Next",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-id:"Sofia Cond","Arial Narrow",system-ui,sans-serif;
+  --r-s:10px; --r-m:14px; --r-l:20px;
+  --focus:0 0 0 3px var(--surface),0 0 0 5px var(--accent);
+  --ease-out:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--f-ui);font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+a{color:var(--accent-strong)}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:8px}
+[hidden]{display:none!important}
+[tabindex="-1"]:focus{outline:none;box-shadow:none}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.id{font-family:var(--f-id);font-weight:700;letter-spacing:.01em}
+.num{font-family:var(--f-id);font-variant-numeric:tabular-nums}
+
+/* ---------- Status-Chips ---------- */
+.st{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 7px;border-radius:999px;font-size:12.5px;font-weight:650;line-height:1.3;white-space:nowrap}
+.st::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.st-ok{background:var(--ok-soft);color:var(--ok)} .st-due{background:var(--due-soft);color:var(--due)}
+.st-over{background:var(--over-soft);color:var(--over)} .st-def{background:var(--def-soft);color:var(--def)}
+.st-off{background:var(--off);color:#fff} .st-off::before{background:#FF8A7F}
+.pr{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;white-space:nowrap}
+.pr-hoch{background:var(--over-soft);color:var(--over)} .pr-mittel{background:var(--due-soft);color:var(--due)} .pr-niedrig{background:var(--low-soft);color:var(--low)}
+
+/* ---------- Typenschild ---------- */
+.plate{position:relative;border-radius:9px;color:var(--alu-ink);overflow:hidden;
+  background:
+    radial-gradient(circle at 9px 9px,#8C9699 0 2.6px,#E9EDED 3px,transparent 3.6px),
+    radial-gradient(circle at calc(100% - 9px) 9px,#8C9699 0 2.6px,#E9EDED 3px,transparent 3.6px),
+    radial-gradient(circle at 9px calc(100% - 9px),#8C9699 0 2.6px,#E9EDED 3px,transparent 3.6px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#8C9699 0 2.6px,#E9EDED 3px,transparent 3.6px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 1px,rgba(0,0,0,.025) 1px 2px,transparent 2px 4px),
+    linear-gradient(172deg,var(--alu-1),#DCE1E1 45%,var(--alu-2));
+  box-shadow:inset 0 0 0 1px rgba(60,72,76,.35),inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(20,30,34,.18)}
+.plate-band{background:var(--accent-strong);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:5px 22px;font-size:11px;font-weight:650;letter-spacing:.02em}
+.plate-body{display:flex;gap:12px;align-items:center;padding:10px 18px 14px 22px}
+.plate-id{font-family:var(--f-id);font-weight:800;font-size:30px;line-height:1;letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,255,255,.75),0 -1px 0 rgba(0,0,0,.18)}
+.plate-name{font-size:12.5px;font-weight:650;margin-top:4px;line-height:1.25}
+.plate-meta{font-size:11px;color:#46555A;margin-top:3px}
+.plate-qr{flex:none;background:#fff;padding:5px;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);line-height:0}
+.plate-qr svg{display:block;width:100%;height:auto}
+.plate-txt{min-width:0;flex:1}
+
+/* ======================= LEITSTAND ======================= */
+.ls{min-height:100vh;padding-right:var(--ls-pr,0px);transition:padding-right .55s var(--ease-out)}
+.ls-head{container-type:inline-size;position:sticky;top:0;z-index:20;background:rgba(228,231,229,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.ls-head-in{display:flex;align-items:center;gap:16px;padding:12px 24px;min-height:64px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--accent-strong);display:grid;place-items:center;color:#fff;flex:none}
+.brand-mark svg{width:20px;height:20px}
+.brand>div{min-width:0}
+.brand b{font-family:var(--f-id);font-size:21px;font-weight:800;letter-spacing:.01em;display:block;line-height:1}
+.brand>div>span{font-size:12.5px;color:var(--ink-2);display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ls-clock{flex:none;text-align:right;font-size:12.5px;color:var(--ink-2);line-height:1.3;white-space:nowrap}
+.ls-clock b{display:block;font-family:var(--f-id);font-size:18px;color:var(--ink);font-weight:700}
+.ls-actions{display:flex;gap:8px;flex:none}
+@container (max-width:1060px){.ls-clock{display:none}}
+@container (max-width:780px){.ls-actions .btn{padding:8px 10px}.ls-actions .btn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}
+@container (max-width:420px){.brand>div>span{display:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:650;font-size:14px;line-height:1.2;color:var(--ink);text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s,transform .12s}
+.btn:hover{background:#fff;border-color:#AEB8B4}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-pri:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:rgba(255,255,255,.6);border-color:var(--line)}
+.btn-s{min-height:34px;padding:6px 11px;font-size:13px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.ls-task{margin:16px 24px 0;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--r-m);background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent)}
+.ls-task{flex-wrap:wrap}
+.ls-task p{margin:0;font-size:14px;flex:1 1 300px;min-width:0}
+.ls-task .steps-mini{display:flex;gap:6px}
+.steps-mini i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.steps-mini i.on{background:var(--accent)}
+.ls-task.done{border-left-color:var(--ok-fill)}
+
+.ls-main{container-type:inline-size;padding:16px 24px 40px}
+.kpis{display:grid;grid-template-columns:1fr;gap:12px}
+@container (min-width:560px){.kpis{grid-template-columns:1fr 1fr}}
+@container (min-width:980px){.kpis{grid-template-columns:1.05fr 1.25fr 1fr 1fr}}
+.kpi{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-m);padding:14px 16px 16px;min-width:0}
+.kpi h2{margin:0 0 6px;font-size:13px;font-weight:650;color:var(--ink-2)}
+.kpi-big{font-family:var(--f-id);font-size:40px;font-weight:800;line-height:1;letter-spacing:-.01em}
+.kpi-big small{font-size:18px;font-weight:700;color:var(--ink-2);margin-left:2px}
+.kpi-sub{font-size:13px;color:var(--ink-2);margin-top:4px}
+.kpi-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bar{height:10px;border-radius:5px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-2);overflow:hidden;display:flex;margin-top:12px}
+.bar i{display:block;height:100%;transition:width .6s var(--ease-out)}
+.stackbar{display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px;margin-top:10px}
+.stackbar i{display:block;height:100%;transition:flex-grow .5s var(--ease-out)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.legend b{color:var(--ink);font-family:var(--f-id);font-size:15px}
+.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.prio-bars{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:8px;font-size:13px}
+.prio-bars .pb{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.prio-bars .pb i{display:block;height:100%;border-radius:4px;transition:width .5s var(--ease-out)}
+.prio-bars b{font-family:var(--f-id);font-size:16px}
+.over-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.over-list button{border:1px solid var(--over-soft);background:var(--over-soft);color:var(--over);border-radius:7px;padding:3px 8px;font:700 14px var(--f-id)}
+
+.row2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+@container (min-width:1000px){.row2{grid-template-columns:minmax(0,1fr) 340px}}
+.panel{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-m);min-width:0}
+.panel-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line-2)}
+.panel-h h2{margin:0;font-size:15px;font-weight:700}
+.panel-h .sub{font-size:12.5px;color:var(--ink-2)}
+.panel-h .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* Hallenplan */
+.plan-wrap{padding:12px 14px 6px;overflow-x:auto}
+.plan{display:block;width:100%;min-width:480px;height:auto}
+.plan .hall{fill:#F4F6F5;stroke:#9DA8A4;stroke-width:1.5}
+.plan .hall-l{font:700 15px var(--f-id);fill:#5F6C71}
+.plan .hall-s{font:500 11px var(--f-ui);fill:#7A868A}
+.plan .aisle{fill:none;stroke:#C5CDCA;stroke-width:1.2;stroke-dasharray:6 6}
+.plan .rail{stroke:#8E9A9E;stroke-width:2.5;stroke-dasharray:2 4}
+.plan .m{cursor:pointer}
+.plan .m rect.b{stroke-width:2;rx:6;transition:fill .3s}
+.plan .m text.mid{font:800 15px var(--f-id);fill:var(--ink);pointer-events:none}
+.plan .m text.mnm{font:500 10.5px var(--f-ui);fill:var(--ink-2);pointer-events:none}
+.plan .m:hover rect.b,.plan .m:focus-visible rect.b{stroke-width:3.5}
+.plan .m:focus{outline:none}
+.plan .m.ok rect.b{fill:var(--ok-soft);stroke:var(--ok-fill)}
+.plan .m.due rect.b{fill:var(--due-soft);stroke:var(--due-fill)}
+.plan .m.over rect.b{fill:var(--over-soft);stroke:var(--over-fill)}
+.plan .m.def rect.b{fill:var(--def-soft);stroke:var(--def-fill)}
+.plan .m.off rect.b{fill:url(#hatch);stroke:var(--off)}
+.plan .m.off text.mid,.plan .m.off text.mnm{fill:#fff}
+.plan .m .dot{stroke:#fff;stroke-width:2}
+.plan .m.ok .dot{fill:var(--ok-fill)} .plan .m.due .dot{fill:var(--due-fill)} .plan .m.over .dot{fill:var(--over-fill)} .plan .m.def .dot{fill:var(--def-fill)} .plan .m.off .dot{fill:#FF8A7F}
+.plan .m.flash rect.b{animation:flash 1.6s ease-out 2}
+@keyframes flash{0%{stroke-width:8;stroke-opacity:.5}100%{stroke-width:2;stroke-opacity:1}}
+.plan .m.me .ring{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:5 4;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-18}}
+.plan-legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:4px 16px 14px;font-size:12.5px;color:var(--ink-2)}
+.plan-legend span{display:inline-flex;align-items:center;gap:6px}
+.plan-legend i{width:14px;height:14px;border-radius:4px;border:2px solid}
+
+/* Live-Feed */
+.feed{list-style:none;margin:0;padding:6px 0;max-height:520px;overflow:auto}
+.feed li{position:relative}
+.feed-it{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;border:0;background:transparent;padding:10px 16px;border-radius:0}
+.feed-it:hover{background:var(--surface-2)}
+.feed-ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2)}
+.feed-ic svg{width:18px;height:18px}
+.feed-ic.k-pruefung{background:var(--ok-soft);color:var(--ok)} .feed-ic.k-mangel{background:var(--def-soft);color:var(--def)}
+.feed-ic.k-still{background:var(--off);color:#fff} .feed-ic.k-scan,.feed-ic.k-start{background:var(--accent-soft);color:var(--accent-strong)}
+.feed-ic.k-erledigt,.feed-ic.k-freigabe{background:var(--ok-soft);color:var(--ok)}
+.feed-ic.k-zuweisung,.feed-ic.k-zaehler{background:var(--low-soft);color:var(--low)}
+.feed-ic.k-nio{background:var(--over-soft);color:var(--over)}
+.feed-t{font-size:13.5px;font-weight:650;line-height:1.3}
+.feed-s{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.feed-time{font-size:12px;color:var(--ink-3);white-space:nowrap;text-align:right}
+.feed-new{display:inline-block;margin-left:6px;padding:0 6px;border-radius:5px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;vertical-align:1px}
+.feed li.is-new .feed-it{animation:newbg 18s linear forwards}
+.feed li.is-new::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:4px;border-radius:0 3px 3px 0;background:var(--accent);animation:newbar 18s linear forwards}
+@keyframes newbg{0%{background:#C9E6E6}8%{background:#DCEFEF}100%{background:transparent}}
+@keyframes newbar{0%,85%{opacity:1}100%{opacity:0}}
+.feed li.is-new .feed-it{animation-delay:var(--d,0s)} .feed li.is-new::before{animation-delay:var(--d,0s)}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--accent-strong)}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+/* Tabs */
+.tabs-wrap{margin-top:12px}
+.tabs{display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--line-2);overflow-x:auto}
+.tab{border:0;background:transparent;padding:9px 14px;border-radius:9px;font-weight:650;color:var(--ink-2);white-space:nowrap;display:inline-flex;gap:8px;align-items:center}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+.tab .cnt{font-family:var(--f-id);font-size:13px;background:var(--surface-2);color:var(--ink-2);border-radius:6px;padding:0 6px}
+.tab[aria-selected="true"] .cnt{background:rgba(255,255,255,.18);color:#fff}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px}
+.toolbar .r{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:650;color:var(--ink-2);min-height:34px}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong)}
+.tbl-wrap{position:relative;overflow-x:auto;border-top:1px solid var(--line-2)}
+table.tbl{border-collapse:collapse;width:100%;font-size:13.5px}
+.tbl th{text-align:left;font-weight:650;color:var(--ink-2);font-size:12.5px;padding:9px 12px;background:var(--surface-2);white-space:nowrap;border-bottom:1px solid var(--line-2)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#F6F8F7}
+.tbl .link{border:0;background:none;padding:0;color:var(--accent-strong);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,90,97,.35);text-underline-offset:3px}
+.tbl .idc{font:800 16px var(--f-id);white-space:nowrap}
+.tbl .muted{color:var(--ink-2);font-size:12.5px}
+.tbl tr.row-new{animation:rownew 4s ease-out}
+@keyframes rownew{0%{background:#C9E6E6}100%{background:transparent}}
+.tbl select{min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:4px 8px;font-size:13px;max-width:210px}
+.thumb{width:44px;height:34px;border-radius:6px;object-fit:cover;display:block;border:1px solid var(--line)}
+.empty{padding:28px 16px;text-align:center;color:var(--ink-2)}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;padding:16px}
+.qr-hint{margin:0;padding:14px 16px 0;color:var(--ink-2);font-size:13.5px;max-width:72ch}
+.qr-grid .plate{cursor:pointer;border:0;text-align:left;padding:0;width:100%;font:inherit}
+.qr-grid .plate .plate-qr{width:96px}
+.ls-foot{padding:0 24px 32px;font-size:12.5px;color:var(--ink-2);max-width:900px}
+
+/* Leitstand-Dialoge */
+dialog.dlg{border:0;padding:0;border-radius:var(--r-l);background:var(--surface);color:var(--ink);width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:0 30px 80px -20px rgba(10,22,26,.5)}
+dialog.dlg::backdrop{background:rgba(20,30,34,.5)}
+dialog.dlg-s{width:min(520px,calc(100vw - 32px))}
+.dlg-h{position:sticky;top:0;background:var(--surface);display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line-2);z-index:2}
+.dlg-h h2{margin:0;font-size:18px;font-weight:700}
+.dlg-h .x{margin-left:auto}
+.dlg-b{padding:18px 20px 22px}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:inline-grid;place-items:center;flex:none}
+.icon-btn:hover{background:#fff}
+.det-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media (min-width:760px){.det-grid{grid-template-columns:300px minmax(0,1fr)}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13.5px}
+.kv dt{color:var(--ink-2)} .kv dd{margin:0;font-weight:600}
+.sec-t{font-size:14px;font-weight:700;margin:18px 0 8px}
+.sec-t:first-child{margin-top:0}
+.mini-list{list-style:none;margin:0;padding:0;border:1px solid var(--line-2);border-radius:12px;overflow:hidden}
+.mini-list li{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line-2);font-size:13.5px}
+.mini-list li:last-child{border-bottom:0}
+.mini-list .grow{flex:1;min-width:0}
+
+/* Prüfprotokoll (geteilt) */
+.proto{font-size:13.5px}
+.proto-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding-bottom:12px;border-bottom:2px solid var(--ink)}
+.proto-head h3{margin:0;font-family:var(--f-id);font-size:26px;font-weight:800;line-height:1.05}
+.proto-head p{margin:2px 0 0;color:var(--ink-2)}
+.proto-res{padding:6px 12px;border-radius:8px;font-weight:700;white-space:nowrap}
+.proto-res.io{background:var(--ok-soft);color:var(--ok)} .proto-res.nio{background:var(--over-soft);color:var(--over)}
+.proto-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px 18px;margin:14px 0}
+.proto-kv div span{display:block;font-size:12px;color:var(--ink-2)}
+.proto-kv div b{font-weight:650}
+.proto-tbl-wrap{position:relative;overflow-x:auto;border:1px solid var(--line-2);border-radius:10px}
+.proto table{border-collapse:collapse;width:100%;min-width:520px}
+.proto th,.proto td{padding:8px 10px;border-bottom:1px solid var(--line-2);text-align:left;vertical-align:top}
+.proto th{font-size:12px;color:var(--ink-2);font-weight:650;background:var(--surface-2)}
+.proto tr:last-child td{border-bottom:0}
+.res{display:inline-block;min-width:52px;text-align:center;padding:2px 7px;border-radius:6px;font-weight:700;font-size:12.5px}
+.res.io{background:var(--ok-soft);color:var(--ok)} .res.nio{background:var(--over-soft);color:var(--over)} .res.na{background:var(--surface-2);color:var(--ink-2)}
+.val-bad{color:var(--over);font-weight:700}
+.proto-sig{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
+.proto-sig .sig{width:220px;height:84px;border-bottom:1.5px solid var(--ink);display:flex;align-items:flex-end}
+.proto-sig .sig img{max-width:100%;max-height:80px}
+.proto-fotos{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.proto-fotos img{width:56px;height:42px;object-fit:cover;border-radius:5px;border:1px solid var(--line)}
+
+/* Toast (Leitstand) */
+.ls-toasts{position:fixed;left:24px;bottom:24px;z-index:90;display:flex;flex-direction:column;gap:8px;max-width:min(420px,calc(100vw - 48px))}
+.toast{display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;padding:11px 12px 11px 16px;border-radius:12px;box-shadow:0 14px 30px -10px rgba(0,0,0,.4);font-size:14px;animation:tin .3s var(--ease-out)}
+.toast button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px}
+@keyframes tin{from{transform:translateY(12px);opacity:0}}
+
+/* ======================= BÜHNE + HANDY ======================= */
+.stage{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:48px;padding:24px;background:rgba(18,28,32,.56);backdrop-filter:blur(2.5px);-webkit-backdrop-filter:blur(2.5px);transition:opacity .45s ease,visibility .45s}
+.stage.hide{opacity:0;visibility:hidden;pointer-events:none}
+.stage-slot{flex:none;width:var(--pw);height:var(--ph)}
+.taskcard{width:300px;flex:none;background:var(--surface);border-radius:var(--r-l);padding:22px 22px 20px;box-shadow:0 30px 60px -30px rgba(0,0,0,.5);animation:cardin .7s .35s var(--ease-out) both}
+@keyframes cardin{from{opacity:0;transform:translateX(-24px)}}
+.taskcard h2{margin:0 0 6px;font-family:var(--f-id);font-size:26px;font-weight:800;line-height:1.05}
+.taskcard p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px}
+.taskcard p strong{color:var(--ink)}
+.tsteps{list-style:none;margin:0 0 16px;padding:0;counter-reset:s}
+.tsteps li{counter-increment:s;display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line-2);font-size:14px}
+.tsteps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;font:800 14px var(--f-id);background:var(--surface-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
+.tsteps li.on::before{content:"✓";background:var(--ok-fill);color:#fff;box-shadow:none}
+.tsteps li.cur{font-weight:700}
+.tsteps li.cur::before{background:var(--accent);color:#fff;box-shadow:none}
+.taskcard .note{font-size:12.5px;color:var(--ink-3);margin:12px 0 0}
+.stage-ctrl{display:flex;flex-direction:column;gap:10px;flex:none;animation:cardin .7s .45s var(--ease-out) both}
+.pill{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 16px 10px 12px;background:rgba(255,255,255,.94);color:var(--ink);font-weight:700;font-size:14px;box-shadow:0 8px 20px -8px rgba(0,0,0,.45);white-space:nowrap}
+.pill:hover{background:#fff}
+.stage.narrow{flex-direction:column;gap:14px;padding:12px}
+.stage.narrow .taskcard{width:min(560px,100%);padding:12px 16px;display:flex;gap:12px;align-items:center}
+.stage.narrow .taskcard h2{font-size:18px;margin:0}
+.stage.narrow .taskcard p{margin:0;font-size:13px}
+.stage.narrow .taskcard .tsteps,.stage.narrow .taskcard .note{display:none}
+.stage.narrow .stage-ctrl{flex-direction:row}
+
+.shell{position:fixed;left:0;top:0;width:414px;height:868px;z-index:60;transform-origin:0 0;will-change:transform}
+.shell.anim{transition:transform .6s var(--ease-out),opacity .45s ease}
+.shell.pop{animation:pop .85s cubic-bezier(.2,1.25,.35,1) both}
+@keyframes pop{0%{opacity:0;transform:var(--t0)}35%{opacity:1}100%{opacity:1;transform:var(--t1)}}
+.shell.min{opacity:0;pointer-events:none}
+.frame{position:absolute;inset:0;border-radius:66px;padding:12px;
+  background:linear-gradient(140deg,#5B666B 0%,#262E31 22%,#1A2023 55%,#3A4448 100%);
+  box-shadow:inset 0 0 0 1.5px #0B0F10,inset 0 0 0 3px #6D787C,0 50px 90px -30px rgba(5,15,18,.65),0 22px 40px -22px rgba(5,15,18,.6)}
+.frame::before{content:"";position:absolute;inset:5px;border-radius:61px;background:#06090A}
+.frame .sb{position:absolute;width:4px;background:linear-gradient(90deg,#1B2224,#4C575B);border-radius:2px}
+.sb.l1{left:-3px;top:150px;height:30px}.sb.l2{left:-3px;top:206px;height:58px}.sb.l3{left:-3px;top:276px;height:58px}.sb.r1{right:-3px;top:232px;height:92px;background:linear-gradient(270deg,#1B2224,#4C575B)}
+.screen{position:absolute;inset:12px;border-radius:54px;overflow:hidden;background:var(--app-bg);isolation:isolate;transform:translateZ(0)}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:80;pointer-events:none}
+.side-ctrl{position:fixed;z-index:61;display:flex;flex-direction:column;gap:8px;transition:opacity .3s}
+.side-ctrl .icon-btn{width:44px;height:44px;border-radius:50%;box-shadow:0 6px 16px -6px rgba(0,0,0,.35);border-color:var(--line)}
+.bubble{position:fixed;right:24px;bottom:24px;z-index:62;display:flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:12px 18px 12px 14px;background:var(--ink);color:#fff;font-weight:700;font-size:14.5px;box-shadow:0 16px 34px -12px rgba(0,0,0,.55);animation:tin .35s var(--ease-out)}
+.bubble .cnt{background:var(--accent);border-radius:999px;padding:0 7px;font-size:12.5px}
+
+/* ======================= HANDY-APP ======================= */
+.app{--sat:50px;--sab:24px;position:absolute;inset:0;display:flex;flex-direction:column;background:var(--app-bg);font-size:16px;line-height:1.4;color:var(--ink);overflow:hidden}
+.sbar{position:absolute;top:0;left:0;right:0;height:50px;z-index:70;display:flex;justify-content:space-between;align-items:center;padding:6px 34px 0 44px;font:700 16px var(--f-ui);pointer-events:none;color:var(--ink);transition:color .3s}
+.sbar .sic{display:flex;gap:6px;align-items:center}
+.sbar svg{height:13px;width:auto;fill:currentColor}
+.app.dark .sbar{color:#fff}
+.views{position:relative;flex:1;min-height:0}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:var(--sat);padding-bottom:24px;background:var(--app-bg);scrollbar-width:none}
+.view::-webkit-scrollbar{display:none}
+.view:has(.dock){padding-bottom:0}
+.view.in-r{animation:inr .38s var(--ease-out)} .view.out-l{animation:outl .38s var(--ease-out) forwards}
+.view.in-l{animation:inl .38s var(--ease-out)} .view.out-r{animation:outr .38s var(--ease-out) forwards;z-index:3}
+.view.in-f{animation:inf .22s ease-out}
+@keyframes inr{from{transform:translateX(100%)}} @keyframes outl{to{transform:translateX(-28%);filter:brightness(.92)}}
+@keyframes inl{from{transform:translateX(-28%)}} @keyframes outr{to{transform:translateX(100%)}}
+@keyframes inf{from{opacity:0;transform:translateY(6px)}}
+.app-bar{position:sticky;top:calc(var(--sat) * -1);margin-top:calc(var(--sat) * -1);padding-top:var(--sat);z-index:10;background:rgba(237,240,239,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent}
+.app-bar.sc{border-bottom-color:var(--line-2)}
+.app-bar-in{display:flex;align-items:center;gap:4px;height:52px;padding:0 8px}
+.app-bar h1{margin:0;font-size:17px;font-weight:700;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+.back{display:inline-flex;align-items:center;gap:2px;border:0;background:none;color:var(--accent-strong);font-weight:650;font-size:16px;min-height:44px;padding:0 8px 0 2px;border-radius:10px}
+.back svg{width:26px;height:26px}
+.bar-sp{width:72px;flex:none;display:flex;justify-content:flex-end}
+.bar-sp:first-child{justify-content:flex-start}
+.lt{padding:10px 20px 6px}
+.lt-row{display:flex;align-items:flex-start;gap:12px}
+.lt h1{margin:0;font-family:var(--f-id);font-size:34px;font-weight:800;line-height:1.02;letter-spacing:-.005em;flex:1}
+.lt-sub{margin:0 0 4px;font-size:14px;color:var(--ink-2)}
+.a-ic{width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);display:grid;place-items:center;align-items:center;justify-content:center;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2);flex:none}
+.a-sec{padding:0 16px;margin-top:18px}
+.a-sec h2{font-size:15px;font-weight:700;margin:0 4px 8px;display:flex;align-items:center;gap:8px}
+.a-sec h2 .c{font-family:var(--f-id);font-size:14px;color:var(--ink-2);font-weight:700}
+.a-card{background:var(--surface);border-radius:var(--r-l);box-shadow:inset 0 0 0 1px var(--line-2)}
+.a-list{list-style:none;margin:0;padding:0;background:var(--surface);border-radius:var(--r-l);box-shadow:inset 0 0 0 1px var(--line-2);overflow:hidden}
+.a-list>li+li{border-top:1px solid var(--line-2)}
+.a-row{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border:0;background:none;text-align:left;font-size:15px}
+.a-row:active{background:var(--surface-2)}
+.a-row .grow{flex:1;min-width:0}
+.a-row .t{font-weight:700;line-height:1.25}
+.a-row .s{font-size:13.5px;color:var(--ink-2);margin-top:2px;line-height:1.3}
+.a-row .chev{color:#9AA5A8;width:18px;height:18px}
+.tag-id{flex:none;min-width:62px;height:44px;padding:0 8px;border-radius:9px;display:grid;place-items:center;font:800 17px var(--f-id);letter-spacing:.02em;background:linear-gradient(172deg,#F2F4F4,#CDD3D4);box-shadow:inset 0 0 0 1px rgba(60,72,76,.3);color:var(--alu-ink)}
+.tag-id.over{box-shadow:inset 4px 0 0 var(--over-fill),inset 0 0 0 1px rgba(60,72,76,.3)}
+.tag-id.due{box-shadow:inset 4px 0 0 var(--due-fill),inset 0 0 0 1px rgba(60,72,76,.3)}
+.tag-id.ok{box-shadow:inset 4px 0 0 var(--ok-fill),inset 0 0 0 1px rgba(60,72,76,.3)}
+.tag-id.def{box-shadow:inset 4px 0 0 var(--def-fill),inset 0 0 0 1px rgba(60,72,76,.3)}
+.tag-id.off{background:var(--off);color:#fff}
+.due-t{font-size:13px;font-weight:700;white-space:nowrap}
+.due-t.over{color:var(--over)} .due-t.due{color:var(--due)} .due-t.soon{color:var(--ink-2)}
+.typ{display:inline-block;font-size:12px;font-weight:700;padding:1px 7px;border-radius:5px;background:var(--surface-2);color:var(--ink-2);margin-right:6px;vertical-align:1px}
+.typ.w{background:var(--accent-soft);color:var(--accent-strong)}
+
+.demo-task{margin:12px 16px 0;padding:14px 14px 14px 16px;border-radius:var(--r-l);background:var(--accent-strong);color:#fff;display:flex;gap:12px;align-items:flex-start}
+.demo-task b{display:block;font-size:13px;font-weight:650;opacity:.85;margin-bottom:2px}
+.demo-task p{margin:0;font-size:15px;line-height:1.35}
+.demo-task .x{margin-left:auto;border:0;background:rgba(255,255,255,.14);color:#fff;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none}
+.scan-cta{margin:14px 16px 0;width:calc(100% - 32px);display:flex;align-items:center;gap:14px;padding:16px;border:0;border-radius:var(--r-l);background:var(--ink);color:#fff;text-align:left;min-height:84px;position:relative;overflow:hidden}
+.scan-cta .qrbox{width:52px;height:52px;border-radius:12px;background:var(--accent);display:grid;place-items:center;flex:none}
+.scan-cta .qrbox svg{width:30px;height:30px}
+.scan-cta b{display:block;font-size:19px;font-family:var(--f-id);font-weight:800;letter-spacing:.01em}
+.scan-cta span{display:block;font-size:13.5px;opacity:.78;margin-top:1px}
+.scan-cta::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;border:16px solid rgba(255,255,255,.05)}
+.sum3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 16px 0}
+.sum3 div{background:var(--surface);border-radius:16px;padding:10px 12px;box-shadow:inset 0 0 0 1px var(--line-2)}
+.sum3 b{display:block;font:800 28px/1 var(--f-id)}
+.sum3 span{font-size:12.5px;color:var(--ink-2)}
+.sum3 .o b{color:var(--over)} .sum3 .d b{color:var(--due)}
+.a-empty{padding:18px 16px;text-align:center;color:var(--ink-2);font-size:14.5px}
+
+/* Scan */
+.view.scan{background:#0E1517;color:#fff;padding-bottom:0}
+.scan-top{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px}
+.scan-top h1{margin:0;font-family:var(--f-id);font-size:30px;font-weight:800}
+.vf{position:relative;margin:10px auto 0;width:268px;height:268px;border-radius:26px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#22302F,#0B1112 75%)}
+.vf video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vf .c{position:absolute;width:46px;height:46px;border:4px solid #fff;transition:border-color .2s,transform .3s var(--ease-out)}
+.vf .c1{left:14px;top:14px;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.vf .c2{right:14px;top:14px;border-left:0;border-bottom:0;border-radius:0 14px 0 0}
+.vf .c3{left:14px;bottom:14px;border-right:0;border-top:0;border-radius:0 0 0 14px}
+.vf .c4{right:14px;bottom:14px;border-left:0;border-top:0;border-radius:0 0 14px 0}
+.vf .laser{position:absolute;left:24px;right:24px;top:30px;height:2px;background:#5EE6E0;box-shadow:0 0 12px 2px rgba(94,230,224,.7);animation:laser 2.2s ease-in-out infinite alternate;opacity:.9}
+@keyframes laser{to{top:236px}}
+.vf .sim{position:absolute;inset:0;display:grid;place-items:center;opacity:0}
+.vf .sim .plate{width:220px;transform:scale(.6) rotate(-8deg);transition:transform .7s var(--ease-out)}
+.vf.scanning .sim{opacity:1;transition:opacity .2s}
+.vf.scanning .sim .plate{transform:scale(1) rotate(0)}
+.vf.hit .c{border-color:#57D17A;transform:scale(.86)}
+.vf.hit .c1{transform:translate(18px,18px)} .vf.hit .c2{transform:translate(-18px,18px)} .vf.hit .c3{transform:translate(18px,-18px)} .vf.hit .c4{transform:translate(-18px,-18px)}
+.vf.hit .laser{display:none}
+.vf .msg{position:absolute;left:0;right:0;bottom:0;padding:10px;text-align:center;font-size:13px;color:rgba(255,255,255,.8)}
+.vf.hit::after{content:"";position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 0 0 4px #57D17A;animation:hitf .6s ease-out}
+@keyframes hitf{0%{background:rgba(87,209,122,.35)}100%{background:transparent}}
+.scan-state{text-align:center;font-size:14.5px;margin:12px 24px 0;min-height:42px;color:rgba(255,255,255,.86)}
+.scan-state b{color:#7FE3A0}
+.cam-btn{display:flex;margin:4px auto 0;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 18px;background:rgba(255,255,255,.12);color:#fff;font-weight:700;min-height:44px}
+.sim-panel{margin-top:16px;background:var(--app-bg);color:var(--ink);border-radius:26px 26px 0 0;padding:16px 16px 28px;min-height:400px}
+.sim-panel h2{margin:0 4px;font-size:17px;font-weight:700}
+.sim-panel p{margin:2px 4px 12px;font-size:13.5px;color:var(--ink-2)}
+.sim-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sim-it .plate-band span+span{display:none}
+.sim-it .plate-txt{overflow:hidden}
+.sim-it .plate-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-it{border:0;padding:0;background:none;text-align:left;border-radius:12px;position:relative}
+.sim-it .plate-band{padding:4px 14px;font-size:10px}
+.sim-it .plate-body{padding:8px 10px 10px 14px;gap:8px}
+.sim-it .plate-id{font-size:21px}
+.sim-it .plate-name{font-size:11px;font-weight:600;margin-top:2px}
+.sim-it .plate-qr{width:48px;padding:3px}
+.sim-it.goal::after{content:"Aufgabe";position:absolute;right:6px;top:-8px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px}
+
+/* Akte */
+.akte-plate{margin:8px 16px 0}
+.akte-plate .plate-id{font-size:40px}
+.akte-plate .plate-qr{width:78px}
+.akte-plate .plate-name{font-size:14px}
+.banner{margin:12px 16px 0;padding:12px 14px;border-radius:16px;display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.35}
+.banner svg{margin-top:1px}
+.banner.over{background:var(--over-soft);color:#7E1A14} .banner.due{background:var(--due-soft);color:#5E3D00} .banner.ok{background:var(--ok-soft);color:#1F521D} .banner.def{background:var(--def-soft);color:#45277A}
+.banner.off{background:repeating-linear-gradient(-45deg,#2A3237 0 12px,#343E43 12px 24px);color:#fff}
+.banner b{display:block}
+.big-act{display:grid;gap:8px;margin:12px 16px 0}
+.abtn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;border-radius:16px;border:0;font-size:17px;font-weight:700;padding:12px 18px;background:var(--accent);color:#fff;width:100%;text-align:center;transition:transform .12s,background .15s}
+.abtn:active{transform:scale(.975)}
+.abtn.sec{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.abtn.warn{background:var(--surface);color:var(--over);box-shadow:inset 0 0 0 1.5px #E7B4AE}
+.abtn.dark{background:var(--ink)}
+.abtn[aria-disabled="true"]{background:#9FB4B5}
+.abtn .sub{font-size:13px;font-weight:600;opacity:.85}
+.plan-row{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.plan-row .grow{flex:1;min-width:0}
+.plan-row .t{font-weight:700}
+.plan-row .s{font-size:13.5px;color:var(--ink-2)}
+.plan-row .go{border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;min-height:44px;padding:0 14px;font-size:14.5px}
+.plan-row .go.ghost{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.counter{display:flex;align-items:center;gap:14px;padding:14px}
+.counter .v{font:800 34px/1 var(--f-id);letter-spacing:.01em}
+.counter .v small{font-size:17px;color:var(--ink-2);margin-left:3px}
+.counter .s{font-size:13px;color:var(--ink-2);margin-top:3px}
+.counter button{margin-left:auto}
+.kv2{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;padding:14px;margin:0;font-size:14.5px}
+.kv2 dt{color:var(--ink-2)} .kv2 dd{margin:0;font-weight:650;text-align:right}
+.doc-ic{width:40px;height:44px;border-radius:7px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);display:grid;place-items:center;font:800 11px var(--f-id);color:var(--ink-2);flex:none;position:relative}
+.doc-ic.pdf{color:#9C2A20}
+
+/* Checkliste */
+.prog{height:4px;background:var(--line-2)}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .35s var(--ease-out)}
+.prog-t{font:700 13px var(--f-ui);color:var(--ink-2);text-align:center;padding:0 0 6px}
+.cl-intro{padding:14px 20px 4px;font-size:14px;color:var(--ink-2)}
+.cl-intro b{color:var(--ink);font-size:15px}
+.pp{margin:12px 12px 0;background:var(--surface);border-radius:var(--r-l);box-shadow:inset 0 0 0 1px var(--line-2);padding:14px 14px 12px;scroll-margin-top:120px;transition:box-shadow .25s}
+.pp.done-io{box-shadow:inset 0 0 0 1px var(--line-2),inset 4px 0 0 var(--ok-fill)}
+.pp.done-nio{box-shadow:inset 0 0 0 1.5px #E6AFA9,inset 4px 0 0 var(--over-fill)}
+.pp.done-na{box-shadow:inset 0 0 0 1px var(--line-2),inset 4px 0 0 #A9B4B7}
+.pp.need{box-shadow:inset 0 0 0 2px var(--over-fill);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pp-head{display:flex;gap:12px;align-items:flex-start}
+.pp-no{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);font:800 15px var(--f-id);color:var(--ink-2);margin-top:1px}
+.pp.done-io .pp-no{background:var(--ok-fill);color:#fff;box-shadow:none}
+.pp.done-nio .pp-no{background:var(--over-fill);color:#fff;box-shadow:none}
+.pp.done-na .pp-no{background:#A9B4B7;color:#fff;box-shadow:none}
+.pp h3{margin:2px 0 0;font-size:16.5px;font-weight:700;line-height:1.25}
+.pp-hint{margin:3px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.35}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:12px 0 0;padding:0;border:0;min-width:0}
+.seg legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.seg label{position:relative;display:block}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:2;width:100%;height:100%}
+.seg span{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border-radius:13px;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:700;font-size:15.5px;color:var(--ink-2);transition:background .15s,color .15s,box-shadow .15s,transform .12s;user-select:none}
+.seg span svg{width:18px;height:18px}
+.seg label:active span{transform:scale(.95)}
+.seg input:focus-visible+span{box-shadow:inset 0 0 0 1.5px var(--line),0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
+.seg input:checked+span.io{background:var(--ok-fill);color:#fff;box-shadow:none}
+.seg input:checked+span.nio{background:var(--over-fill);color:#fff;box-shadow:none}
+.seg input:checked+span.na{background:#7E8B8F;color:#fff;box-shadow:none}
+.seg.prio input:checked+span.hoch{background:var(--over-fill);color:#fff;box-shadow:none}
+.seg.prio input:checked+span.mittel{background:var(--due-fill);color:#2C1D00;box-shadow:none}
+.seg.prio input:checked+span.niedrig{background:var(--low-fill);color:#fff;box-shadow:none}
+.seg.prio span{min-height:46px;font-size:14.5px}
+.seg input:checked+span{animation:tick .28s var(--ease-out)}
+@keyframes tick{40%{transform:scale(1.05)}}
+.mess{margin-top:12px}
+.mess-row{display:flex;gap:10px;align-items:stretch}
+.mess-in{flex:1;min-width:0;display:flex;align-items:center;border-radius:13px;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line);padding:0 14px;min-height:56px;transition:box-shadow .15s}
+.mess-in:focus-within{box-shadow:inset 0 0 0 2px var(--accent)}
+.mess-in.bad{box-shadow:inset 0 0 0 2px var(--over-fill);background:#FFF5F4}
+.mess-in.good{box-shadow:inset 0 0 0 2px var(--ok-fill)}
+.mess-in input{flex:1;min-width:0;border:0;background:transparent;font:800 26px var(--f-id);padding:6px 0;outline:none;letter-spacing:.01em}
+.mess-in input::placeholder{font:600 16px var(--f-ui);color:#97A3A1;letter-spacing:0}
+.mess-in .u{font:700 17px var(--f-id);color:var(--ink-2);margin-left:6px}
+.na-btn{border:0;border-radius:13px;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:700;color:var(--ink-2);padding:0 14px;min-width:64px}
+.na-btn[aria-pressed="true"]{background:#7E8B8F;color:#fff;box-shadow:none}
+.mess label.ml{display:block;font-size:13px;font-weight:650;color:var(--ink-2);margin:0 0 6px 2px}
+.gauge{position:relative;height:30px;margin:10px 4px 0}
+.gauge .tr{position:absolute;left:0;right:0;top:9px;height:8px;border-radius:4px;background:#E7D2CF}
+.gauge .zn{position:absolute;top:9px;height:8px;background:var(--ok-fill);border-radius:2px}
+.gauge .mk{position:absolute;top:2px;width:4px;height:22px;margin-left:-2px;border-radius:2px;background:var(--ink);transition:left .3s var(--ease-out);box-shadow:0 0 0 2px #fff}
+.gauge .lb{position:absolute;top:19px;font:700 11.5px var(--f-id);color:var(--ink-2);transform:translateX(-50%);white-space:nowrap}
+.mess-eval{margin:6px 2px 0;font-size:14px;font-weight:700;min-height:20px}
+.mess-eval.bad{color:var(--over)} .mess-eval.good{color:var(--ok)}
+.pp-tools{display:flex;gap:8px;margin-top:10px}
+.tool{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:11px;background:transparent;color:var(--accent-strong);font-weight:700;font-size:14.5px;min-height:44px;padding:0 12px 0 8px}
+.tool:active{background:var(--accent-soft)}
+.tool .n{font:800 13px var(--f-id);background:var(--accent);color:#fff;border-radius:999px;padding:0 6px;margin-left:2px}
+.pp-fotos{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.pp-fotos figure{margin:0;position:relative}
+.pp-fotos img{width:84px;height:63px;object-fit:cover;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.pp-fotos button{position:absolute;right:-6px;top:-6px;width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:var(--ink);color:#fff;display:grid;place-items:center;padding:0}
+.pp-fotos button svg{width:13px;height:13px}
+.field{margin-top:10px}
+.field label,.flabel{display:block;font-size:13.5px;font-weight:650;color:var(--ink-2);margin:0 0 6px 2px}
+.field textarea,.field input[type=text],.field input:not([type]),.field select{width:100%;border:0;border-radius:13px;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line);padding:12px 14px;font-size:16px;min-height:52px;resize:vertical;outline:none}
+.field textarea{min-height:84px}
+.field textarea:focus,.field input:focus,.field select:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+.field .err,.f-err{display:block;color:var(--over);font-size:13.5px;font-weight:650;margin:6px 2px 0}
+.field.bad textarea,.field.bad input,.field.bad select{box-shadow:inset 0 0 0 2px var(--over-fill)}
+.pp-def{margin-top:12px;border-radius:14px;background:var(--over-soft);padding:12px;animation:inf .25s ease-out}
+.pp-def>p{margin:0 0 8px;font-size:14px;font-weight:700;color:#7E1A14;display:flex;gap:8px;align-items:center}
+.sw-row{display:flex;align-items:center;gap:12px;margin-top:10px;min-height:48px}
+.sw-row .txt{flex:1;font-size:14.5px;font-weight:650;line-height:1.3}
+.sw-row .txt small{display:block;font-weight:500;font-size:13px;color:var(--ink-2)}
+.switch{position:relative;width:54px;height:32px;border-radius:16px;border:0;background:#B9C3C1;flex:none;padding:0;transition:background .2s}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .22s var(--ease-out)}
+.switch[aria-checked="true"]{background:var(--over-fill)}
+.switch[aria-checked="true"]::after{transform:translateX(22px)}
+.pp-err{margin:8px 2px 0;color:var(--over);font-size:13.5px;font-weight:700}
+.dock{position:sticky;bottom:0;z-index:5;padding:10px 16px calc(var(--sab) + 8px);background:rgba(237,240,239,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line-2);margin-top:16px}
+.dock .hint{text-align:center;font-size:13px;color:var(--ink-2);margin:0 0 8px;font-weight:650}
+
+/* Abschluss */
+.sum-big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 16px 0}
+.sum-big div{background:var(--surface);border-radius:16px;padding:12px;box-shadow:inset 0 0 0 1px var(--line-2);text-align:center}
+.sum-big b{display:block;font:800 32px/1 var(--f-id)}
+.sum-big span{font-size:13px;color:var(--ink-2)}
+.sum-big .io b{color:var(--ok)} .sum-big .nio b{color:var(--over)}
+.sigpad{position:relative;margin-top:2px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line);height:170px;overflow:hidden;touch-action:none}
+.sigpad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.sigpad .base{position:absolute;left:18px;right:18px;bottom:38px;border-bottom:1.5px dashed #AAB4B2;pointer-events:none}
+.sigpad .ph{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:13px;color:var(--ink-3);pointer-events:none}
+.field.bad .sigpad{box-shadow:inset 0 0 0 2px var(--over-fill)}
+.sig-tools{display:flex;justify-content:space-between;margin-top:4px}
+.chk{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer;font-size:15px;line-height:1.35}
+.chk input{width:24px;height:24px;margin:0;accent-color:var(--accent);flex:none}
+.chk.bad{box-shadow:inset 0 0 0 2px var(--over-fill)}
+
+/* Fertig */
+.done-wrap{text-align:center;padding:24px 22px 0}
+.plakette{width:210px;height:210px;margin:14px auto 6px;position:relative}
+.plakette svg{width:100%;height:100%;display:block;overflow:visible}
+.plakette.drop svg{animation:stamp .7s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes stamp{0%{transform:scale(1.9) rotate(-28deg);opacity:0}55%{opacity:1}100%{transform:scale(1) rotate(-6deg)}}
+.plakette.drop::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--accent);opacity:0;animation:wave .9s .45s ease-out}
+@keyframes wave{0%{opacity:.7;transform:scale(.9)}100%{opacity:0;transform:scale(1.35)}}
+.done-wrap h2{font-family:var(--f-id);font-size:30px;font-weight:800;margin:12px 0 6px;line-height:1.05}
+.done-wrap p{margin:0 auto;color:var(--ink-2);font-size:15px;max-width:30ch}
+
+/* Mangel-Formular */
+.f-sec{margin:14px 16px 0}
+.prio-help{font-size:13px;color:var(--ink-2);margin:6px 2px 0;min-height:18px}
+.anl-pick{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2)}
+.anl-pick .grow{flex:1;min-width:0}
+.foto-drop{display:flex;gap:8px}
+.foto-drop button,.foto-drop label{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:80px;border-radius:16px;border:0;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:700;font-size:14px;color:var(--accent-strong);cursor:pointer;position:relative}
+.foto-drop label input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.foto-drop label:focus-within{box-shadow:inset 0 0 0 1.5px var(--line),0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
+.foto-drop small{font-size:12px;color:var(--ink-3);font-weight:600}
+
+/* Tab-Leiste */
+.tabbar{position:relative;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:6px 6px calc(var(--sab) + 2px);background:rgba(251,252,251,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line-2);transition:transform .3s var(--ease-out)}
+.tabbar.hide{display:none}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;padding:6px 0 4px;font-size:11.5px;font-weight:650;color:var(--ink-3);min-height:52px;position:relative}
+.tb svg{width:25px;height:25px;stroke-width:1.8}
+.tb[aria-current="page"]{color:var(--accent-strong)}
+.tb[aria-current="page"] svg{stroke-width:2.3}
+.tb .badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--over-fill);color:#fff;font:800 12px/18px var(--f-id);padding:0 5px}
+.tb.scan-tb .ring{width:58px;height:58px;margin-top:-24px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 8px 18px -6px rgba(0,90,97,.6),0 0 0 5px var(--app-bg)}
+.tb.scan-tb .ring svg{width:28px;height:28px;stroke-width:2.1}
+.tb.scan-tb[aria-current="page"] .ring{background:var(--ink)}
+.home-ind{position:absolute;left:50%;bottom:8px;width:136px;height:5px;margin-left:-68px;border-radius:3px;background:#101618;z-index:90;pointer-events:none;transition:background .3s}
+.app.dark .home-ind{background:#fff}
+
+/* Haptik */
+.hap{animation:hap .22s ease-out}
+@keyframes hap{0%{transform:scale(1)}40%{transform:scale(.94)}100%{transform:scale(1)}}
+
+/* App-Sheets und Toast */
+.sheet-layer{position:absolute;inset:0;z-index:60;pointer-events:none}
+.sheet-scrim{position:absolute;inset:0;background:rgba(14,22,24,.45);opacity:0;transition:opacity .25s;pointer-events:auto}
+.sheet-layer.open .sheet-scrim{opacity:1}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;max-height:calc(100% - var(--sat) - 20px);overflow:auto;background:var(--surface);border-radius:28px;padding:10px 18px calc(var(--sab) + 10px);transform:translateY(105%);transition:transform .32s var(--ease-out);pointer-events:auto;outline:none}
+.sheet-layer.open .sheet{transform:none}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:#C9D0CD;margin:0 auto 10px}
+.sheet h2{margin:0 0 4px;font-size:19px;font-weight:700}
+.sheet p.lead{margin:0 0 12px;font-size:14.5px;color:var(--ink-2)}
+.sheet .abtn+.abtn{margin-top:8px}
+.doc-prev{border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);padding:16px;margin:8px 0 12px}
+.doc-prev .l{height:7px;border-radius:4px;background:#E2E6E5;margin:7px 0}
+.doc-prev h4{margin:0 0 8px;font-size:15px}
+.app-toast{position:absolute;left:12px;right:12px;bottom:calc(var(--sab) + 84px);z-index:70;display:flex;justify-content:center;pointer-events:none}
+.app-toast .toast{pointer-events:auto;max-width:100%}
+.app-toast.low{bottom:calc(var(--sab) + 16px)}
+
+/* ======================= RESPONSIV ======================= */
+@media (max-width:759.98px){
+  .stage,.side-ctrl,.bubble{display:none!important}
+  .shell{position:fixed;inset:0;width:auto;height:auto;transform:none!important;z-index:40;animation:none!important;opacity:1!important}
+  .frame{border-radius:0;padding:0;background:none;box-shadow:none}
+  .frame::before,.frame .sb,.island,.sbar{display:none}
+  .screen{inset:0;border-radius:0;transform:none}
+  .app{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+  .home-ind{display:none}
+  body.m-ls .shell{display:none}
+  body:not(.m-ls) .ls{display:none}
+  .ls{padding-right:0!important;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .ls-head-in{padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));flex-wrap:wrap;gap:10px}
+  .ls-clock{display:none}
+  .ls-main{padding:12px 16px 24px}
+  .ls-task{margin:12px 16px 0}
+  .ls-foot{padding:0 16px 24px}
+  .m-back{display:flex!important}
+  .ls-toasts{left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+.m-back{display:none;position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(251,252,251,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.m-back .abtn{min-height:52px;font-size:16px}
+.only-m{display:none}
+@media (max-width:759.98px){.only-m{display:inline-flex}.only-d{display:none!important}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .vf .laser{display:none}
+}
+@media print{
+  body *{visibility:hidden}
+  dialog.dlg[open],dialog.dlg[open] *{visibility:visible}
+  dialog.dlg[open]{position:absolute;left:0;top:0;width:100%;max-height:none;box-shadow:none}
+  .dlg-h button{display:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4M20 17v3"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></symbol>
+    <symbol id="i-fab" viewBox="0 0 24 24"><path d="M3 21V10l5 3V10l5 3V6l8-3v18z"/><path d="M7 17h2M12 17h2M17 17h1"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 2.6 19.5a1 1 0 0 0 .9 1.5h17a1 1 0 0 0 .9-1.5z"/><path d="M12 10v4.5M12 17.5v.01"/></symbol>
+    <symbol id="i-hist" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l1.6-2.4A1.5 1.5 0 0 1 9.9 5h4.2a1.5 1.5 0 0 1 1.3.6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8.5 12.5h7M8.5 16h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.5 12.5 5 5 10-11"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.7"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M4.5 20h15"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.7"/><path d="M4 4v4.7h4.7"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8.5 20h7M12 16v4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="m12 13.5 4-5"/><circle cx="12" cy="14" r="1.5"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5"/><path d="M14.5 6.5 17 4l3 3-2.5 2.5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M14 4v16"/><path d="m7.5 10 2.5 2-2.5 2"/></symbol>
+    <symbol id="i-center" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1.2"/></symbol>
+    <symbol id="i-min" viewBox="0 0 24 24"><path d="M6 15l6 5 6-5M12 4v15"/></symbol>
+    <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 3.5 3 2.5-2 4.5 4"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20c3-1 4-4 6-4s1 3 3 3 3-3 4-3 1.5 2 3 2"/><path d="m14 4 3 3-8 8H6v-3z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5V10a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v7H17"/><rect x="7" y="14" width="10" height="6.5"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.4-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  </defs>
+</svg>
+
+<!-- ======================= LEITSTAND ======================= -->
+<div class="ls" id="ls">
+  <header class="ls-head">
+    <div class="ls-head-in">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg class="i"><use href="#i-qr"/></svg></span>
+        <div><b>AnlagenCheck</b><span>Leitstand Instandhaltung, Muster GmbH Werk 1</span></div>
+      </div>
+      <div class="ls-clock" id="ls-clock"></div>
+      <div class="ls-actions">
+        <button class="btn only-d" id="btn-phone" type="button"><svg class="i"><use href="#i-phone"/></svg><span class="lbl">Handy-App</span></button>
+        <button class="btn" type="button" data-ls="export"><svg class="i"><use href="#i-dl"/></svg><span class="lbl">CSV-Export</span></button>
+        <button class="btn btn-ghost" type="button" data-ls="reset"><svg class="i"><use href="#i-reset"/></svg><span class="lbl">Demo zurücksetzen</span></button>
+      </div>
+    </div>
+  </header>
+  <div id="ls-task"></div>
+  <main class="ls-main" id="ls-main" aria-label="Leitstand">
+    <h1 class="sr">Leitstand</h1>
+    <section class="kpis" id="kpis" aria-label="Kennzahlen"></section>
+    <div class="row2">
+      <section class="panel" aria-labelledby="h-plan">
+        <div class="panel-h"><h2 id="h-plan">Hallenplan</h2><span class="sub" id="plan-sub">12 Anlagen</span><div class="r"><span class="sub">Anlage antippen für Details</span></div></div>
+        <div class="plan-wrap" id="plan"></div>
+        <div class="plan-legend" id="plan-legend"></div>
+      </section>
+      <section class="panel" aria-labelledby="h-feed">
+        <div class="panel-h"><h2 id="h-feed">Live-Feed</h2><div class="r"><span class="live">Live</span></div></div>
+        <ul class="feed" id="feed"></ul><p class="sr" id="ls-live" aria-live="polite"></p>
+      </section>
+    </div>
+    <section class="panel tabs-wrap" aria-label="Listen">
+      <div class="tabs" role="tablist" id="tabs" aria-label="Ansicht wählen"></div>
+      <div id="tabpanel" role="tabpanel"></div>
+    </section>
+  </main>
+  <p class="ls-foot">Demo mit Beispieldaten. Handy-App und Leitstand laufen hier im selben Browser und tauschen Daten direkt aus. Im Echtbetrieb synchronisiert ein Server, auch offline erfasste Prüfungen. Alle Eingaben bleiben lokal in diesem Browser.</p>
+  <div class="m-back"><button class="abtn" type="button" data-ls="to-app"><svg class="i"><use href="#i-phone"/></svg>Zur Handy-App</button></div>
+</div>
+
+<!-- ======================= BÜHNE ======================= -->
+<div class="stage hide" id="stage">
+  <aside class="taskcard" id="taskcard" aria-label="Aufgabe"></aside>
+  <div class="stage-slot" id="slot"></div>
+  <div class="stage-ctrl" id="stage-ctrl">
+    <button class="pill" type="button" data-shell="side"><svg class="i"><use href="#i-side"/></svg>An die Seite</button>
+    <button class="pill" type="button" data-shell="min"><svg class="i"><use href="#i-min"/></svg>Minimieren</button>
+  </div>
+</div>
+
+<div class="side-ctrl" id="side-ctrl" hidden>
+  <button class="icon-btn" type="button" data-shell="center" aria-label="Handy in die Mitte holen" title="In die Mitte"><svg class="i"><use href="#i-center"/></svg></button>
+  <button class="icon-btn" type="button" data-shell="min" aria-label="Handy minimieren" title="Minimieren"><svg class="i"><use href="#i-min"/></svg></button>
+</div>
+<button class="bubble" id="bubble" type="button" data-shell="side" hidden><svg class="i"><use href="#i-phone"/></svg>Handy-App öffnen</button>
+
+<div class="shell" id="shell" role="region" aria-label="Handy-App AnlagenCheck">
+  <div class="frame">
+    <i class="sb l1"></i><i class="sb l2"></i><i class="sb l3"></i><i class="sb r1"></i>
+    <div class="screen">
+      <div class="island" aria-hidden="true"></div>
+      <div class="app" id="app">
+        <div class="sbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sic">
+          <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.3-1.4A10.6 10.6 0 0 0 8 .2 10.6 10.6 0 0 0 .7 3.2L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.9c1.3 0 2.4.5 3.3 1.3l1.3-1.4A6.6 6.6 0 0 0 8 4.1 6.6 6.6 0 0 0 3.4 6l1.3 1.4C5.6 6.6 6.7 6.1 8 6.1zm0 3.9 2-2.1A2.9 2.9 0 0 0 8 7a2.9 2.9 0 0 0-2 .9z"/></svg>
+          <svg viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="17" height="9" rx="2"/><path d="M25 4.5v4a2 2 0 0 0 0-4z" opacity=".5"/></svg></span></div>
+        <div class="views" id="views"></div>
+        <nav class="tabbar" id="tabbar" aria-label="App-Navigation">
+          <button class="tb" type="button" data-tab="aufgaben"><svg class="i"><use href="#i-list"/></svg>Aufgaben<span class="badge" id="badge-auf" hidden></span></button>
+          <button class="tb" type="button" data-tab="anlagen"><svg class="i"><use href="#i-fab"/></svg>Anlagen</button>
+          <button class="tb scan-tb" type="button" data-tab="scan" aria-label="QR scannen"><span class="ring"><svg class="i"><use href="#i-qr"/></svg></span>Scannen</button>
+          <button class="tb" type="button" data-tab="melden"><svg class="i"><use href="#i-alert"/></svg>Melden</button>
+          <button class="tb" type="button" data-tab="verlauf"><svg class="i"><use href="#i-hist"/></svg>Verlauf</button>
+        </nav>
+        <div class="app-toast" id="app-toast" aria-live="polite"></div>
+        <div class="sheet-layer" id="sheets" hidden></div>
+        <div class="home-ind" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ls-toasts" id="ls-toasts" aria-live="polite"></div>
+<dialog class="dlg" id="dlg" aria-labelledby="dlg-t"></dialog>
+<input type="file" id="file-cam" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
+
+<script src="anlagencheck-files/qrcode-generator-2.0.4.js"></script>
+<script>
+(() => {
+'use strict';
+/* ================= Grundlagen ================= */
+const KEY = 'anlagencheck-demo-v1', UIKEY = 'anlagencheck-ui-v1';
+const DAY = 864e5, MIN = 6e4;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ic = (n, c = '') => `<svg class="i ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const sod = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+let TODAY = sod(Date.now());
+const dayDiff = t => Math.round((sod(t) - TODAY) / DAY);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const nf0 = new Intl.NumberFormat('de-DE');
+const nfCache = {};
+const nfd = (v, dec = 0) => (nfCache[dec] ||= new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec, maximumFractionDigits: dec })).format(v);
+const pct = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
+const fD = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const fDm = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit' });
+const fDs = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+const fT = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
+const fLong = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+const fMonth = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const isoWeek = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7); const w1 = new Date(d.getFullYear(), 0, 4); return 1 + Math.round(((d - w1) / DAY - 3 + (w1.getDay() + 6) % 7) / 7); };
+const weekStart = () => { const d = new Date(TODAY); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d.getTime(); };
+function relTime(ts) {
+  const m = Math.round((Date.now() - ts) / MIN);
+  if (m < 1) return 'gerade eben';
+  if (m < 60) return `vor ${m} Min.`;
+  const dd = dayDiff(ts);
+  if (dd === 0) return fT.format(ts);
+  if (dd === -1) return 'gestern ' + fT.format(ts);
+  return fDm.format(ts) + ' ' + fT.format(ts);
+}
+function dayLabel(ts) {
+  const dd = dayDiff(ts);
+  if (dd === 0) return 'Heute';
+  if (dd === -1) return 'Gestern';
+  return fDs.format(ts);
+}
+function dueText(dd) {
+  if (dd < -1) return `seit ${-dd} Tagen überfällig`;
+  if (dd === -1) return 'seit gestern überfällig';
+  if (dd === 0) return 'heute fällig';
+  if (dd === 1) return 'morgen fällig';
+  return `in ${dd} Tagen`;
+}
+const dueCls = dd => dd < 0 ? 'over' : dd === 0 ? 'due' : 'soon';
+
+const ME = 'Jonas Keller';
+const LS_USER = 'Stefan Vogt';
+const TEAM = ['Jonas Keller', 'Petra Lindner', 'Mehmet Aydın', 'Sven Krüger'];
+const ZUST = ['Thomas Brandt (Mechanik)', 'Aylin Demir (Elektrik)', 'Sven Krüger (Hydraulik)', 'Muster GmbH 3 (Kundendienst)'];
+const RES = { io: 'i. O.', nio: 'n. i. O.', na: 'n. a.' };
+const PRIO = { hoch: 'Hoch', mittel: 'Mittel', niedrig: 'Niedrig' };
+const PRIO_HELP = { hoch: 'Gefahr für Personen oder Anlagenstillstand. Sofort beheben.', mittel: 'Beeinträchtigt den Betrieb. Behebung in dieser Woche.', niedrig: 'Kein Einfluss auf Sicherheit. Bei Gelegenheit beheben.' };
+const STATUS = { ok: 'In Ordnung', due: 'Prüfung fällig', over: 'Überfällig', def: 'Mangel offen', off: 'Stillgelegt' };
+const MSTAT = { offen: 'Offen', in_arbeit: 'In Arbeit', erledigt: 'Erledigt' };
+
+/* ================= Prüfpläne ================= */
+const c = (id, t, h, prio = 'mittel', stop = false) => ({ id, typ: 'c', t, h, prio, stop });
+const m = (id, t, h, u, min, max, dec, prio = 'mittel', stop = false) => ({ id, typ: 'm', t, h, u, min, max, dec, prio, stop });
+const CL = {
+  cnc: { code: 'PP-CNC-W', ver: 3, min: 12, items: [
+    c('tuer', 'Schutztür und Türverriegelung', 'Tür bei laufender Spindel öffnen. Spindel muss sofort stoppen.', 'hoch', true),
+    c('nh', 'Not-Halt-Taster am Bedienpult', 'Auslösen, Maschine muss stillsetzen. Quittierung prüfen.', 'hoch', true),
+    m('hyd', 'Hydraulikdruck Spannsystem', 'Manometer am Hydraulikaggregat ablesen.', 'bar', 45, 55, 1),
+    m('rl', 'Spindelrundlauf', 'Prüfdorn einspannen, Messuhr am Kegel ansetzen.', 'µm', 0, 5, 1),
+    m('temp', 'Spindeltemperatur nach Warmlauf', '10 Minuten Warmlaufprogramm, dann an der Steuerung ablesen.', '°C', 20, 38, 1),
+    m('kss', 'Konzentration Kühlschmierstoff', 'Refraktometer, Probe aus dem Rücklauf.', '%', 6, 9, 1, 'niedrig'),
+    c('spf', 'Späneförderer frei und gängig', 'Förderer im Tippbetrieb laufen lassen.', 'mittel'),
+    c('leck', 'Keine Leckagen an Hydraulik und Schmierung', 'Sichtprüfung Aggregat, Leitungen und Wanne.', 'mittel'),
+    c('zs', 'Zentralschmierung über Minimum', 'Füllstand am Behälter ablesen.', 'niedrig')] },
+  presse: { code: 'PP-PRS-W', ver: 5, min: 15, items: [
+    c('lv', 'Lichtvorhang unterbricht den Hub', 'Prüfstab 30 mm durch das Schutzfeld führen.', 'hoch', true),
+    c('zh', 'Zweihandschaltung', 'Beide Taster innerhalb 0,5 s. Einhändig darf kein Hub auslösen.', 'hoch', true),
+    m('nl', 'Nachlaufweg Stößel', 'Nachlaufmessgerät, Abschaltung bei 90 Grad Kurbelwinkel.', 'mm', 0, 12, 1, 'hoch', true),
+    m('hyd', 'Hydrauliköldruck', 'Manometer am Steuerblock.', 'bar', 180, 210, 0),
+    m('ot', 'Öltemperatur im Tank', 'Anzeige am Aggregat.', '°C', 30, 55, 0),
+    c('wz', 'Werkzeugbefestigung und Spannpratzen fest', 'Sicht- und Handprüfung aller Pratzen.', 'hoch'),
+    c('leck', 'Keine Leckagen an Zylinder und Leitungen', 'Sichtprüfung, Tropfwanne kontrollieren.', 'mittel'),
+    c('sg', 'Seitliche Schutzgitter vollständig', 'Gitter montiert, keine Lücken.', 'hoch', true)] },
+  roboter: { code: 'PP-ROB-W', ver: 2, min: 14, items: [
+    c('tz', 'Türschalter Schutzzaun', 'Tür öffnen im Automatikbetrieb. Roboter muss stoppen.', 'hoch', true),
+    c('nh', 'Not-Halt an Handbediengerät und Zelle', 'Beide Not-Halt-Taster nacheinander prüfen.', 'hoch', true),
+    m('dl', 'Druckluft Spannvorrichtung', 'Wartungseinheit am Zelleneingang.', 'bar', 5.5, 6.5, 1),
+    m('kw', 'Kühlwasser-Durchfluss Brenner', 'Durchflussanzeige am Kühlgerät.', 'l/min', 4, 8, 1, 'hoch', true),
+    c('br', 'Brenner, Gasdüse und Kontaktrohr in Ordnung', 'Spritzer entfernen, Verschleiß prüfen.', 'niedrig'),
+    c('sp', 'Schlauchpaket ohne Scheuerstellen', 'Achse 3 bis 6 abfahren und prüfen.', 'mittel'),
+    m('wg', 'Abweichung am Referenzpunkt', 'Referenzspitze anfahren, Abweichung messen.', 'mm', 0, 0.1, 2),
+    c('ger', 'Achsen ohne auffällige Geräusche', 'Testprogramm im reduzierten Tempo.', 'mittel')] },
+  kompressor: { code: 'PP-KMP-W', ver: 4, min: 8, items: [
+    m('nd', 'Netzdruck', 'Anzeige an der Steuerung.', 'bar', 7, 8.5, 1),
+    m('vt', 'Verdichtungsendtemperatur', 'Anzeige an der Steuerung unter Last.', '°C', 70, 95, 0),
+    c('ka', 'Kondensatableiter arbeitet', 'Testtaste drücken, Ablauf beobachten.', 'niedrig'),
+    c('ol', 'Ölstand im Schauglas', 'Zwischen Min und Max bei laufendem Kompressor.', 'mittel'),
+    m('fd', 'Differenzdruck Ansaugfilter', 'Anzeige am Filtergehäuse.', 'mbar', 0, 50, 0, 'niedrig'),
+    c('sv', 'Sicherheitsventil, Plombe intakt', 'Sichtprüfung, nicht anlüften.', 'hoch', true),
+    c('leck', 'Keine Leckagen hörbar', 'Rundgang um Kompressor und Kessel.', 'niedrig')] },
+  kran: { code: 'PP-KRN-M', ver: 2, min: 20, items: [
+    c('es', 'Hubendschalter oben und unten', 'Langsam anfahren bis Abschaltung.', 'hoch', true),
+    c('br', 'Bremse Hubwerk hält die Last', 'Prüflast anheben, Bremse halten lassen.', 'hoch', true),
+    c('lh', 'Lasthaken mit Sicherungsfalle', 'Falle schließt selbsttätig, keine Verformung.', 'hoch', true),
+    m('kl', 'Kettenlängung', 'Kettenlehre über 11 Glieder.', '%', 0, 2, 1, 'hoch', true),
+    c('st', 'Hängetaster mit Not-Halt', 'Alle Richtungen und Not-Halt prüfen.', 'hoch', true),
+    c('lb', 'Kranbahn frei, Puffer vorhanden', 'Sichtprüfung über die ganze Bahn.', 'mittel'),
+    c('ts', 'Traglastschild lesbar', 'Beidseitig an der Brücke.', 'niedrig')] },
+  spritzguss: { code: 'PP-SPG-W', ver: 3, min: 12, items: [
+    c('st', 'Schutztür Werkzeugbereich', 'Tür öffnen, Schließbewegung muss stoppen.', 'hoch', true),
+    c('nh', 'Not-Halt', 'Auslösen und quittieren.', 'hoch', true),
+    m('zt', 'Zylindertemperatur Zone 1', 'Anzeige an der Steuerung.', '°C', 225, 245, 0),
+    m('hyd', 'Hydraulikdruck System', 'Manometer am Aggregat.', 'bar', 125, 145, 0),
+    m('wt', 'Werkzeugtemperatur', 'Temperiergerät ablesen.', '°C', 55, 65, 0, 'niedrig'),
+    c('du', 'Düse ohne Leckage', 'Sichtprüfung am Düsenkopf.', 'mittel'),
+    c('aw', 'Auswerfer und Entnahme gängig', 'Ein Zyklus im Einrichtbetrieb.', 'niedrig')] },
+  laser: { code: 'PP-LSR-W', ver: 4, min: 12, items: [
+    c('ka', 'Schutzkabine und Sichtfenster unbeschädigt', 'Keine Risse, Fenster fest im Rahmen.', 'hoch', true),
+    c('tv', 'Türverriegelung Kabine', 'Tür öffnen, Laser darf nicht freigeben.', 'hoch', true),
+    m('ab', 'Absaugung Volumenstrom', 'Anzeige an der Filteranlage.', 'm³/h', 900, 1300, 0),
+    m('kw', 'Kühlwassertemperatur', 'Anzeige am Kühlaggregat.', '°C', 19, 23, 1),
+    m('gd', 'Schneidgasdruck Stickstoff', 'Druckminderer an der Gasversorgung.', 'bar', 14, 18, 1),
+    c('sg', 'Schutzglas Schneidkopf sauber', 'Ausbauen, gegen Licht prüfen.', 'niedrig'),
+    c('sw', 'Schlackewanne geleert', 'Füllstand unter Markierung.', 'niedrig'),
+    c('nh', 'Not-Halt', 'Auslösen und quittieren.', 'hoch', true)] },
+  wartung: { code: 'WP-ALLG-M', ver: 6, min: 30, items: [
+    c('sch', 'Schmierstellen nach Plan abgeschmiert', 'Schmierplan an der Anlage beachten.', 'mittel'),
+    c('fi', 'Filter geprüft, bei Bedarf getauscht', 'Luft-, Öl- und Schaltschrankfilter.', 'mittel'),
+    c('ri', 'Riemen und Kupplungen ohne Verschleiß', 'Spannung und Risse prüfen.', 'mittel'),
+    c('el', 'Kabel und Stecker ohne Schäden', 'Sichtprüfung, keine offenen Adern.', 'hoch', true),
+    m('bh', 'Betriebsstunden abgelesen', 'Zähler an der Steuerung.', 'h', null, null, 0, 'niedrig'),
+    c('rg', 'Anlage gereinigt', 'Arbeitsbereich frei von Spänen und Öl.', 'niedrig')] }
+};
+const W = (cl, lastOff) => ({ art: 'Wochenprüfung', cl, int: 7, lastOff });
+const WA = (lastOff, art = 'Monatswartung') => ({ art, cl: 'wartung', int: 30, lastOff });
+const DOCS = typ => [
+  { k: 'ba', t: 'Betriebsanleitung', f: 'PDF', s: { cnc: '186 Seiten, 14,2 MB', presse: '142 Seiten, 9,8 MB', roboter: '210 Seiten, 18,4 MB', kompressor: '64 Seiten, 4,1 MB', kran: '48 Seiten, 3,6 MB', spritzguss: '174 Seiten, 12,9 MB', laser: '196 Seiten, 16,0 MB' }[typ] },
+  { k: 'pp', t: 'Prüfplan', f: 'PLAN', s: 'aktuelle Version, in der App ausführbar' },
+  { k: 'wp', t: 'Wartungsplan', f: 'PDF', s: '6 Seiten, 0,4 MB' },
+  { k: 'sp', t: 'Schaltplan', f: 'PDF', s: '38 Seiten, 6,2 MB' },
+  { k: 'gb', t: 'Gefährdungsbeurteilung', f: 'PDF', s: 'Stand ' + new Date(TODAY - 200 * DAY).getFullYear() + ', 9 Seiten' },
+  { k: 'ce', t: 'EG-Konformitätserklärung', f: 'PDF', s: '2 Seiten' }];
+// x, y, w, h: Lage im Hallenplan (SVG-Einheiten)
+const ANL = [
+  { id: 'CNC-03', name: 'CNC-Bearbeitungszentrum', modell: 'BZ 500 3-Achs', typ: 'cnc', halle: 'Halle 1', linie: 'Linie A', platz: 'Platz 3', her: 'Muster GmbH 1', bj: 2016, sn: 'BZ500-16-0219', inv: 'INV-10212', bh: 31840, plans: [W('cnc', 2), WA(12)], x: 40, y: 78, w: 112, h: 66 },
+  { id: 'CNC-05', name: 'CNC-Bearbeitungszentrum', modell: 'BZ 500 3-Achs', typ: 'cnc', halle: 'Halle 1', linie: 'Linie A', platz: 'Platz 5', her: 'Muster GmbH 1', bj: 2017, sn: 'BZ500-17-0287', inv: 'INV-10255', bh: 28412, plans: [W('cnc', 9), WA(18)], x: 182, y: 78, w: 112, h: 66 },
+  { id: 'CNC-07', name: 'CNC-Bearbeitungszentrum', modell: 'BZ 650 5-Achs', typ: 'cnc', halle: 'Halle 1', linie: 'Linie A', platz: 'Platz 7', her: 'Muster GmbH 1', bj: 2019, sn: 'BZ650-19-0442', inv: 'INV-10427', bh: 18436, plans: [W('cnc', 7), WA(20)], x: 324, y: 78, w: 126, h: 66 },
+  { id: 'DRH-02', name: 'CNC-Drehzentrum', modell: 'DZ 300 Y', typ: 'cnc', halle: 'Halle 1', linie: 'Linie B', platz: 'Platz 2', her: 'Muster GmbH 2', bj: 2018, sn: 'DZ300-18-1173', inv: 'INV-10330', bh: 22907, plans: [W('cnc', 3), WA(8)], x: 40, y: 190, w: 112, h: 66 },
+  { id: 'LSR-01', name: 'Laserschneidanlage', modell: 'LS 3015 Faser 6 kW', typ: 'laser', halle: 'Halle 1', linie: 'Linie B', platz: 'Platz 4', her: 'Muster GmbH 9', bj: 2021, sn: 'LS3015-21-0058', inv: 'INV-10561', bh: 9874, plans: [W('laser', 7), WA(25)], x: 222, y: 184, w: 228, h: 78 },
+  { id: 'PRS-01', name: 'Hydraulikpresse 250 t', modell: 'HP 250', typ: 'presse', halle: 'Halle 2', linie: 'Linie C', platz: 'Platz 1', her: 'Muster GmbH 4', bj: 2012, sn: 'HP250-12-0031', inv: 'INV-09874', bh: 46210, plans: [W('presse', 0)], x: 540, y: 78, w: 120, h: 72 },
+  { id: 'PRS-02', name: 'Hydraulikpresse 160 t', modell: 'HP 160', typ: 'presse', halle: 'Halle 2', linie: 'Linie C', platz: 'Platz 2', her: 'Muster GmbH 4', bj: 2015, sn: 'HP160-15-0077', inv: 'INV-10108', bh: 37655, plans: [W('presse', 6)], x: 690, y: 78, w: 120, h: 72 },
+  { id: 'ROB-04', name: 'Schweißroboter Zelle 1', modell: 'SR 8 MAG', typ: 'roboter', halle: 'Halle 2', linie: 'Linie D', platz: 'Zelle 1', her: 'Muster GmbH 5', bj: 2020, sn: 'SR8-20-0904', inv: 'INV-10498', bh: 14320, plans: [W('roboter', 4)], x: 540, y: 186, w: 120, h: 72 },
+  { id: 'ROB-06', name: 'Schweißroboter Zelle 2', modell: 'SR 8 MAG', typ: 'roboter', halle: 'Halle 2', linie: 'Linie D', platz: 'Zelle 2', her: 'Muster GmbH 5', bj: 2020, sn: 'SR8-20-0911', inv: 'INV-10499', bh: 13987, plans: [W('roboter', 8)], x: 690, y: 186, w: 120, h: 72 },
+  { id: 'KRN-01', name: 'Brückenkran 5 t', modell: 'ZK 5000', typ: 'kran', halle: 'Halle 2', linie: 'Kranbahn', platz: 'Achse 1 bis 8', her: 'Muster GmbH 7', bj: 2009, sn: 'ZK5-09-0412', inv: 'INV-09310', bh: 8120, plans: [{ art: 'Monatsprüfung', cl: 'kran', int: 30, lastOff: 33 }], x: 880, y: 52, w: 46, h: 214 },
+  { id: 'SPG-02', name: 'Spritzgießmaschine 180 t', modell: 'SG 1800', typ: 'spritzguss', halle: 'Halle 3', linie: 'Linie E', platz: 'Platz 2', her: 'Muster GmbH 8', bj: 2017, sn: 'SG1800-17-0365', inv: 'INV-10281', bh: 35480, plans: [W('spritzguss', 0)], x: 60, y: 340, w: 140, h: 66 },
+  { id: 'KMP-01', name: 'Schraubenkompressor', modell: 'SK 37 kW', typ: 'kompressor', halle: 'Technikraum', linie: 'Druckluft', platz: 'Raum T1', her: 'Muster GmbH 6', bj: 2014, sn: 'SK37-14-0122', inv: 'INV-09950', bh: 52310, plans: [W('kompressor', 5), WA(28, 'Wartung 1.000 h')], x: 350, y: 340, w: 110, h: 66 }
+];
+
+/* ================= Zustand ================= */
+let S = null;
+let storageOk = true;
+function seed() {
+  TODAY = sod(Date.now());
+  const now = Date.now(), R = rng(4711);
+  const A = ANL.map(a => ({ id: a.id, bh: a.bh, still: false, stillTs: null, stillRef: null, plans: a.plans.map(p => ({ art: p.art, cl: p.cl, int: p.int, last: 0 })) }));
+  const occ = [];
+  ANL.forEach((a, ai) => a.plans.forEach((p, pi) => {
+    const n = p.int <= 7 ? 3 : 2;
+    for (let k = n - 1; k >= 0; k--) occ.push({ ai, pi, off: p.lastOff + k * p.int });
+  }));
+  occ.forEach(o => {
+    let ts = TODAY - o.off * DAY + (6 * 60 + 25 + Math.floor(R() * 380)) * MIN;
+    if (o.off === 0) ts = TODAY + (6 * 60 + 35 + Math.floor(R() * 50)) * MIN;
+    if (ts > now - 20 * MIN) ts = now - (20 + Math.floor(R() * 40)) * MIN;
+    o.ts = ts;
+  });
+  occ.sort((x, y) => x.ts - y.ts);
+  const special = {
+    'ROB-06|8': { kw: { res: 'nio', val: 2.1, note: 'Durchfluss schwankt, Tropfen am Brenneranschluss.' } },
+    'DRH-02|3': { spf: { res: 'nio', note: 'Förderer blockiert bei langen Spänen.' } },
+    'CNC-03|9': { kss: { res: 'nio', val: 4.8, note: 'Konzentrat nachdosiert, Nachkontrolle nötig.' } }
+  };
+  const fixedPr = { 'PRS-01|0': ME, 'SPG-02|0': 'Mehmet Aydın', 'ROB-06|8': 'Petra Lindner', 'DRH-02|3': ME, 'CNC-03|2': ME };
+  const P = [], M = [];
+  let mSeq = 131;
+  occ.forEach((o, i) => {
+    const a = ANL[o.ai], p = a.plans[o.pi], cl = CL[p.cl];
+    const sp = special[a.id + '|' + o.off] || {};
+    const pr = fixedPr[a.id + '|' + o.off] || (R() < .45 ? ME : TEAM[1 + Math.floor(R() * 3)]);
+    const results = cl.items.map(it => {
+      if (sp[it.id]) return { id: it.id, res: sp[it.id].res, val: sp[it.id].val ?? null, note: sp[it.id].note || '', fotos: sp[it.id].res === 'nio' ? ['demo:' + (i * 7 + 3) + ':' + a.id] : [] };
+      if (it.typ === 'm') {
+        let val;
+        if (it.min == null) val = a.bh - o.off * 11;
+        else { const span = it.max - it.min; val = +(it.min + span * (.22 + R() * .56)).toFixed(it.dec); }
+        return { id: it.id, res: 'io', val, note: '', fotos: [] };
+      }
+      return { id: it.id, res: (it.id === 'zs' && R() < .2) ? 'na' : 'io', val: null, note: '', fotos: [] };
+    });
+    const nio = results.filter(r => r.res === 'nio');
+    const rec = { id: 'P-0' + (300 + i), anlage: a.id, plan: o.pi, art: p.art, cl: p.cl, ts: o.ts, dauer: cl.min + Math.floor(R() * 7) - 2, pruefer: pr, results, sig: null, gesamt: nio.length ? 'nio' : 'io', maengel: [] };
+    nio.forEach(r => {
+      const it = cl.items.find(x => x.id === r.id);
+      const mid = 'M-0' + (mSeq++);
+      const mg = { id: mid, anlage: a.id, titel: it.typ === 'm' ? `${it.t} außerhalb Toleranz (${nfd(r.val, it.dec)} ${it.u})` : `${it.t}: n. i. O.`, text: r.note, prio: it.prio, still: it.stop && a.id === 'ROB-06', status: 'offen', zust: '', von: pr, ts: o.ts + rec.dauer * MIN, foto: r.fotos[0] || null, quelle: rec.id, doneTs: null, doneBy: '' };
+      if (a.id === 'ROB-06') { mg.status = 'in_arbeit'; mg.zust = ZUST[2]; }
+      if (a.id === 'CNC-03') { mg.status = 'erledigt'; mg.doneTs = o.ts + DAY + 3 * 3600e3; mg.doneBy = 'Thomas Brandt'; mg.zust = ZUST[0]; }
+      rec.maengel.push(mid);
+      M.push(mg);
+      if (mg.still) { const sa = A[o.ai]; sa.still = true; sa.stillTs = mg.ts; sa.stillRef = mid; }
+    });
+    P.push(rec);
+    A[o.ai].plans[o.pi].last = o.ts;
+  });
+  // manuell gemeldete Mängel
+  const yest = TODAY - DAY;
+  M.push({ id: 'M-0' + (mSeq++), anlage: 'ROB-04', titel: 'Schlauchpaket scheuert an Achse 3', text: 'Schutzschlauch an der Umlenkung durchgescheuert, Gewebe sichtbar.', prio: 'mittel', still: false, status: 'in_arbeit', zust: ZUST[0], von: 'Petra Lindner', ts: yest + (13 * 60 + 12) * MIN, foto: 'demo:41:ROB-04', quelle: null, doneTs: null, doneBy: '' });
+  M.push({ id: 'M-0' + (mSeq++), anlage: 'PRS-01', titel: 'Leckage an Rücklaufleitung', text: 'Verschraubung tropft, Wanne halb voll.', prio: 'mittel', still: false, status: 'erledigt', zust: ZUST[2], von: 'Mehmet Aydın', ts: TODAY - 12 * DAY + 9 * 3600e3, foto: 'demo:52:PRS-01', quelle: null, doneTs: TODAY - 11 * DAY + 11 * 3600e3, doneBy: 'Sven Krüger' });
+  let spgTs = TODAY + (7 * 60 + 41) * MIN; if (spgTs > now - 10 * MIN) spgTs = now - 10 * MIN;
+  M.push({ id: 'M-0' + (mSeq++), anlage: 'SPG-02', titel: 'Schaltschrankbeleuchtung defekt', text: 'Leuchte im Schaltschrank geht nicht an. Arbeiten nur mit Taschenlampe möglich.', prio: 'niedrig', still: false, status: 'offen', zust: '', von: 'Mehmet Aydın', ts: spgTs, foto: null, quelle: null, doneTs: null, doneBy: '' });
+  // Feed aus den letzten zwei Tagen
+  const F = [];
+  P.filter(p => p.ts >= yest).forEach(p => F.push(feedFromPruefung(p, false)));
+  M.filter(x => x.ts >= yest).forEach(x => F.push({ id: 'f' + x.id, ts: x.ts, kind: 'mangel', anlage: x.anlage, ref: x.id, t: `Mangel ${x.id} gemeldet: ${x.titel}`, s: `${x.von}, Priorität ${PRIO[x.prio]}`, src: 'app' }));
+  const rm = M.find(x => x.anlage === 'ROB-04');
+  F.push({ id: 'fz' + rm.id, ts: rm.ts + 34 * MIN, kind: 'zuweisung', anlage: 'ROB-04', ref: rm.id, t: `${rm.id} an ${rm.zust} zugewiesen`, s: LS_USER + ', Leitstand', src: 'ls' });
+  F.sort((x, y) => y.ts - x.ts);
+  return { v: 1, seedDay: TODAY, anlagen: A, pruef: P, maengel: M, feed: F, draft: null, seq: { p: 300 + occ.length, m: mSeq, f: 1 }, demo: { scanned: false, started: false, done: false, pid: null, dismissed: false } };
+}
+function feedFromPruefung(p, live) {
+  const n = { io: 0, nio: 0, na: 0 }; p.results.forEach(r => n[r.res]++);
+  return { id: 'f' + p.id, ts: p.ts + p.dauer * MIN, kind: p.gesamt === 'nio' ? 'nio' : 'pruefung', anlage: p.anlage, ref: p.id, t: `${p.art} ${p.anlage} abgeschlossen`, s: `${n.io} i. O., ${n.nio} n. i. O.${n.na ? `, ${n.na} n. a.` : ''}, ${p.pruefer}`, src: 'app' };
+}
+function shiftDays(st, delta) {
+  const d = delta * DAY;
+  st.anlagen.forEach(a => { a.plans.forEach(p => p.last += d); if (a.stillTs) a.stillTs += d; });
+  st.pruef.forEach(p => p.ts += d);
+  st.maengel.forEach(x => { x.ts += d; if (x.doneTs) x.doneTs += d; });
+  st.feed.forEach(f => f.ts += d);
+  if (st.draft) st.draft.start += d;
+  st.seedDay += d;
+}
+function load() {
+  TODAY = sod(Date.now());
+  let st = null;
+  try { const raw = localStorage.getItem(KEY); if (raw) st = JSON.parse(raw); } catch (e) { storageOk = false; }
+  if (!st || st.v !== 1 || !Array.isArray(st.anlagen) || st.anlagen.length !== ANL.length) st = seed();
+  const delta = Math.round((TODAY - sod(st.seedDay)) / DAY);
+  if (delta) shiftDays(st, delta);
+  S = st;
+}
+let saveT = 0;
+function save(now) {
+  clearTimeout(saveT);
+  const run = () => {
+    if (!storageOk) return;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) {
+      // Speicher voll: eigene Fotos der ältesten Einträge entfernen und erneut versuchen
+      try {
+        let removed = 0;
+        S.maengel.forEach(x => { if (x.foto && x.foto.startsWith('data:') && removed < 3) { x.foto = null; removed++; } });
+        S.pruef.forEach(p => p.results.forEach(r => { r.fotos = r.fotos.filter(f => !(f.startsWith('data:') && removed++ < 6)); }));
+        localStorage.setItem(KEY, JSON.stringify(S));
+      } catch (e2) { storageOk = false; }
+    }
+  };
+  if (now) run(); else saveT = setTimeout(run, 250);
+}
+let ui = { lsTab: 'maengel', mFilter: 'offen', pFilter: 'alle' };
+try { const u = JSON.parse(localStorage.getItem(UIKEY) || 'null'); if (u) ui = Object.assign(ui, u); } catch (e) {}
+const saveUi = () => { try { localStorage.setItem(UIKEY, JSON.stringify(ui)); } catch (e) {} };
+
+/* ================= Abfragen ================= */
+const DEF = id => ANL.find(a => a.id === id);
+const ST = id => S.anlagen.find(a => a.id === id);
+const nextDue = p => p.last + p.int * DAY;
+const openM = id => S.maengel.filter(x => (!id || x.anlage === id) && x.status !== 'erledigt');
+function status(id) {
+  const a = ST(id);
+  if (a.still) return 'off';
+  if (openM(id).length) return 'def';
+  const dd = Math.min(...a.plans.map(p => dayDiff(nextDue(p))));
+  if (dd < 0) return 'over';
+  if (dd === 0) return 'due';
+  return 'ok';
+}
+function tasks(maxDays = 0) {
+  const out = [];
+  S.anlagen.forEach(a => {
+    if (a.still) return;
+    a.plans.forEach((p, pi) => { const dd = dayDiff(nextDue(p)); if (dd <= maxDays) out.push({ id: a.id, pi, p, dd }); });
+  });
+  return out.sort((x, y) => x.dd - y.dd || x.id.localeCompare(y.id));
+}
+function weekStats() {
+  const ws = weekStart(), we = ws + 7 * DAY;
+  let done = 0, dueToday = 0, planned = 0;
+  S.anlagen.forEach(a => a.plans.forEach((p, pi) => {
+    const did = S.pruef.some(x => x.anlage === a.id && x.plan === pi && x.ts >= ws);
+    if (did) { done++; planned++; return; }
+    if (a.still) return;
+    const nd = nextDue(p);
+    if (nd < we) { planned++; if (dayDiff(nd) <= 0) dueToday++; }
+  }));
+  return { done, dueToday, planned, quote: done + dueToday ? done / (done + dueToday) : 1 };
+}
+const tolText = it => it.min == null ? 'Zählerstand' : it.min === 0 ? `bis ${nfd(it.max, it.dec)} ${it.u}` : `${nfd(it.min, it.dec)} bis ${nfd(it.max, it.dec)} ${it.u}`;
+const evalVal = (it, v) => v == null || isNaN(v) ? null : it.min == null ? 'io' : (v >= it.min && v <= it.max ? 'io' : 'nio');
+const parseNum = s => { s = String(s || '').trim().replace(/\s/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'); if (!s || !/^-?\d*\.?\d+$/.test(s)) return null; return parseFloat(s); };
+
+/* ================= QR und Fotos ================= */
+const qrCache = {};
+function qrSVG(text, label) {
+  if (qrCache[text]) return qrCache[text];
+  const q = qrcode(0, 'M'); q.addData(text); q.make();
+  const n = q.getModuleCount(), qz = 2; let d = '';
+  for (let r = 0; r < n; r++) for (let col = 0; col < n; col++) if (q.isDark(r, col)) d += `M${col + qz} ${r + qz}h1v1h-1z`;
+  return qrCache[text] = `<svg viewBox="0 0 ${n + qz * 2} ${n + qz * 2}" shape-rendering="crispEdges" role="img" aria-label="${esc(label || 'QR-Code ' + text)}"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#111"/></svg>`;
+}
+const qrCode = id => 'ANLAGE:' + id;
+function plateHTML(id, opt = {}) {
+  const a = DEF(id);
+  return `<div class="plate${opt.cls ? ' ' + opt.cls : ''}"${opt.attrs || ''}>
+    <div class="plate-band"><span>Muster GmbH</span><span>${esc(a.inv)}</span></div>
+    <div class="plate-body"><div class="plate-txt"><div class="plate-id">${a.id}</div><div class="plate-name">${esc(a.name)}</div>${opt.short ? '' : `<div class="plate-meta">${esc(a.halle)}, ${esc(a.linie)}, ${esc(a.platz)}</div>`}</div>
+    <div class="plate-qr">${qrSVG(qrCode(id), 'QR-Code ' + qrCode(id))}</div></div></div>`;
+}
+const photoCache = {};
+function demoPhoto(key) {
+  if (photoCache[key]) return photoCache[key];
+  const parts = key.split(':'), R = rng(+parts[1] || 7), label = parts[2] || '';
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 360;
+  const g = cv.getContext('2d');
+  const hue = 150 + R() * 50;
+  let gr = g.createLinearGradient(0, 0, 480, 360);
+  gr.addColorStop(0, `hsl(${hue},9%,${62 + R() * 10}%)`); gr.addColorStop(1, `hsl(${hue},12%,${26 + R() * 10}%)`);
+  g.fillStyle = gr; g.fillRect(0, 0, 480, 360);
+  // Gehäuseblech mit Schrauben
+  g.fillStyle = `hsl(${hue},7%,${70 + R() * 8}%)`; g.fillRect(-20, 30 + R() * 30, 300 + R() * 80, 220);
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-20, 250 + R() * 20, 380, 6);
+  for (let i = 0; i < 4; i++) { const x = 20 + i * 80, y = 70; g.beginPath(); g.arc(x, y, 7, 0, 7); g.fillStyle = '#8b9496'; g.fill(); g.strokeStyle = '#5c6466'; g.beginPath(); g.moveTo(x - 4, y); g.lineTo(x + 4, y); g.stroke(); }
+  // Rohrleitung
+  const py = 200 + R() * 60;
+  let pg = g.createLinearGradient(0, py - 18, 0, py + 18); pg.addColorStop(0, '#d9dee0'); pg.addColorStop(.5, '#7f8a8e'); pg.addColorStop(1, '#3d4548');
+  g.fillStyle = pg; g.fillRect(150, py - 18, 340, 36);
+  g.fillStyle = '#5a6366'; g.fillRect(250, py - 24, 26, 48);
+  // Manometer
+  const mx = 140 + R() * 40, my = 150, mr = 62;
+  g.beginPath(); g.arc(mx, my, mr + 8, 0, 7); g.fillStyle = '#2b3235'; g.fill();
+  g.beginPath(); g.arc(mx, my, mr, 0, 7); g.fillStyle = '#f4f4ef'; g.fill();
+  g.strokeStyle = '#222'; g.lineWidth = 2;
+  for (let i = 0; i <= 10; i++) { const an = Math.PI * .75 + i * Math.PI * 1.5 / 10; g.beginPath(); g.moveTo(mx + Math.cos(an) * (mr - 4), my + Math.sin(an) * (mr - 4)); g.lineTo(mx + Math.cos(an) * (mr - 14), my + Math.sin(an) * (mr - 14)); g.stroke(); }
+  g.strokeStyle = '#c62828'; g.lineWidth = 4; g.beginPath(); g.arc(mx, my, mr - 9, Math.PI * 1.95, Math.PI * 2.25); g.stroke();
+  const na = Math.PI * .75 + (.3 + R() * .6) * Math.PI * 1.5;
+  g.strokeStyle = '#111'; g.lineWidth = 3; g.beginPath(); g.moveTo(mx, my); g.lineTo(mx + Math.cos(na) * (mr - 12), my + Math.sin(na) * (mr - 12)); g.stroke();
+  g.beginPath(); g.arc(mx, my, 6, 0, 7); g.fillStyle = '#111'; g.fill();
+  // Tropfen bei Leckage
+  if (R() < .6) { g.fillStyle = 'rgba(60,40,10,.55)'; g.beginPath(); g.ellipse(300, py + 70, 40, 9, 0, 0, 7); g.fill(); g.beginPath(); g.arc(264, py + 34, 5, 0, 7); g.fill(); }
+  // Rauschen und Vignette
+  const id = g.getImageData(0, 0, 480, 360);
+  for (let i = 0; i < id.data.length; i += 4) { const n = (R() - .5) * 18; id.data[i] += n; id.data[i + 1] += n; id.data[i + 2] += n; }
+  g.putImageData(id, 0, 0);
+  const vg = g.createRadialGradient(240, 180, 120, 240, 180, 320); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.45)');
+  g.fillStyle = vg; g.fillRect(0, 0, 480, 360);
+  g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 322, 480, 38);
+  g.fillStyle = '#fff'; g.font = '600 17px system-ui,sans-serif'; g.fillText(`${label}  Beispielfoto (Demo)`, 14, 347);
+  return photoCache[key] = cv.toDataURL('image/jpeg', .72);
+}
+const imgSrc = f => f && f.startsWith('demo:') ? demoPhoto(f) : f;
+function fileToData(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { const s = Math.min(1, 640 / Math.max(im.width, im.height)); const cv = document.createElement('canvas'); cv.width = Math.round(im.width * s); cv.height = Math.round(im.height * s); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', .7)); };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Bild nicht lesbar')); };
+    im.src = url;
+  });
+}
+const fileInput = $('#file-cam');
+let fileCb = null;
+fileInput.addEventListener('change', async () => {
+  const f = fileInput.files && fileInput.files[0]; fileInput.value = '';
+  if (!f || !fileCb) return;
+  const cb = fileCb; fileCb = null;
+  try { cb(await fileToData(f)); } catch (e) { appToast('Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.'); }
+});
+function pickPhoto(cb) { fileCb = cb; fileInput.click(); }
+let demoPhotoSeq = 100;
+const newDemoPhoto = id => 'demo:' + (demoPhotoSeq++ + Math.floor(Math.random() * 900)) + ':' + id;
+
+/* ================= Feed und Mutationen ================= */
+const freshFeed = {}; // id -> Zeitpunkt, an dem es live hinzukam
+function addFeed(f) {
+  f.id = 'L' + (S.seq.f++) + '-' + Date.now().toString(36);
+  f.ts = f.ts || Date.now();
+  S.feed.unshift(f);
+  if (S.feed.length > 120) S.feed.length = 120;
+  freshFeed[f.id] = Date.now();
+  const lv = document.getElementById('ls-live'); if (lv) lv.textContent = f.t;
+  return f;
+}
+let flashIds = new Set();
+function changed(anlageIds = []) { anlageIds.forEach(i => flashIds.add(i)); save(); renderLS(); }
+
+/* ======================================================================
+   HANDY-APP
+   ====================================================================== */
+const appEl = $('#app'), viewsEl = $('#views'), tabbar = $('#tabbar');
+const nav = { tab: 'aufgaben', stack: [{ name: 'aufgaben', params: {} }] };
+const FLOW = new Set(['check', 'abschluss', 'fertig']);
+const SCREENS = {};
+const cur = () => nav.stack[nav.stack.length - 1];
+const haptic = (p = 8) => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const mq = matchMedia('(max-width: 759.98px)');
+const isMobile = () => mq.matches;
+
+function show(entry, anim, focus = true) {
+  stopCamera();
+  $('#app-toast').innerHTML = '';
+  const old = viewsEl.querySelector('.view:not(.leaving)');
+  const v = document.createElement('section');
+  v.className = 'view';
+  v.dataset.s = entry.name;
+  SCREENS[entry.name](v, entry.params || {});
+  viewsEl.appendChild(v);
+  appEl.classList.toggle('dark', entry.name === 'scan');
+  tabbar.classList.toggle('hide', FLOW.has(entry.name));
+  $$('.tb', tabbar).forEach(b => b.dataset.tab === nav.tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  if (entry.scroll) v.scrollTop = entry.scroll;
+  const bar = v.querySelector('.app-bar');
+  if (bar) v.addEventListener('scroll', () => bar.classList.toggle('sc', v.scrollTop > 4), { passive: true });
+  if (old) {
+    old.classList.add('leaving');
+    if (anim === 'push') { v.classList.add('in-r'); old.classList.add('out-l'); }
+    else if (anim === 'pop') { v.classList.add('in-l'); old.classList.add('out-r'); }
+    else v.classList.add('in-f');
+    setTimeout(() => old.remove(), anim === 'push' || anim === 'pop' ? 400 : 10);
+  }
+  if (focus) { const h = v.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  updateBadges();
+  renderTaskcard();
+}
+function go(name, params = {}) {
+  const c0 = cur(); const v = viewsEl.querySelector('.view:not(.leaving)'); if (v) c0.scroll = v.scrollTop;
+  nav.stack.push({ name, params });
+  show(cur(), 'push');
+}
+function back() {
+  if (nav.stack.length < 2) return;
+  nav.stack.pop();
+  show(cur(), 'pop');
+}
+function setTab(tab, params = {}) {
+  nav.tab = tab;
+  nav.stack = [{ name: tab, params }];
+  show(cur(), 'fade');
+}
+function replaceStack(entries) {
+  nav.stack = entries;
+  show(cur(), 'push');
+}
+/* Ansicht neu zeichnen, wenn sich Daten von außen ändern (Leitstand, anderer Tab) */
+function refreshApp() {
+  const e = cur();
+  if (['check', 'abschluss', 'melden', 'scan', 'fertig'].includes(e.name)) { updateBadges(); return; }
+  const v = viewsEl.querySelector('.view:not(.leaving)');
+  e.scroll = v ? v.scrollTop : 0;
+  if (v) v.remove();
+  show(e, null, false);
+}
+function updateBadges() {
+  const n = tasks(0).length, b = $('#badge-auf');
+  b.textContent = n; b.hidden = !n;
+  const bub = $('#bubble');
+  if (bub) bub.innerHTML = `${ic('phone')}Handy-App öffnen${n ? `<span class="cnt">${n}</span>` : ''}`;
+}
+const appBar = (title, right = '', extra = '', backLbl = 'Zurück') => `<div class="app-bar"><div class="app-bar-in"><div class="bar-sp"><button class="back" type="button" data-a="back">${ic('left')}${backLbl}</button></div><h1>${title}</h1><div class="bar-sp">${right}</div></div>${extra}</div>`;
+const tagId = id => `<span class="tag-id ${status(id)}">${id}</span>`;
+
+/* ---------- Toast in der App ---------- */
+let appToastT = 0;
+function appToast(msg, act) {
+  const box = $('#app-toast');
+  box.classList.toggle('low', FLOW.has(cur().name));
+  box.innerHTML = `<div class="toast" role="status"><span>${msg}</span>${act ? `<button type="button">${act.label}</button>` : ''}</div>`;
+  if (act) box.querySelector('button').onclick = () => { box.innerHTML = ''; act.fn(); };
+  clearTimeout(appToastT); appToastT = setTimeout(() => { box.innerHTML = ''; }, act ? 6000 : 3200);
+}
+
+/* ---------- Bottom Sheets ---------- */
+const sheetLayer = $('#sheets');
+let sheetReturn = null, sheetClose = null;
+function openSheet(html, onClose) {
+  sheetReturn = document.activeElement;
+  sheetClose = onClose || null;
+  sheetLayer.hidden = false;
+  sheetLayer.innerHTML = `<div class="sheet-scrim" data-a="sheet-close"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" tabindex="-1"><div class="grab" aria-hidden="true"></div>${html}</div>`;
+  const sh = sheetLayer.querySelector('.sheet');
+  requestAnimationFrame(() => { sheetLayer.classList.add('open'); const f = sh.querySelector('input,textarea,select,button:not([data-a="sheet-close"])'); (f || sh).focus({ preventScroll: true }); });
+  return sh;
+}
+function closeSheet() {
+  if (sheetLayer.hidden) return;
+  sheetLayer.classList.remove('open');
+  setTimeout(() => { sheetLayer.hidden = true; sheetLayer.innerHTML = ''; }, 280);
+  if (sheetClose) { const f = sheetClose; sheetClose = null; f(); }
+  if (sheetReturn && document.contains(sheetReturn)) sheetReturn.focus({ preventScroll: true });
+}
+sheetLayer.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.stopPropagation(); closeSheet(); }
+  if (e.key === 'Tab') {
+    const f = $$('button,input,textarea,select,[href]', sheetLayer.querySelector('.sheet')).filter(x => !x.disabled && x.offsetParent);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
+
+/* ---------- Bildschirm: Aufgaben ---------- */
+function greet() { const h = new Date().getHours(); return h < 11 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend'; }
+function taskRow(t) {
+  const a = DEF(t.id);
+  return `<li><button class="a-row" type="button" data-a="akte" data-v="${a.id}">${tagId(a.id)}<span class="grow"><span class="t" style="display:block">${esc(a.name)}</span><span class="s" style="display:block"><span class="typ${t.p.int === 7 ? ' w' : ''}">${esc(t.p.art)}</span><span class="due-t ${dueCls(t.dd)}">${dueText(t.dd)}</span></span><span class="s" style="display:block">${esc(a.halle)}, ${esc(a.linie)}, ${esc(a.platz)}</span></span>${ic('right', 'chev')}</button></li>`;
+}
+SCREENS.aufgaben = v => {
+  const all = tasks(3), over = all.filter(t => t.dd < 0), today = all.filter(t => t.dd === 0), soon = all.filter(t => t.dd > 0);
+  const d = S.draft;
+  const showDemo = isMobile() && !S.demo.done && !S.demo.dismissed;
+  v.innerHTML = `
+  <div class="lt"><div class="lt-row"><div style="flex:1;min-width:0"><p class="lt-sub">${fLong.format(Date.now())}, Frühschicht</p><h1>${greet()}, Jonas</h1></div>
+  <button class="a-ic only-m" type="button" data-a="to-ls" aria-label="Leitstand ansehen">${ic('monitor')}</button></div></div>
+  ${showDemo ? `<div class="demo-task" role="note"><div><b>Ihre Aufgabe in dieser Demo</b><p>Scannen Sie den QR-Code an Maschine <strong>CNC-07</strong> und führen Sie die Wochenprüfung durch.</p></div><button class="x" type="button" data-a="demo-dismiss" aria-label="Hinweis ausblenden">${ic('x')}</button></div>` : ''}
+  ${d ? `<div class="a-sec"><div class="a-card" style="padding:14px;display:flex;gap:12px;align-items:center;box-shadow:inset 0 0 0 2px var(--accent)"><span class="tag-id">${d.anlage}</span><div style="flex:1;min-width:0"><div style="font-weight:700">${esc(ST(d.anlage).plans[d.plan].art)} läuft</div><div style="font-size:13.5px;color:var(--ink-2)">${answered(d)} von ${CL[d.cl].items.length} Punkten erfasst</div></div><button class="go" type="button" data-a="resume" style="border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;min-height:44px;padding:0 14px">Fortsetzen</button></div></div>` : ''}
+  <button class="scan-cta" type="button" data-a="tab" data-v="scan"><span class="qrbox">${ic('qr')}</span><span><b>QR-Code scannen</b><span>Anlage öffnen, prüfen oder Mangel melden</span></span></button>
+  <div class="sum3"><div class="o"><b>${over.length}</b><span>überfällig</span></div><div class="d"><b>${today.length}</b><span>heute fällig</span></div><div><b>${openM().length}</b><span>Mängel offen</span></div></div>
+  ${over.length ? `<div class="a-sec"><h2 style="color:var(--over)">Überfällig <span class="c">${over.length}</span></h2><ul class="a-list">${over.map(taskRow).join('')}</ul></div>` : ''}
+  <div class="a-sec"><h2>Heute fällig <span class="c">${today.length}</span></h2>${today.length ? `<ul class="a-list">${today.map(taskRow).join('')}</ul>` : `<div class="a-card a-empty">Für heute ist alles erledigt.</div>`}</div>
+  ${soon.length ? `<div class="a-sec"><h2>Nächste Tage <span class="c">${soon.length}</span></h2><ul class="a-list">${soon.map(taskRow).join('')}</ul></div>` : ''}
+  <div style="height:16px"></div>`;
+};
+const answered = d => Object.values(d.items).filter(x => x.res).length;
+
+/* ---------- Bildschirm: Anlagen ---------- */
+SCREENS.anlagen = (v, prm) => {
+  v.innerHTML = `<div class="lt"><h1>Anlagen</h1></div>
+  <div class="a-sec" style="margin-top:6px"><div class="field" style="margin:0"><label for="anl-q" class="sr">Anlage suchen</label><input id="anl-q" type="search" placeholder="Nummer, Name oder Halle" autocomplete="off" value="${esc(prm.q || '')}" style="width:100%;border:0;border-radius:13px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);padding:12px 14px;font-size:16px;min-height:50px"></div></div>
+  <div id="anl-list"></div><div style="height:16px"></div>`;
+  const draw = () => {
+    const q = $('#anl-q', v).value.trim().toLowerCase(); prm.q = q;
+    const groups = {};
+    ANL.filter(a => !q || (a.id + ' ' + a.name + ' ' + a.halle + ' ' + a.linie).toLowerCase().includes(q)).forEach(a => (groups[a.halle] ||= []).push(a));
+    const keys = Object.keys(groups);
+    $('#anl-list', v).innerHTML = keys.length ? keys.map(h => `<div class="a-sec"><h2>${esc(h)} <span class="c">${groups[h].length}</span></h2><ul class="a-list">${groups[h].map(a => { const s = status(a.id); return `<li><button class="a-row" type="button" data-a="akte" data-v="${a.id}">${tagId(a.id)}<span class="grow"><span class="t" style="display:block">${esc(a.name)}</span><span class="s" style="display:block">${esc(a.linie)}, ${esc(a.platz)}</span><span style="display:block;margin-top:5px"><span class="st st-${s}">${STATUS[s]}</span></span></span>${ic('right', 'chev')}</button></li>`; }).join('')}</ul></div>`).join('') : `<div class="a-sec"><div class="a-card a-empty">Keine Anlage gefunden. Suchen Sie nach der Nummer auf dem Typenschild, zum Beispiel CNC-07.</div></div>`;
+  };
+  $('#anl-q', v).addEventListener('input', draw);
+  draw();
+};
+
+/* ---------- Bildschirm: Scannen ---------- */
+let camStream = null, camLoop = 0, scanBusy = false;
+const camSupported = () => 'BarcodeDetector' in window && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+SCREENS.scan = v => {
+  v.classList.add('scan');
+  scanBusy = false;
+  v.innerHTML = `<div class="scan-top"><h1>Scannen</h1></div>
+  <div class="vf" id="vf"><video id="vf-video" playsinline muted hidden></video><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i><div class="laser"></div><div class="sim" id="vf-sim"></div></div>
+  <p class="scan-state" id="scan-state" aria-live="polite">${camSupported() ? 'QR-Schild an der Anlage in den Rahmen halten.' : 'Kamera-Scan ist in diesem Browser nicht verfügbar. Nutzen Sie die Simulation unten.'}</p>
+  ${camSupported() ? `<button class="cam-btn" type="button" data-a="cam">${ic('cam')}Kamera starten</button>` : ''}
+  <div class="sim-panel"><h2>QR-Code simulieren</h2><p>Schild antippen, um einen Scan auszulösen. In der Demo simuliert.</p>
+  <div class="sim-grid">${['CNC-07', ...ANL.map(a => a.id).filter(x => x !== 'CNC-07')].map(id => `<button class="sim-it${id === 'CNC-07' && !S.demo.done ? ' goal' : ''}" type="button" data-a="sim" data-v="${id}" aria-label="QR-Schild ${id} scannen">${plateHTML(id, { short: true })}</button>`).join('')}</div></div>`;
+};
+async function startCamera() {
+  const st = $('#scan-state'), btn = viewsEl.querySelector('[data-a="cam"]');
+  try {
+    const formats = await BarcodeDetector.getSupportedFormats();
+    if (!formats.includes('qr_code')) throw new Error('kein QR');
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    const vid = $('#vf-video'); if (!vid) { stopCamera(); return; }
+    vid.srcObject = camStream; vid.hidden = false; await vid.play();
+    if (btn) btn.remove();
+    st.textContent = 'Kamera aktiv. QR-Schild in den Rahmen halten.';
+    const det = new BarcodeDetector({ formats: ['qr_code'] });
+    const tick = async () => {
+      if (!camStream) return;
+      try { const r = await det.detect(vid); if (r && r[0] && !scanBusy) { scanHit(r[0].rawValue, null); return; } } catch (e) {}
+      camLoop = setTimeout(tick, 220);
+    };
+    tick();
+  } catch (e) {
+    stopCamera();
+    if (st) st.textContent = e && e.name === 'NotAllowedError' ? 'Kein Zugriff auf die Kamera. Erlauben Sie den Zugriff oder nutzen Sie die Simulation unten.' : 'Kamera konnte nicht gestartet werden. Nutzen Sie die Simulation unten.';
+  }
+}
+function stopCamera() {
+  clearTimeout(camLoop);
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+}
+function simulateScan(id) {
+  if (scanBusy) return;
+  scanBusy = true;
+  const vf = $('#vf'), sim = $('#vf-sim');
+  sim.innerHTML = plateHTML(id, { short: true });
+  const view = vf.closest('.view');
+  view.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  vf.classList.add('scanning');
+  $('#scan-state').textContent = 'Suche QR-Code ...';
+  setTimeout(() => scanHit(qrCode(id), vf), 700);
+}
+function scanHit(raw, vf) {
+  scanBusy = true;
+  vf = vf || $('#vf');
+  const mt = /^ANLAGE:([A-Z]{3}-\d{2})$/.exec(String(raw).trim());
+  const a = mt && DEF(mt[1]);
+  if (!a) {
+    $('#scan-state').innerHTML = `Code nicht erkannt: ${esc(String(raw).slice(0, 40))}. Nur Anlagen-Schilder der Muster GmbH werden gelesen.`;
+    haptic([30, 60, 30]);
+    setTimeout(() => { scanBusy = false; if (camStream) startLoopAgain(); }, 1800);
+    return;
+  }
+  stopCamera();
+  vf.classList.add('hit');
+  haptic([14, 50, 14]);
+  $('#scan-state').innerHTML = `<b>${esc(raw)}</b> erkannt`;
+  if (a.id === 'CNC-07' && !S.demo.scanned) S.demo.scanned = true;
+  addFeed({ kind: 'scan', anlage: a.id, t: `${a.id} gescannt`, s: `${ME}, Handy`, src: 'app' });
+  changed([a.id]);
+  setTimeout(() => { go('akte', { id: a.id, scanned: true }); }, 650);
+}
+function startLoopAgain() { const st = $('#scan-state'); if (st) st.textContent = 'Kamera aktiv. QR-Schild in den Rahmen halten.'; startCamera(); }
+
+/* ---------- Bildschirm: Anlagenakte ---------- */
+SCREENS.akte = (v, { id, scanned }) => {
+  const a = DEF(id), s = ST(id), stt = status(id), cl0 = CL[a.typ];
+  const om = openM(id).sort((x, y) => ['hoch', 'mittel', 'niedrig'].indexOf(x.prio) - ['hoch', 'mittel', 'niedrig'].indexOf(y.prio));
+  const prs = S.pruef.filter(p => p.anlage === id).sort((x, y) => y.ts - x.ts).slice(0, 4);
+  const minDd = Math.min(...s.plans.map(p => dayDiff(nextDue(p))));
+  let ban = '';
+  if (s.still) { const ref = S.maengel.find(x => x.id === s.stillRef); ban = `<div class="banner off" role="status">${ic('lock')}<div><b>Anlage stillgelegt</b>seit ${fDm.format(s.stillTs)} ${fT.format(s.stillTs)}${ref ? `, wegen ${ref.id}: ${esc(ref.titel)}` : ''}</div></div>`; }
+  else if (stt === 'def') ban = `<div class="banner def">${ic('alert')}<div><b>${om.length} ${om.length === 1 ? 'Mangel' : 'Mängel'} offen</b>Anlage ist in Betrieb. Details unten.</div></div>`;
+  else if (minDd < 0) ban = `<div class="banner over">${ic('clock')}<div><b>Prüfung überfällig</b>${dueText(minDd)}. Bitte jetzt durchführen.</div></div>`;
+  else if (minDd === 0) ban = `<div class="banner due">${ic('clock')}<div><b>Prüfung heute fällig</b>Starten Sie die Prüfung direkt hier.</div></div>`;
+  else ban = `<div class="banner ok">${ic('check')}<div><b>In Ordnung</b>Nächste Prüfung ${dueText(minDd)}.</div></div>`;
+  const plans = s.plans.map((p, pi) => {
+    const dd = dayDiff(nextDue(p)), isDraft = S.draft && S.draft.anlage === id && S.draft.plan === pi;
+    return `<li class="plan-row"><div class="grow"><div class="t">${esc(p.art)}</div><div class="s">${CL[p.cl].code}, ${CL[p.cl].items.length} Punkte, <span class="due-t ${dueCls(dd)}">${dueText(dd)}</span></div></div><button class="go${dd > 0 && !isDraft ? ' ghost' : ''}" type="button" data-a="start" data-v="${id}" data-p="${pi}">${isDraft ? 'Fortsetzen' : 'Starten'}</button></li>`;
+  }).join('');
+  v.innerHTML = appBar(a.id, '', '') + `
+  <div class="akte-plate">${plateHTML(id)}</div>
+  ${scanned ? `<p style="margin:8px 20px 0;font-size:13.5px;color:var(--ok);font-weight:700;display:flex;gap:6px;align-items:center">${ic('check')}Vor Ort per QR-Code bestätigt, ${fT.format(Date.now())} Uhr</p>` : ''}
+  ${ban}
+  <div class="a-sec"><h2>Prüfungen und Wartung</h2><ul class="a-list">${plans}</ul></div>
+  <div class="big-act"><button class="abtn warn" type="button" data-a="melden" data-v="${id}">${ic('alert')}Mangel melden</button></div>
+  <div class="a-sec"><h2>Zähler</h2><div class="a-card counter"><div><div class="v">${nf0.format(s.bh)}<small>h</small></div><div class="s">Betriebsstunden</div></div><button class="go ghost" type="button" data-a="zaehler" data-v="${id}" style="border:0;border-radius:12px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);font-weight:700;min-height:44px;padding:0 14px">Stand erfassen</button></div></div>
+  <div class="a-sec"><h2>Offene Mängel <span class="c">${om.length}</span></h2>${om.length ? `<ul class="a-list">${om.map(x => `<li class="plan-row" style="align-items:flex-start"><span class="pr pr-${x.prio}">${PRIO[x.prio]}</span><div class="grow"><div class="t" style="font-size:15px">${esc(x.titel)}</div><div class="s">${x.id}, ${esc(x.von)}, ${relTime(x.ts)}${x.zust ? `<br>${MSTAT[x.status]}: ${esc(x.zust)}` : ''}</div></div>${x.foto ? `<img src="${imgSrc(x.foto)}" alt="Foto zu ${x.id}" style="width:56px;height:42px;object-fit:cover;border-radius:8px">` : ''}</li>`).join('')}</ul>` : `<div class="a-card a-empty">Keine offenen Mängel.</div>`}</div>
+  <div class="a-sec"><h2>Letzte Prüfungen</h2>${prs.length ? `<ul class="a-list">${prs.map(p => `<li><button class="a-row" type="button" data-a="proto" data-v="${p.id}"><span class="grow"><span class="t" style="display:block">${esc(p.art)}</span><span class="s" style="display:block">${fDs.format(p.ts)}, ${fT.format(p.ts)}, ${esc(p.pruefer)}</span></span><span class="res ${p.gesamt}">${p.gesamt === 'io' ? 'i. O.' : p.maengel.length + ' Mangel'}</span>${ic('right', 'chev')}</button></li>`).join('')}</ul>` : `<div class="a-card a-empty">Noch keine Prüfung erfasst.</div>`}</div>
+  <div class="a-sec"><h2>Kenndaten</h2><dl class="a-card kv2"><dt>Bezeichnung</dt><dd>${esc(a.modell)}</dd><dt>Hersteller</dt><dd>${esc(a.her)}</dd><dt>Baujahr</dt><dd>${a.bj}</dd><dt>Serien-Nr.</dt><dd>${esc(a.sn)}</dd><dt>Inventar-Nr.</dt><dd>${esc(a.inv)}</dd><dt>Standort</dt><dd>${esc(a.halle)}, ${esc(a.linie)}, ${esc(a.platz)}</dd></dl></div>
+  <div class="a-sec"><h2>Dokumente</h2><ul class="a-list">${DOCS(a.typ).map(d => `<li><button class="a-row" type="button" data-a="doc" data-v="${id}" data-k="${d.k}"><span class="doc-ic ${d.f === 'PDF' ? 'pdf' : ''}">${d.f}</span><span class="grow"><span class="t" style="display:block">${esc(d.t)}</span><span class="s" style="display:block">${esc(d.k === 'pp' ? CL[a.typ].code + ', Version ' + CL[a.typ].ver + ', ' + cl0.items.length + ' Punkte' : d.s)}</span></span>${ic('right', 'chev')}</button></li>`).join('')}</ul></div>
+  <div style="height:20px"></div>`;
+};
+
+/* ---------- Prüfung starten ---------- */
+function startPruefung(id, pi) {
+  const d = S.draft;
+  if (d && d.anlage === id && d.plan === pi) { go('check'); return; }
+  if (d) {
+    const sh = openSheet(`<h2 id="sheet-t">Offene Prüfung an ${d.anlage}</h2><p class="lead">${esc(ST(d.anlage).plans[d.plan].art)} an ${d.anlage} ist noch nicht abgeschlossen (${answered(d)} von ${CL[d.cl].items.length} Punkten).</p>
+      <button class="abtn" type="button" data-x="cont">Offene Prüfung fortsetzen</button><button class="abtn warn" type="button" data-x="drop">Verwerfen und ${id} prüfen</button><button class="abtn sec" type="button" data-a="sheet-close">Abbrechen</button>`);
+    sh.querySelector('[data-x="cont"]').onclick = () => { closeSheet(); go('check'); };
+    sh.querySelector('[data-x="drop"]').onclick = () => { closeSheet(); S.draft = null; startPruefung(id, pi); };
+    return;
+  }
+  const p = ST(id).plans[pi];
+  S.draft = { anlage: id, plan: pi, cl: p.cl, start: Date.now(), items: {}, sig: null, ok: false, fed: {} };
+  CL[p.cl].items.forEach(it => { S.draft.items[it.id] = { res: null, val: null, raw: '', note: '', fotos: [], prio: it.prio, stop: it.stop, noteOpen: false }; });
+  if (id === 'CNC-07') S.demo.started = true;
+  addFeed({ kind: 'start', anlage: id, t: `${p.art} an ${id} gestartet`, s: `${ME}, Handy`, src: 'app' });
+  changed([id]);
+  go('check');
+}
+
+/* ---------- Bildschirm: Checkliste ---------- */
+function itemHTML(it, i, di) {
+  const n = i + 1, name = 'r-' + it.id;
+  const res = di.res;
+  let body;
+  if (it.typ === 'm') {
+    const lo = it.min == null ? null : it.min === 0 ? 0 : it.min - (it.max - it.min) * .6, hi = it.max == null ? null : it.max + (it.max - it.min) * .6;
+    body = `<div class="mess"><label class="ml" for="v-${it.id}">Messwert, Soll ${tolText(it)}</label>
+      <div class="mess-row"><div class="mess-in" id="mi-${it.id}"><input id="v-${it.id}" data-m="${it.id}" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="${it.min == null ? 'Stand, zuletzt ' + nf0.format(ST(S.draft.anlage).bh) : 'Wert eingeben'}" value="${esc(di.raw)}" aria-describedby="me-${it.id}"><span class="u">${esc(it.u)}</span></div>
+      <button class="na-btn" type="button" data-a="na" data-v="${it.id}" aria-pressed="${res === 'na'}">n. a.</button></div>
+      ${lo != null ? `<div class="gauge" aria-hidden="true" data-lo="${lo}" data-hi="${hi}"><div class="tr"></div><div class="zn" style="left:${(it.min - lo) / (hi - lo) * 100}%;width:${(it.max - it.min) / (hi - lo) * 100}%"></div><span class="lb" style="left:${(it.min - lo) / (hi - lo) * 100}%">${nfd(it.min, it.dec)}</span><span class="lb" style="left:${(it.max - lo) / (hi - lo) * 100}%">${nfd(it.max, it.dec)}</span><div class="mk" id="mk-${it.id}" hidden></div></div>` : ''}
+      <p class="mess-eval" id="me-${it.id}" aria-live="polite"></p></div>`;
+  } else {
+    body = `<fieldset class="seg"><legend>Ergebnis ${it.t}</legend>
+      <label><input type="radio" name="${name}" value="io"${res === 'io' ? ' checked' : ''}><span class="io">${ic('check')}i. O.</span></label>
+      <label><input type="radio" name="${name}" value="nio"${res === 'nio' ? ' checked' : ''}><span class="nio">${ic('x')}n. i. O.</span></label>
+      <label><input type="radio" name="${name}" value="na"${res === 'na' ? ' checked' : ''}><span class="na">${ic('minus')}n. a.</span></label></fieldset>`;
+  }
+  return `<article class="pp" id="pp-${it.id}" data-id="${it.id}" aria-labelledby="pt-${it.id}">
+    <div class="pp-head"><span class="pp-no" aria-hidden="true">${n}</span><div><h3 id="pt-${it.id}">${esc(it.t)}</h3><p class="pp-hint">${esc(it.h)}</p></div></div>
+    ${body}
+    <div class="pp-tools"><button class="tool" type="button" data-a="foto" data-v="${it.id}">${ic('cam')}Foto<span class="n" id="fn-${it.id}"${di.fotos.length ? '' : ' hidden'}>${di.fotos.length}</span></button><button class="tool" type="button" data-a="note" data-v="${it.id}" aria-expanded="${di.noteOpen || !!di.note}" aria-controls="nt-${it.id}">${ic('note')}Notiz</button></div>
+    <div class="pp-fotos" id="pf-${it.id}"></div>
+    <div class="field pp-note" id="nt-${it.id}"${di.noteOpen || di.note ? '' : ' hidden'}><label for="ta-${it.id}">Notiz zu Punkt ${n}</label><textarea id="ta-${it.id}" data-note="${it.id}" rows="2" placeholder="Was ist aufgefallen?">${esc(di.note)}</textarea></div>
+    <div class="pp-def" id="pd-${it.id}" hidden></div>
+    <p class="pp-err" id="pe-${it.id}" hidden>Bitte ein Ergebnis erfassen.</p>
+  </article>`;
+}
+SCREENS.check = v => {
+  const d = S.draft;
+  if (!d) { v.innerHTML = appBar('Prüfung') + `<div class="a-sec"><div class="a-card a-empty">Keine Prüfung offen.</div></div>`; return; }
+  const a = DEF(d.anlage), p = ST(d.anlage).plans[d.plan], cl = CL[d.cl];
+  v.innerHTML = appBar(esc(p.art), `<span class="id" style="font-size:17px;padding-right:8px">${a.id}</span>`, `<div class="prog-t" id="prog-t"></div><div class="prog"><i id="prog-i"></i></div>`, 'Anlage') + `
+  <div class="cl-intro"><b>${a.id} ${esc(a.name)}</b><br>Prüfplan ${cl.code}, Version ${cl.ver}, etwa ${cl.min} Minuten. Jede Eingabe wird sofort gespeichert.</div>
+  ${cl.items.map((it, i) => itemHTML(it, i, d.items[it.id])).join('')}
+  <div class="dock"><p class="hint" id="dock-hint"></p><button class="abtn" type="button" data-a="to-sign" id="to-sign">Weiter zur Unterschrift</button></div>`;
+  cl.items.forEach(it => updateItem(it.id, v));
+  updateProgress(v);
+};
+function updateProgress(v) {
+  const d = S.draft, cl = CL[d.cl], n = answered(d), tot = cl.items.length;
+  const t = $('#prog-t', v), i = $('#prog-i', v), h = $('#dock-hint', v), b = $('#to-sign', v);
+  if (t) t.textContent = `${n} von ${tot} Punkten erfasst`;
+  if (i) i.style.width = (n / tot * 100) + '%';
+  const nio = Object.values(d.items).filter(x => x.res === 'nio').length;
+  if (h) h.textContent = n < tot ? `Noch ${tot - n} ${tot - n === 1 ? 'Punkt' : 'Punkte'} offen` : nio ? `${nio} ${nio === 1 ? 'Abweichung wird' : 'Abweichungen werden'} als Mangel gemeldet` : 'Alle Punkte erfasst';
+  if (b) b.setAttribute('aria-disabled', n < tot ? 'true' : 'false');
+}
+function updateItem(iid, v) {
+  v = v || viewsEl.querySelector('.view:not(.leaving)');
+  const d = S.draft, it = CL[d.cl].items.find(x => x.id === iid), di = d.items[iid];
+  const card = $('#pp-' + iid, v); if (!card) return;
+  card.classList.remove('done-io', 'done-nio', 'done-na');
+  if (di.res) { card.classList.add('done-' + di.res); card.classList.remove('need'); $('#pe-' + iid, v).hidden = true; }
+  if (it.typ === 'm') {
+    const mi = $('#mi-' + iid, v), me = $('#me-' + iid, v), mk = $('#mk-' + iid, v), na = card.querySelector('.na-btn'), inp = $('#v-' + iid, v);
+    na.setAttribute('aria-pressed', di.res === 'na');
+    inp.disabled = di.res === 'na';
+    mi.classList.toggle('bad', di.res === 'nio'); mi.classList.toggle('good', di.res === 'io');
+    if (di.res === 'na') { me.className = 'mess-eval'; me.textContent = 'Nicht anwendbar'; }
+    else if (di.val == null) { me.className = 'mess-eval'; me.textContent = di.raw ? 'Bitte eine Zahl eingeben, zum Beispiel 48,5.' : ''; }
+    else if (it.min == null) { me.className = 'mess-eval good'; me.textContent = 'Zählerstand erfasst'; }
+    else if (di.res === 'io') { me.className = 'mess-eval good'; me.textContent = `${nfd(di.val, it.dec)} ${it.u} liegt in der Toleranz`; }
+    else { const dir = di.val < it.min ? 'unter' : 'über'; const diff = di.val < it.min ? it.min - di.val : di.val - it.max; me.className = 'mess-eval bad'; me.textContent = `Außerhalb der Toleranz: ${nfd(diff, it.dec)} ${it.u} ${dir} dem Grenzwert`; }
+    if (mk) { const g = mk.parentElement, lo = +g.dataset.lo, hi = +g.dataset.hi; if (di.val == null || di.res === 'na') mk.hidden = true; else { mk.hidden = false; mk.style.left = clamp((di.val - lo) / (hi - lo) * 100, 0, 100) + '%'; } }
+  }
+  // Fotos
+  const pf = $('#pf-' + iid, v);
+  pf.innerHTML = di.fotos.map((f, k) => `<figure><img src="${imgSrc(f)}" alt="Foto ${k + 1} zu ${esc(it.t)}"><button type="button" data-a="foto-del" data-v="${iid}" data-k="${k}" aria-label="Foto ${k + 1} entfernen">${ic('x')}</button></figure>`).join('');
+  const fn = $('#fn-' + iid, v); fn.textContent = di.fotos.length; fn.hidden = !di.fotos.length;
+  // Mangelbox
+  const pd = $('#pd-' + iid, v);
+  if (di.res === 'nio') {
+    if (pd.hidden || !pd.innerHTML) {
+      pd.innerHTML = `<p>${ic('alert')}Daraus wird automatisch ein Mangel gemeldet.</p>
+      <fieldset class="seg prio"><legend>Priorität des Mangels</legend>${['hoch', 'mittel', 'niedrig'].map(pk => `<label><input type="radio" name="pp-${iid}" value="${pk}"${di.prio === pk ? ' checked' : ''} data-prio="${iid}"><span class="${pk}">${PRIO[pk]}</span></label>`).join('')}</fieldset>
+      <div class="sw-row"><span class="txt" id="swl-${iid}">Anlage stilllegen<small>Im Leitstand gesperrt bis zur Behebung</small></span><button class="switch" type="button" role="switch" aria-checked="${di.stop}" aria-labelledby="swl-${iid}" data-a="stop" data-v="${iid}"></button></div>`;
+    }
+    pd.hidden = false;
+  } else { pd.hidden = true; pd.innerHTML = ''; }
+  updateProgress(v);
+}
+function setRes(iid, res, fromUser) {
+  const d = S.draft, di = d.items[iid], it = CL[d.cl].items.find(x => x.id === iid);
+  const was = di.res;
+  di.res = res;
+  updateItem(iid);
+  save();
+  if (res === 'nio' && !d.fed[iid]) {
+    d.fed[iid] = 1;
+    addFeed({ kind: 'nio', anlage: d.anlage, t: `Abweichung an ${d.anlage}: ${it.t}`, s: it.typ === 'm' && di.val != null ? `${nfd(di.val, it.dec)} ${it.u}, Soll ${tolText(it)}. ${ME}, Handy` : `n. i. O. erfasst, ${ME}, Handy`, src: 'app' });
+    changed([d.anlage]);
+  }
+  if (fromUser && !was && (res === 'io' || res === 'na')) scrollToNext(iid);
+}
+function scrollToNext(iid) {
+  const d = S.draft, items = CL[d.cl].items, idx = items.findIndex(x => x.id === iid);
+  const next = items.slice(idx + 1).find(x => !d.items[x.id].res) || items.find(x => !d.items[x.id].res);
+  const v = viewsEl.querySelector('.view:not(.leaving)');
+  const el = next ? $('#pp-' + next.id, v) : $('#to-sign', v);
+  if (!el || !v) return;
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(() => v.scrollTo({ top: Math.max(0, el.offsetTop - 118), behavior: rm ? 'auto' : 'smooth' }), 180);
+}
+function fotoSheet(onAdd, label) {
+  const sh = openSheet(`<h2 id="sheet-t">Foto hinzufügen</h2><p class="lead">${esc(label)}</p>
+    <button class="abtn" type="button" data-x="cam">${ic('cam')}Kamera öffnen</button>
+    <button class="abtn sec" type="button" data-x="demo">${ic('img')}<span>Beispielfoto einfügen <span class="sub">(Demo)</span></span></button>
+    <button class="abtn sec" type="button" data-a="sheet-close" style="margin-top:8px">Abbrechen</button>`);
+  sh.querySelector('[data-x="cam"]').onclick = () => { closeSheet(); pickPhoto(onAdd); };
+  sh.querySelector('[data-x="demo"]').onclick = () => { closeSheet(); onAdd(null); };
+}
+function toSign() {
+  const d = S.draft, v = viewsEl.querySelector('.view:not(.leaving)');
+  const open = CL[d.cl].items.filter(it => !d.items[it.id].res);
+  if (open.length) {
+    open.forEach(it => { const card = $('#pp-' + it.id, v); card.classList.remove('need'); void card.offsetWidth; card.classList.add('need'); $('#pe-' + it.id, v).hidden = false; });
+    const first = $('#pp-' + open[0].id, v);
+    v.scrollTo({ top: Math.max(0, first.offsetTop - 118), behavior: 'smooth' });
+    haptic([20, 40, 20]);
+    appToast(`Noch ${open.length} ${open.length === 1 ? 'Punkt' : 'Punkte'} ohne Ergebnis.`);
+    const f = first.querySelector('input'); if (f) setTimeout(() => f.focus({ preventScroll: true }), 350);
+    return;
+  }
+  go('abschluss');
+}
+
+/* ---------- Bildschirm: Abschluss mit Unterschrift ---------- */
+SCREENS.abschluss = v => {
+  const d = S.draft; if (!d) { v.innerHTML = appBar('Abschluss'); return; }
+  const a = DEF(d.anlage), p = ST(d.anlage).plans[d.plan], cl = CL[d.cl];
+  const cnt = { io: 0, nio: 0, na: 0 }; Object.values(d.items).forEach(x => x.res && cnt[x.res]++);
+  const nio = cl.items.filter(it => d.items[it.id].res === 'nio');
+  const stops = nio.filter(it => d.items[it.id].stop);
+  v.innerHTML = appBar('Abschluss', `<span class="id" style="font-size:17px;padding-right:8px">${a.id}</span>`, '', 'Prüfung') + `
+  <div class="cl-intro"><b>${esc(p.art)} ${a.id}</b><br>Prüfer: ${ME}, Dauer ${Math.max(1, Math.round((Date.now() - d.start) / MIN))} Min.</div>
+  <div class="sum-big"><div class="io"><b>${cnt.io}</b><span>i. O.</span></div><div class="nio"><b>${cnt.nio}</b><span>n. i. O.</span></div><div><b>${cnt.na}</b><span>n. a.</span></div></div>
+  ${nio.length ? `<div class="a-sec"><h2>Wird als Mangel gemeldet <span class="c">${nio.length}</span></h2><ul class="a-list">${nio.map(it => { const di = d.items[it.id]; return `<li class="plan-row"><span class="pr pr-${di.prio}">${PRIO[di.prio]}</span><div class="grow"><div class="t" style="font-size:15px">${esc(it.t)}</div><div class="s">${it.typ === 'm' && di.val != null ? `${nfd(di.val, it.dec)} ${it.u}, Soll ${tolText(it)}` : 'n. i. O.'}${di.stop ? ', mit Stilllegung' : ''}</div></div></li>`; }).join('')}</ul></div>` : `<div class="banner ok">${ic('check')}<div><b>Alle Punkte in Ordnung</b>Die Anlage bleibt freigegeben.</div></div>`}
+  ${stops.length ? `<div class="banner off">${ic('lock')}<div><b>${a.id} wird stillgelegt</b>Der Leitstand sieht die Sperre sofort.</div></div>` : ''}
+  <div class="a-sec"><div class="field" id="f-sig" style="margin:0"><span class="flabel" id="sig-l">Unterschrift ${ME}</span><div class="sigpad" id="sigpad"><canvas id="sig" aria-labelledby="sig-l" role="img"></canvas><div class="base"></div><div class="ph" id="sig-ph">Hier mit dem Finger unterschreiben</div></div>
+  <div class="sig-tools"><button class="tool" type="button" data-a="sig-auto">${ic('pen')}Namenszug einsetzen</button><button class="tool" type="button" data-a="sig-clear">Löschen</button></div><span class="f-err" id="sig-err" hidden>Bitte unterschreiben oder Namenszug einsetzen.</span></div>
+  <label class="chk" id="chk-l"><input type="checkbox" id="chk-ok"${d.ok ? ' checked' : ''}><span>Ich bestätige, dass ich die Prüfung nach Prüfplan ${cl.code} vor Ort durchgeführt habe.</span></label><span class="f-err" id="chk-err" hidden>Bitte bestätigen.</span></div>
+  <div class="dock"><button class="abtn" type="button" data-a="finish">${ic('check')}Prüfung abschließen</button></div>`;
+  initSig(v);
+  $('#chk-ok', v).addEventListener('change', e => { d.ok = e.target.checked; $('#chk-l', v).classList.remove('bad'); $('#chk-err', v).hidden = true; save(); });
+};
+function initSig(v) {
+  const cv = $('#sig', v), pad = $('#sigpad', v), ctx = cv.getContext('2d');
+  const W0 = pad.offsetWidth || 340, H0 = pad.offsetHeight || 170;
+  cv.width = W0 * 2; cv.height = H0 * 2;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#13265A'; ctx.lineWidth = 4.2;
+  const d = S.draft;
+  const ph = $('#sig-ph', v);
+  if (d.sig) { const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, cv.width, cv.height); im.src = d.sig; ph.hidden = true; }
+  let drawing = false, last = null;
+  const pt = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * cv.width, y: (e.clientY - r.top) / r.height * cv.height }; };
+  cv.addEventListener('pointerdown', e => { drawing = true; last = pt(e); cv.setPointerCapture(e.pointerId); ph.hidden = true; ctx.beginPath(); ctx.arc(last.x, last.y, 2, 0, 7); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); e.preventDefault(); });
+  cv.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); const mx = (last.x + p.x) / 2, my = (last.y + p.y) / 2; ctx.quadraticCurveTo(last.x, last.y, mx, my); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; });
+  const end = () => { if (!drawing) return; drawing = false; d.sig = cv.toDataURL('image/png'); $('#f-sig', v).classList.remove('bad'); $('#sig-err', v).hidden = true; save(); };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+}
+function sigAuto(v) {
+  const cv = $('#sig', v), ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.lineWidth = 4.2; ctx.strokeStyle = '#13265A';
+  const base = h * .66, R = rng(99);
+  ctx.beginPath();
+  // J
+  ctx.moveTo(w * .14, base - h * .38); ctx.bezierCurveTo(w * .2, base - h * .42, w * .18, base, w * .15, base + h * .1); ctx.bezierCurveTo(w * .12, base + h * .18, w * .07, base + h * .05, w * .11, base - h * .02);
+  ctx.stroke(); ctx.beginPath();
+  // Schleifenzug für "Keller"
+  let x = w * .24; ctx.moveTo(x, base - h * .05);
+  for (let i = 0; i < 9; i++) {
+    const tall = i === 0 || i === 4 || i === 5, amp = tall ? h * .4 : h * .16 + R() * h * .05, step = w * (.055 + R() * .012);
+    ctx.bezierCurveTo(x + step * .2, base - amp, x + step * .9, base - amp, x + step * .45, base - h * .02);
+    ctx.bezierCurveTo(x + step * .3, base + h * .03, x + step * .8, base + h * .02, x + step, base - h * .06);
+    x += step;
+  }
+  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(w * .2, base + h * .14); ctx.bezierCurveTo(w * .45, base + h * .2, w * .7, base + h * .08, w * .86, base + h * .1); ctx.stroke();
+  S.draft.sig = cv.toDataURL('image/png');
+  $('#sig-ph', v).hidden = true; $('#f-sig', v).classList.remove('bad'); $('#sig-err', v).hidden = true;
+  save();
+}
+function finish() {
+  const d = S.draft, v = viewsEl.querySelector('.view:not(.leaving)');
+  let bad = false;
+  if (!d.sig) { $('#f-sig', v).classList.add('bad'); $('#sig-err', v).hidden = false; bad = true; }
+  if (!d.ok) { $('#chk-l', v).classList.add('bad'); $('#chk-err', v).hidden = false; bad = true; }
+  if (bad) { haptic([20, 40, 20]); appToast('Unterschrift und Bestätigung fehlen noch.'); (d.sig ? $('#chk-ok', v) : $('#sig', v)).scrollIntoView({ block: 'center' }); return; }
+  const a = DEF(d.anlage), s = ST(d.anlage), plan = s.plans[d.plan], cl = CL[d.cl], now = Date.now();
+  const pid = 'P-0' + (S.seq.p++);
+  const results = cl.items.map(it => { const di = d.items[it.id]; return { id: it.id, res: di.res, val: di.res === 'na' ? null : di.val, note: di.note, fotos: di.fotos.slice() }; });
+  const rec = { id: pid, anlage: a.id, plan: d.plan, art: plan.art, cl: d.cl, ts: now - Math.max(1, Math.round((now - d.start) / MIN)) * MIN, dauer: Math.max(1, Math.round((now - d.start) / MIN)), pruefer: ME, results, sig: d.sig, gesamt: 'io', maengel: [], neu: true };
+  const created = [];
+  cl.items.forEach(it => {
+    const di = d.items[it.id]; if (di.res !== 'nio') return;
+    const mid = 'M-0' + (S.seq.m++);
+    const mg = { id: mid, anlage: a.id, titel: it.typ === 'm' && di.val != null ? `${it.t} außerhalb Toleranz (${nfd(di.val, it.dec)} ${it.u})` : `${it.t}: n. i. O.`, text: di.note, prio: di.prio, still: !!di.stop, status: 'offen', zust: '', von: ME, ts: now, foto: di.fotos[0] || null, quelle: pid, doneTs: null, doneBy: '' };
+    S.maengel.push(mg); rec.maengel.push(mid); created.push(mg);
+  });
+  if (created.length) rec.gesamt = 'nio';
+  // Betriebsstunden aus Wartung übernehmen
+  const bhItem = cl.items.find(it => it.id === 'bh'); if (bhItem && d.items.bh.val > s.bh) s.bh = Math.round(d.items.bh.val);
+  S.pruef.push(rec);
+  plan.last = now;
+  const f = feedFromPruefung(rec, true); f.ts = now; addFeed(f);
+  created.forEach(mg => addFeed({ kind: 'mangel', anlage: a.id, ref: mg.id, t: `Mangel ${mg.id} gemeldet: ${mg.titel}`, s: `Aus Prüfung ${pid}, Priorität ${PRIO[mg.prio]}`, src: 'app' }));
+  const stop = created.find(mg => mg.still);
+  if (stop && !s.still) { s.still = true; s.stillTs = now; s.stillRef = stop.id; addFeed({ kind: 'still', anlage: a.id, ref: stop.id, t: `${a.id} stillgelegt`, s: `Wegen ${stop.id}, ${ME}, Handy`, src: 'app' }); }
+  if (a.id === 'CNC-07') { S.demo.done = true; S.demo.pid = pid; }
+  S.draft = null;
+  lastNew.pruef = pid;
+  save(true);
+  flashIds.add(a.id); renderLS();
+  haptic([10, 30, 10, 30, 40]);
+  nav.tab = 'aufgaben';
+  replaceStack([{ name: 'aufgaben', params: {} }, { name: 'fertig', params: { pid } }]);
+}
+const lastNew = { pruef: null };
+
+/* ---------- Bildschirm: Fertig mit Prüfplakette ---------- */
+function plaketteSVG(ts) {
+  const d = new Date(ts), mo = d.getMonth(), yy = String(d.getFullYear()).slice(2);
+  let ring = '';
+  for (let i = 0; i < 12; i++) {
+    const an = (i / 12) * Math.PI * 2 - Math.PI / 2, x = 100 + Math.cos(an) * 78, y = 100 + Math.sin(an) * 78;
+    ring += i === mo ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="#fff"/><text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" font-family="Sofia Cond,sans-serif" font-weight="800" font-size="15" fill="#005A61">${i + 1}</text>`
+      : `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" font-family="Sofia Cond,sans-serif" font-weight="700" font-size="14" fill="#fff" opacity=".9">${i + 1}</text>`;
+  }
+  return `<svg viewBox="0 0 200 200" role="img" aria-label="Prüfplakette, nächste Prüfung ${fD.format(ts)}"><circle cx="100" cy="100" r="97" fill="#005A61"/><circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>${ring}<circle cx="100" cy="100" r="58" fill="#fff"/><text x="100" y="78" text-anchor="middle" font-family="AH Next,sans-serif" font-weight="700" font-size="10" fill="#46545A">Nächste Prüfung</text><text x="100" y="119" text-anchor="middle" font-family="Sofia Cond,sans-serif" font-weight="800" font-size="46" fill="#172024">${yy}</text><text x="100" y="138" text-anchor="middle" font-family="Sofia Cond,sans-serif" font-weight="700" font-size="14" fill="#005A61">${fD.format(ts)}</text></svg>`;
+}
+SCREENS.fertig = (v, { pid }) => {
+  const p = S.pruef.find(x => x.id === pid); if (!p) { v.innerHTML = ''; return; }
+  const s = ST(p.anlage), next = nextDue(s.plans[p.plan]);
+  v.innerHTML = `<div class="done-wrap"><div class="plakette drop">${plaketteSVG(next)}</div>
+  <h1 style="font-family:var(--f-id);font-size:32px;font-weight:800;margin:10px 0 6px;line-height:1.05">Prüfung abgeschlossen</h1>
+  <p>${esc(p.art)} ${p.anlage} ist als Protokoll ${p.id} gespeichert.${p.maengel.length ? ` ${p.maengel.length} ${p.maengel.length === 1 ? 'Mangel ist' : 'Mängel sind'} gemeldet.` : ''} Der Leitstand sieht es sofort.</p></div>
+  <div class="big-act" style="margin-top:22px">
+    <button class="abtn" type="button" data-a="ls-show" data-v="${p.id}">${ic('monitor')}Im Leitstand ansehen</button>
+    <button class="abtn sec" type="button" data-a="proto" data-v="${p.id}">${ic('doc')}Protokoll ansehen</button>
+    <button class="abtn sec" type="button" data-a="tab" data-v="aufgaben">Zu meinen Aufgaben</button></div>`;
+};
+
+/* ---------- Bildschirm: Mangel melden ---------- */
+SCREENS.melden = (v, prm) => {
+  const pushed = nav.stack.length > 1;
+  const f = prm.form ||= { anlage: prm.id || '', titel: '', text: '', prio: 'mittel', still: false, fotos: [] };
+  const head = pushed ? appBar('Mangel melden') : `<div class="lt"><p class="lt-sub">Auch ohne Prüfung</p><h1>Mangel melden</h1></div>`;
+  v.innerHTML = head + `
+  <form id="mform" novalidate>
+  <div class="f-sec"><div class="field" id="mf-a-f" style="margin:0"><label for="mf-a">Anlage</label>
+    <select id="mf-a" aria-describedby="mf-a-e"><option value="">Anlage wählen</option>${ANL.map(a => `<option value="${a.id}"${f.anlage === a.id ? ' selected' : ''}>${a.id}, ${esc(a.name)}</option>`).join('')}</select><span class="err" id="mf-a-e" hidden>Bitte die betroffene Anlage wählen.</span></div></div>
+  <div class="f-sec"><span class="flabel">Foto</span><div class="foto-drop"><button type="button" data-a="mf-cam">${ic('cam')}Foto aufnehmen<small>Kamera oder Datei</small></button><button type="button" data-a="mf-demo">${ic('img')}Beispielfoto<small>In der Demo simuliert</small></button></div><div class="pp-fotos" id="mf-fotos" style="margin-top:10px"></div></div>
+  <div class="f-sec"><div class="field" id="mf-t-f" style="margin:0"><label for="mf-t">Was ist kaputt?</label><input id="mf-t" type="text" maxlength="90" placeholder="zum Beispiel Ölleck am Hydraulikaggregat" value="${esc(f.titel)}" aria-describedby="mf-t-e"><span class="err" id="mf-t-e" hidden>Bitte kurz beschreiben, was nicht in Ordnung ist.</span></div></div>
+  <div class="f-sec"><div class="field" style="margin:0"><label for="mf-d">Details <span style="font-weight:500">(optional)</span></label><textarea id="mf-d" rows="3" placeholder="Wo genau, seit wann, was wurde schon getan?">${esc(f.text)}</textarea></div></div>
+  <div class="f-sec"><span class="flabel" aria-hidden="true">Priorität</span><fieldset class="seg prio" style="margin:0"><legend>Priorität</legend>${['hoch', 'mittel', 'niedrig'].map(pk => `<label><input type="radio" name="mf-p" value="${pk}"${f.prio === pk ? ' checked' : ''}><span class="${pk}">${PRIO[pk]}</span></label>`).join('')}</fieldset><p class="prio-help" id="mf-ph">${PRIO_HELP[f.prio]}</p></div>
+  <div class="f-sec"><div class="a-card" style="padding:4px 14px"><div class="sw-row"><span class="txt" id="mf-sl">Anlage stilllegen<small>Die Anlage gilt als gesperrt, bis der Mangel erledigt ist.</small></span><button class="switch" type="button" role="switch" id="mf-s" aria-checked="${f.still}" aria-labelledby="mf-sl"></button></div></div></div>
+  <div class="dock" style="position:static;background:none"><button class="abtn" type="submit">${ic('alert')}Mangel melden</button></div>
+  </form>`;
+  const drawF = () => { $('#mf-fotos', v).innerHTML = f.fotos.map((x, k) => `<figure><img src="${imgSrc(x)}" alt="Foto ${k + 1}"><button type="button" data-k="${k}" aria-label="Foto ${k + 1} entfernen">${ic('x')}</button></figure>`).join(''); };
+  drawF();
+  $('#mf-fotos', v).addEventListener('click', e => { const b = e.target.closest('button'); if (b) { f.fotos.splice(+b.dataset.k, 1); drawF(); } });
+  const add = data => { f.fotos.push(data || newDemoPhoto(f.anlage || 'Anlage')); drawF(); };
+  v.querySelector('[data-a="mf-cam"]').onclick = () => pickPhoto(add);
+  v.querySelector('[data-a="mf-demo"]').onclick = () => add(null);
+  $('#mf-a', v).onchange = e => { f.anlage = e.target.value; $('#mf-a-f', v).classList.remove('bad'); $('#mf-a-e', v).hidden = true; };
+  $('#mf-t', v).oninput = e => { f.titel = e.target.value; if (f.titel.trim()) { $('#mf-t-f', v).classList.remove('bad'); $('#mf-t-e', v).hidden = true; } };
+  $('#mf-d', v).oninput = e => { f.text = e.target.value; };
+  $$('input[name="mf-p"]', v).forEach(r => r.onchange = () => { f.prio = r.value; $('#mf-ph', v).textContent = PRIO_HELP[f.prio]; if (f.prio === 'hoch' && !f.still) { /* Vorschlag, keine Automatik */ } });
+  $('#mf-s', v).onclick = e => { f.still = !f.still; e.currentTarget.setAttribute('aria-checked', f.still); haptic(); };
+  $('#mform', v).addEventListener('submit', e => {
+    e.preventDefault();
+    let first = null;
+    if (!f.anlage) { $('#mf-a-f', v).classList.add('bad'); $('#mf-a-e', v).hidden = false; first = first || $('#mf-a', v); }
+    if (!f.titel.trim()) { $('#mf-t-f', v).classList.add('bad'); $('#mf-t-e', v).hidden = false; first = first || $('#mf-t', v); }
+    if (first) { haptic([20, 40, 20]); first.focus(); return; }
+    const now = Date.now(), mid = 'M-0' + (S.seq.m++), s = ST(f.anlage);
+    const mg = { id: mid, anlage: f.anlage, titel: f.titel.trim(), text: f.text.trim(), prio: f.prio, still: f.still, status: 'offen', zust: '', von: ME, ts: now, foto: f.fotos[0] || null, quelle: null, doneTs: null, doneBy: '' };
+    S.maengel.push(mg);
+    addFeed({ kind: 'mangel', anlage: f.anlage, ref: mid, t: `Mangel ${mid} gemeldet: ${mg.titel}`, s: `${ME}, Handy, Priorität ${PRIO[mg.prio]}`, src: 'app' });
+    if (f.still && !s.still) { s.still = true; s.stillTs = now; s.stillRef = mid; addFeed({ kind: 'still', anlage: f.anlage, ref: mid, t: `${f.anlage} stillgelegt`, s: `Wegen ${mid}, ${ME}, Handy`, src: 'app' }); }
+    lastNew.mangel = mid;
+    changed([f.anlage]);
+    haptic([10, 30, 10]);
+    const id = f.anlage;
+    delete prm.form;
+    if (pushed) { nav.stack.pop(); const c0 = cur(); if (c0.name === 'akte') { show(c0, 'pop'); } else go('akte', { id }); }
+    else { nav.stack = [{ name: 'melden', params: {} }]; go('akte', { id }); }
+    appToast(`Mangel ${mid} gemeldet`);
+  });
+};
+
+/* ---------- Bildschirm: Verlauf ---------- */
+SCREENS.verlauf = v => {
+  const mine = S.pruef.filter(p => p.pruefer === ME).sort((x, y) => y.ts - x.ts).slice(0, 40);
+  const ws = weekStart(), wk = mine.filter(p => p.ts >= ws).length;
+  const groups = []; let lastD = null;
+  mine.forEach(p => { const dl = dayLabel(p.ts); if (dl !== lastD) { groups.push({ dl, items: [] }); lastD = dl; } groups[groups.length - 1].items.push(p); });
+  v.innerHTML = `<div class="lt"><p class="lt-sub">Meine erledigten Prüfungen</p><h1>Verlauf</h1></div>
+  <div class="sum3" style="grid-template-columns:1fr 1fr"><div><b>${wk}</b><span>diese Woche</span></div><div><b>${mine.length}</b><span>letzte 30 Tage</span></div></div>
+  ${groups.map(g => `<div class="a-sec"><h2>${g.dl}</h2><ul class="a-list">${g.items.map(p => { const a = DEF(p.anlage); return `<li><button class="a-row" type="button" data-a="proto" data-v="${p.id}"><span class="tag-id">${p.anlage}</span><span class="grow"><span class="t" style="display:block">${esc(p.art)}${p.neu ? ' <span class="feed-new">Neu</span>' : ''}</span><span class="s" style="display:block">${fT.format(p.ts)} Uhr, ${esc(a.name)}, ${p.id}</span></span><span class="res ${p.gesamt}">${p.gesamt === 'io' ? 'i. O.' : p.maengel.length + ' Mangel'}</span></button></li>`; }).join('')}</ul></div>`).join('') || `<div class="a-sec"><div class="a-card a-empty">Noch keine Prüfungen. Scannen Sie eine Anlage, um zu starten.</div></div>`}
+  <div style="height:16px"></div>`;
+};
+
+/* ---------- Dokument ---------- */
+function docSheet(id, k) {
+  const a = DEF(id), d = DOCS(a.typ).find(x => x.k === k), cl = CL[a.typ];
+  let body;
+  if (k === 'pp') body = `<ol style="margin:0 0 12px;padding-left:22px;font-size:14.5px;line-height:1.45">${cl.items.map(it => `<li style="margin:4px 0"><b>${esc(it.t)}</b>${it.typ === 'm' ? `, Soll ${tolText(it)}` : ''}</li>`).join('')}</ol>`;
+  else body = `<div class="doc-prev" aria-hidden="true"><h4>${esc(d.t)} ${esc(a.modell)}</h4><div class="l" style="width:92%"></div><div class="l" style="width:84%"></div><div class="l" style="width:88%"></div><div class="l" style="width:60%"></div><div style="height:46px;border-radius:6px;background:#EEF1F0;margin:10px 0"></div><div class="l" style="width:90%"></div><div class="l" style="width:76%"></div></div><p class="lead" style="font-size:13px">Vorschau in der Demo simuliert. Im Echtbetrieb öffnet sich das Original aus dem Dokumentenarchiv.</p>`;
+  openSheet(`<h2 id="sheet-t">${esc(d.t)}</h2><p class="lead">${a.id}, ${k === 'pp' ? cl.code + ', Version ' + cl.ver : esc(d.s)}</p>${body}<button class="abtn sec" type="button" data-a="sheet-close">Schließen</button>`);
+}
+function zaehlerSheet(id) {
+  const s = ST(id);
+  const sh = openSheet(`<h2 id="sheet-t">Betriebsstunden ${id}</h2><p class="lead">Letzter Stand ${nf0.format(s.bh)} h. Neuen Stand von der Steuerung ablesen.</p>
+    <form id="zf" novalidate><div class="field" id="zf-f"><label for="zf-v">Neuer Zählerstand in Stunden</label><input id="zf-v" inputmode="numeric" autocomplete="off" value="${s.bh + 8}" aria-describedby="zf-e"><span class="err" id="zf-e" hidden></span></div>
+    <button class="abtn" type="submit" style="margin-top:14px">Stand speichern</button></form><button class="abtn sec" type="button" data-a="sheet-close" style="margin-top:8px">Abbrechen</button>`);
+  const inp = $('#zf-v', sh); setTimeout(() => inp.select(), 50);
+  $('#zf', sh).addEventListener('submit', e => {
+    e.preventDefault();
+    const val = parseNum(inp.value), err = $('#zf-e', sh);
+    let msg = '';
+    if (val == null) msg = 'Bitte eine ganze Zahl eingeben.';
+    else if (val < s.bh) msg = `Der Stand darf nicht kleiner als ${nf0.format(s.bh)} h sein.`;
+    else if (val > s.bh + 2000) msg = 'Der Sprung ist ungewöhnlich groß. Bitte Eingabe prüfen.';
+    if (msg) { err.textContent = msg; err.hidden = false; $('#zf-f', sh).classList.add('bad'); inp.focus(); return; }
+    s.bh = Math.round(val);
+    addFeed({ kind: 'zaehler', anlage: id, t: `Betriebsstunden ${id}: ${nf0.format(s.bh)} h`, s: `${ME}, Handy`, src: 'app' });
+    changed([id]); closeSheet(); refreshApp(); appToast('Zählerstand gespeichert');
+  });
+}
+
+/* ---------- Ereignisse in der App ---------- */
+appEl.addEventListener('pointerdown', e => {
+  const b = e.target.closest('button, .seg label');
+  if (!b) return;
+  const t = b.matches('.seg label') ? b.querySelector('span') : b;
+  t.classList.remove('hap'); void t.offsetWidth; t.classList.add('hap');
+  haptic(6);
+  setTimeout(() => t.classList.remove('hap'), 260);
+});
+appEl.addEventListener('click', e => {
+  const tb = e.target.closest('[data-tab]');
+  if (tb) { if (nav.tab === tb.dataset.tab && nav.stack.length === 1) { const v = viewsEl.querySelector('.view'); v && v.scrollTo({ top: 0, behavior: 'smooth' }); return; } setTab(tb.dataset.tab); return; }
+  const el = e.target.closest('[data-a]'); if (!el) return;
+  const a = el.dataset.a, val = el.dataset.v;
+  switch (a) {
+    case 'back': back(); break;
+    case 'tab': setTab(val); break;
+    case 'akte': go('akte', { id: val }); break;
+    case 'resume': go('check'); break;
+    case 'start': startPruefung(val, +el.dataset.p); break;
+    case 'melden': go('melden', { id: val }); break;
+    case 'zaehler': zaehlerSheet(val); break;
+    case 'doc': docSheet(val, el.dataset.k); break;
+    case 'proto': go('proto', { pid: val }); break;
+    case 'sim': simulateScan(val); break;
+    case 'cam': startCamera(); break;
+    case 'sheet-close': closeSheet(); break;
+    case 'demo-dismiss': S.demo.dismissed = true; save(); refreshApp(); break;
+    case 'to-ls': setMobileLS(true); break;
+    case 'ls-show': lsShow(val); break;
+    case 'to-sign': toSign(); break;
+    case 'finish': finish(); break;
+    case 'sig-auto': sigAuto(el.closest('.view')); break;
+    case 'sig-clear': { const v = el.closest('.view'), cv = $('#sig', v); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); S.draft.sig = null; $('#sig-ph', v).hidden = false; save(); break; }
+    case 'na': { const di = S.draft.items[val], it = CL[S.draft.cl].items.find(x => x.id === val); if (di.res === 'na') { di.res = evalVal(it, di.val); updateItem(val); save(); } else setRes(val, 'na', true); break; }
+    case 'note': { const box = $('#nt-' + val), di = S.draft.items[val]; di.noteOpen = box.hidden; box.hidden = !box.hidden; el.setAttribute('aria-expanded', !box.hidden); if (!box.hidden) $('#ta-' + val).focus(); save(); break; }
+    case 'foto': { const it = CL[S.draft.cl].items.find(x => x.id === val); fotoSheet(data => { S.draft.items[val].fotos.push(data || newDemoPhoto(S.draft.anlage)); updateItem(val); save(); appToast('Foto hinzugefügt'); }, `Punkt: ${it.t}`); break; }
+    case 'foto-del': { const di = S.draft.items[val], k = +el.dataset.k, f = di.fotos.splice(k, 1)[0]; updateItem(val); save(); appToast('Foto entfernt', { label: 'Rückgängig', fn: () => { di.fotos.splice(k, 0, f); updateItem(val); save(); } }); break; }
+    case 'stop': { const di = S.draft.items[val]; di.stop = !di.stop; el.setAttribute('aria-checked', di.stop); save(); break; }
+  }
+});
+appEl.addEventListener('change', e => {
+  const t = e.target;
+  if (t.type === 'radio' && t.name.startsWith('r-') && S.draft) setRes(t.name.slice(2), t.value, true);
+  if (t.dataset.prio && S.draft) { S.draft.items[t.dataset.prio].prio = t.value; save(); }
+  if (t.dataset.m && S.draft) commitMess(t, true);
+});
+appEl.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.m && S.draft) commitMess(t, false);
+  if (t.dataset.note && S.draft) { S.draft.items[t.dataset.note].note = t.value; save(); }
+});
+appEl.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.m && e.key === 'Enter') { e.preventDefault(); commitMess(t, true); scrollToNext(t.dataset.m); }
+});
+function commitMess(inp, final) {
+  const iid = inp.dataset.m, d = S.draft, di = d.items[iid], it = CL[d.cl].items.find(x => x.id === iid);
+  di.raw = inp.value;
+  di.val = parseNum(inp.value);
+  const r = evalVal(it, di.val);
+  if (final) { if (r) setRes(iid, r, false); else { di.res = null; updateItem(iid); save(); } }
+  else {
+    // während der Eingabe sofort bewerten, Mangel-Feed erst beim Verlassen des Feldes
+    const was = di.res; di.res = r; updateItem(iid); save();
+    if (r === 'nio' && was !== 'nio') haptic([16, 40, 16]);
+  }
+}
+
+/* ======================================================================
+   PRÜFPROTOKOLL (Leitstand und App)
+   ====================================================================== */
+function protoHTML(p, compact) {
+  const a = DEF(p.anlage), cl = CL[p.cl], cnt = { io: 0, nio: 0, na: 0 };
+  p.results.forEach(r => cnt[r.res]++);
+  const rows = p.results.map((r, i) => {
+    const it = cl.items.find(x => x.id === r.id);
+    const val = it.typ === 'm' && r.val != null ? `<span class="${r.res === 'nio' ? 'val-bad' : ''}">${nfd(r.val, it.dec)} ${esc(it.u)}</span>` : '';
+    const fotos = r.fotos && r.fotos.length ? `<div class="proto-fotos">${r.fotos.map((f, k) => `<img src="${imgSrc(f)}" alt="Foto ${k + 1} zu ${esc(it.t)}">`).join('')}</div>` : '';
+    if (compact) return `<li style="display:block"><div style="display:flex;gap:10px;align-items:flex-start"><span class="res ${r.res}">${RES[r.res]}</span><div style="flex:1;min-width:0"><b style="font-weight:650">${i + 1}. ${esc(it.t)}</b>${val ? `<div style="font-size:13px">${val}, Soll ${tolText(it)}</div>` : ''}${r.note ? `<div style="font-size:13px;color:var(--ink-2)">${esc(r.note)}</div>` : ''}${fotos}</div></div></li>`;
+    return `<tr><td>${i + 1}</td><td>${esc(it.t)}</td><td><span class="res ${r.res}">${RES[r.res]}</span></td><td>${val || '<span class="muted">–</span>'}</td><td class="muted">${it.typ === 'm' ? tolText(it) : '–'}</td><td>${r.note ? esc(r.note) : ''}${fotos}</td></tr>`;
+  }).join('');
+  const ms = p.maengel.map(id => S.maengel.find(x => x.id === id)).filter(Boolean);
+  return `<div class="proto"><div class="proto-head"><div><h3>${esc(p.art)} ${p.anlage}</h3><p>${esc(a.name)}, ${esc(a.modell)}</p></div><span class="proto-res ${p.gesamt}">${p.gesamt === 'io' ? 'Bestanden' : 'Mit Mängeln'}</span></div>
+  <div class="proto-kv"><div><span>Protokoll</span><b>${p.id}</b></div><div><span>Datum</span><b>${fD.format(p.ts)}, ${fT.format(p.ts)} Uhr</b></div><div><span>Dauer</span><b>${p.dauer} Min.</b></div><div><span>Prüfer</span><b>${esc(p.pruefer)}</b></div><div><span>Prüfplan</span><b>${cl.code}, Version ${cl.ver}</b></div><div><span>Standort</span><b>${esc(a.halle)}, ${esc(a.linie)}</b></div><div><span>Ergebnis</span><b>${cnt.io} i. O., ${cnt.nio} n. i. O., ${cnt.na} n. a.</b></div></div>
+  ${compact ? `<ul class="mini-list">${rows}</ul>` : `<div class="proto-tbl-wrap"><table><thead><tr><th>Nr.</th><th>Prüfpunkt</th><th>Ergebnis</th><th>Messwert</th><th>Soll</th><th>Notiz und Fotos</th></tr></thead><tbody>${rows}</tbody></table></div>`}
+  ${ms.length ? `<h4 class="sec-t">Daraus gemeldete Mängel</h4><ul class="mini-list">${ms.map(x => `<li><span class="pr pr-${x.prio}">${PRIO[x.prio]}</span><span class="grow"><b>${x.id}</b> ${esc(x.titel)}</span><span class="st st-${x.status === 'erledigt' ? 'ok' : 'def'}">${MSTAT[x.status]}</span></li>`).join('')}</ul>` : ''}
+  <div class="proto-sig"><div><div class="sig">${p.sig ? `<img src="${p.sig}" alt="Unterschrift ${esc(p.pruefer)}">` : '<span style="font-size:12.5px;color:var(--ink-2);padding-bottom:6px">In der App digital bestätigt</span>'}</div><div style="font-size:12.5px;margin-top:4px;color:var(--ink-2)">${esc(p.pruefer)}, ${fD.format(p.ts + p.dauer * MIN)} ${fT.format(p.ts + p.dauer * MIN)} Uhr</div></div></div></div>`;
+}
+SCREENS.proto = (v, { pid }) => {
+  const p = S.pruef.find(x => x.id === pid);
+  v.innerHTML = appBar('Protokoll') + `<div style="margin:12px 12px 0" class="a-card"><div style="padding:16px 14px">${p ? protoHTML(p, true) : 'Protokoll nicht gefunden.'}</div></div><div style="height:20px"></div>`;
+};
+
+/* ======================================================================
+   LEITSTAND
+   ====================================================================== */
+const lsEl = $('#ls');
+const FICON = { pruefung: 'check', nio: 'alert', mangel: 'alert', still: 'lock', freigabe: 'unlock', scan: 'qr', start: 'play', zaehler: 'gauge', zuweisung: 'user', erledigt: 'check' };
+const PORD = ['hoch', 'mittel', 'niedrig'];
+let pLimit = 25;
+function renderLS() {
+  TODAY = sod(Date.now());
+  renderClock(); renderLsTask(); renderKPIs(); renderPlan(); renderFeed(); renderTabs(); renderTaskcard();
+  updateBadges();
+}
+function renderClock() {
+  const n = Date.now();
+  $('#ls-clock').innerHTML = `<b>${fT.format(n)} Uhr</b>${fDs.format(n)}, KW ${isoWeek(n)}, Frühschicht`;
+  const sb = $('#sb-time'); if (sb) sb.textContent = new Intl.DateTimeFormat('de-DE', { hour: 'numeric', minute: '2-digit' }).format(n);
+}
+function demoSteps() {
+  const d = S.demo;
+  return [
+    ['QR-Code an CNC-07 scannen', d.scanned || d.done],
+    ['Wochenprüfung durchführen', d.done],
+    ['Unterschreiben und abschließen', d.done],
+    ['Ergebnis im Leitstand ansehen', !!d.viewed]];
+}
+function renderTaskcard() {
+  const tc = $('#taskcard'); if (!tc) return;
+  const st = demoSteps(), curI = st.findIndex(x => !x[1]);
+  const done = S.demo.done;
+  tc.innerHTML = `<h2>${done ? 'Prüfung erledigt' : 'Ihre Aufgabe'}</h2>
+  <p>${done ? `Protokoll <strong>${S.demo.pid}</strong> ist gespeichert. Schieben Sie das Handy zur Seite und sehen Sie, was im Leitstand angekommen ist.` : 'Scannen Sie den QR-Code an Maschine <strong>CNC-07</strong> und führen Sie die Wochenprüfung durch.'}</p>
+  <ol class="tsteps">${st.map((s, i) => `<li class="${s[1] ? 'on' : i === curI ? 'cur' : ''}">${s[0]}</li>`).join('')}</ol>
+  ${done ? `<button class="btn btn-pri" type="button" data-shell="side" style="width:100%">${ic('side')}Leitstand ansehen</button>` : `<p class="note">Ohne zweites Handy: In der App auf Scannen tippen und das Schild CNC-07 wählen. Die Kamera funktioniert auch echt.</p>`}`;
+}
+function renderLsTask() {
+  const box = $('#ls-task'), st = demoSteps();
+  if (S.demo.done && S.demo.viewed && S.demo.lsDismiss) { box.innerHTML = ''; return; }
+  box.innerHTML = S.demo.done
+    ? `<div class="ls-task done"><p><b>Aufgabe erledigt.</b> Protokoll ${S.demo.pid} ist eingegangen. Prüfquote, Hallenplan und Feed haben sich aktualisiert.</p><div class="steps-mini" aria-hidden="true">${st.map(s => `<i class="${s[1] ? 'on' : ''}"></i>`).join('')}</div><button class="btn btn-s" type="button" data-ls="proto" data-v="${S.demo.pid}">Protokoll ansehen</button></div>`
+    : `<div class="ls-task"><p><b>Aufgabe:</b> Scannen Sie den QR-Code an Maschine CNC-07 und führen Sie die Wochenprüfung durch. Der Leitstand zeigt jede Eingabe sofort.</p><div class="steps-mini" aria-hidden="true">${st.map(s => `<i class="${s[1] ? 'on' : ''}"></i>`).join('')}</div><button class="btn btn-s btn-pri only-d" type="button" data-shell="center">${ic('phone')}Handy öffnen</button><button class="btn btn-s btn-pri only-m" type="button" data-ls="to-app">${ic('phone')}Zur App</button></div>`;
+}
+function renderKPIs() {
+  const w = weekStats(), cnt = { ok: 0, due: 0, over: 0, def: 0, off: 0 };
+  ANL.forEach(a => cnt[status(a.id)]++);
+  const om = openM(), pc = { hoch: 0, mittel: 0, niedrig: 0 }; om.forEach(x => pc[x.prio]++);
+  const maxp = Math.max(1, ...Object.values(pc));
+  const over = tasks(-1);
+  const order = ['ok', 'due', 'over', 'def', 'off'], col = { ok: 'var(--ok-fill)', due: 'var(--due-fill)', over: 'var(--over-fill)', def: 'var(--def-fill)', off: 'var(--off)' };
+  const pl = Math.max(1, w.planned);
+  $('#kpis').innerHTML = `
+  <div class="kpi"><h2>Prüfquote KW ${isoWeek(TODAY)}</h2><div class="kpi-big">${pct.format(w.quote * 100)}<small>%</small></div><div class="kpi-sub">${w.done} von ${w.done + w.dueToday} bis heute fälligen Prüfungen erledigt</div>
+    <div class="bar" role="img" aria-label="${w.done} erledigt, ${w.dueToday} offen fällig, ${w.planned - w.done - w.dueToday} später in dieser Woche"><i style="width:${w.done / pl * 100}%;background:var(--ok-fill)"></i><i style="width:${w.dueToday / pl * 100}%;background:var(--over-fill)"></i></div>
+    <div class="kpi-sub" style="font-size:12.5px">${w.planned} Prüfungen in dieser Woche geplant, ohne stillgelegte Anlagen</div></div>
+  <div class="kpi"><h2>Anlagenstatus</h2><div class="kpi-big">${cnt.ok}<small>von ${ANL.length} in Ordnung</small></div>
+    <div class="stackbar" role="img" aria-label="${order.map(k => `${cnt[k]} ${STATUS[k]}`).join(', ')}">${order.filter(k => cnt[k]).map(k => `<i style="flex-grow:${cnt[k]};background:${col[k]}${k === 'off' ? ';background-image:repeating-linear-gradient(-45deg,transparent 0 4px,rgba(255,255,255,.18) 4px 8px)' : ''}"></i>`).join('')}</div>
+    <div class="legend">${order.map(k => `<span><i class="sw" style="background:${col[k]}"></i><b>${cnt[k]}</b>${STATUS[k]}</span>`).join('')}</div></div>
+  <div class="kpi"><h2>Offene Mängel</h2><div class="kpi-big">${om.length}</div>
+    <div class="prio-bars">${PORD.map(k => `<span class="pr pr-${k}">${PRIO[k]}</span><span class="pb"><i style="width:${pc[k] / maxp * 100}%;background:var(--${k === 'hoch' ? 'over' : k === 'mittel' ? 'due' : 'low'}-fill)"></i></span><b>${pc[k]}</b>`).join('')}</div></div>
+  <div class="kpi"><h2>Überfällige Prüfungen</h2><div class="kpi-big" style="color:${over.length ? 'var(--over)' : 'var(--ok)'}">${over.length}</div>
+    <div class="over-list">${over.length ? over.map(t => `<button type="button" data-ls="anl" data-v="${t.id}" aria-label="${t.id}, ${t.p.art}, ${dueText(t.dd)}">${t.id}</button>`).join('') : '<span class="kpi-sub">Keine. Gut gemacht.</span>'}</div></div>`;
+}
+function renderPlan() {
+  const halls = `
+  <defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#3A4449"/><rect width="5" height="10" fill="#283035"/></pattern>
+  <pattern id="lager" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#EEF1F0"/><path d="M0 14L14 0" stroke="#DCE1DF" stroke-width="1.2"/></pattern></defs>
+  <rect class="hall" x="10" y="16" width="470" height="276" rx="6"/><text class="hall-l" x="26" y="40">Halle 1</text><text class="hall-s" x="82" y="40">Zerspanung</text>
+  <rect class="hall" x="500" y="16" width="490" height="276" rx="6"/><text class="hall-l" x="516" y="40">Halle 2</text><text class="hall-s" x="572" y="40">Umformung und Schweißen</text>
+  <rect class="hall" x="10" y="310" width="300" height="122" rx="6"/><text class="hall-l" x="26" y="332">Halle 3</text><text class="hall-s" x="82" y="332">Kunststoff</text>
+  <rect class="hall" x="330" y="310" width="150" height="122" rx="6"/><text class="hall-l" x="344" y="332">Technik</text>
+  <rect x="500" y="310" width="490" height="122" rx="6" fill="url(#lager)" stroke="#B9C3BF" stroke-width="1.5"/><text class="hall-l" x="516" y="332">Lager und Versand</text><text class="hall-s" x="516" y="350">keine prüfpflichtigen Anlagen</text>
+  <path class="aisle" d="M24 168H466M24 278H466M514 168H860M42 300V310M560 300V310"/>
+  <line class="rail" x1="516" y1="50" x2="976" y2="50"/><line class="rail" x1="516" y1="270" x2="976" y2="270"/><text class="hall-s" x="944" y="44" text-anchor="end">Kranbahn</text>`;
+  const ms = ANL.map(a => {
+    const s = status(a.id), me = S.draft && S.draft.anlage === a.id, vert = a.h > a.w;
+    const lock = s === 'off' ? `<path d="M${a.x + a.w - 30} ${a.y + a.h - 14}h12v-8h-12zM${a.x + a.w - 27} ${a.y + a.h - 22}v-3a3 3 0 0 1 6 0v3" fill="none" stroke="#fff" stroke-width="1.8"/>` : '';
+    return `<g class="m ${s}${me ? ' me' : ''}${flashIds.has(a.id) ? ' flash' : ''}" data-id="${a.id}" tabindex="0" role="button" aria-label="${a.id}, ${esc(a.name)}, ${STATUS[s]}${me ? ', Prüfung läuft' : ''}">
+      ${me ? `<rect class="ring" x="${a.x - 6}" y="${a.y - 6}" width="${a.w + 12}" height="${a.h + 12}" rx="10"/>` : ''}
+      <rect class="b" x="${a.x}" y="${a.y}" width="${a.w}" height="${a.h}" rx="6"/>
+      ${vert ? `<text class="mid" text-anchor="middle" transform="translate(${a.x + a.w / 2 + 5} ${a.y + a.h / 2}) rotate(-90)">${a.id}</text>`
+        : `<text class="mid" x="${a.x + 11}" y="${a.y + 24}">${a.id}</text><text class="mnm" x="${a.x + 11}" y="${a.y + 40}">${esc(a.modell)}</text><text class="mnm" x="${a.x + 11}" y="${a.y + 56}" style="font-weight:700">${me ? 'Prüfung läuft' : STATUS[s]}</text>`}
+      <circle class="dot" cx="${a.x + a.w - 12}" cy="${a.y + 12}" r="6.5"/>${lock}</g>`;
+  }).join('');
+  $('#plan').innerHTML = `<svg class="plan" viewBox="0 0 1000 440" role="group" aria-label="Hallenplan mit 12 Anlagen">${halls}${ms}</svg>`;
+  flashIds.clear();
+  const col = { ok: ['var(--ok-soft)', 'var(--ok-fill)'], due: ['var(--due-soft)', 'var(--due-fill)'], over: ['var(--over-soft)', 'var(--over-fill)'], def: ['var(--def-soft)', 'var(--def-fill)'], off: ['#3A4449', 'var(--off)'] };
+  $('#plan-legend').innerHTML = Object.keys(STATUS).map(k => `<span><i style="background:${col[k][0]};border-color:${col[k][1]}"></i>${STATUS[k]}</span>`).join('') + `<span><i style="border-style:dashed;border-color:var(--accent);background:transparent"></i>Prüfung läuft</span>`;
+  const n = openM().length;
+  $('#plan-sub').textContent = `${ANL.length} Anlagen, ${n} ${n === 1 ? 'Mangel' : 'Mängel'} offen`;
+}
+function renderFeed() {
+  const now = Date.now();
+  $('#feed').innerHTML = S.feed.slice(0, 40).map(f => {
+    const fr = freshFeed[f.id], el = fr ? (now - fr) / 1000 : 99, isNew = el < 18;
+    return `<li class="${isNew ? 'is-new' : ''}"${isNew ? ` style="--d:-${el.toFixed(1)}s"` : ''}><button class="feed-it" type="button" data-f="${f.id}"><span class="feed-ic k-${f.kind}">${ic(FICON[f.kind] || 'doc')}</span><span><span class="feed-t" style="display:block">${esc(f.t)}${isNew ? '<span class="feed-new">Neu</span>' : ''}</span><span class="feed-s" style="display:block">${esc(f.s)}</span></span><span class="feed-time">${relTime(f.ts)}</span></button></li>`;
+  }).join('') || '<li class="empty">Noch keine Einträge.</li>';
+}
+const TABS = [['maengel', 'Mängel', () => openM().length], ['anlagen', 'Anlagen', () => ANL.length], ['protokolle', 'Prüfprotokolle', () => S.pruef.length], ['qr', 'QR-Schilder', null]];
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map(([k, l, c]) => `<button class="tab" type="button" role="tab" id="tab-${k}" aria-controls="tabpanel" aria-selected="${ui.lsTab === k}" tabindex="${ui.lsTab === k ? 0 : -1}" data-tabk="${k}">${l}${c ? `<span class="cnt">${c()}</span>` : ''}</button>`).join('');
+  const tp = $('#tabpanel'); tp.setAttribute('aria-labelledby', 'tab-' + ui.lsTab);
+  tp.innerHTML = ({ maengel: panelMaengel, anlagen: panelAnlagen, protokolle: panelProtokolle, qr: panelQR })[ui.lsTab]();
+}
+function panelMaengel() {
+  const f = ui.mFilter;
+  let list = S.maengel.slice();
+  if (f === 'offen') list = list.filter(x => x.status !== 'erledigt');
+  if (f === 'erledigt') list = list.filter(x => x.status === 'erledigt');
+  list.sort((x, y) => (x.status === 'erledigt') - (y.status === 'erledigt') || (x.status === 'erledigt' ? y.doneTs - x.doneTs : PORD.indexOf(x.prio) - PORD.indexOf(y.prio) || y.ts - x.ts));
+  const chip = (k, l) => `<button class="chip" type="button" data-ls="m-filter" data-v="${k}" aria-pressed="${f === k}">${l}</button>`;
+  return `<div class="toolbar">${chip('offen', 'Offen')}${chip('erledigt', 'Erledigt')}${chip('alle', 'Alle')}<div class="r"><button class="btn btn-s" type="button" data-ls="csv-m">${ic('dl')}Mängel als CSV</button></div></div>
+  ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Priorität</th><th>Nr.</th><th>Anlage</th><th>Mangel</th><th>Gemeldet</th><th>Foto</th><th>Zuständig</th><th>Status</th><th><span class="sr">Aktion</span></th></tr></thead><tbody>
+  ${list.map(x => { const fresh = Date.now() - x.ts < 20000 && x.von === ME; return `<tr id="mrow-${x.id}" class="${fresh ? 'row-new' : ''}"><td><span class="pr pr-${x.prio}">${PRIO[x.prio]}</span></td><td class="idc" style="font-size:14px">${x.id}</td>
+    <td><button class="link idc" type="button" data-ls="anl" data-v="${x.anlage}">${x.anlage}</button>${ST(x.anlage).still && ST(x.anlage).stillRef === x.id ? `<div class="muted" style="color:var(--over);font-weight:700">stillgelegt</div>` : ''}</td>
+    <td style="min-width:220px;max-width:340px"><b style="font-weight:650">${esc(x.titel)}</b>${x.text ? `<div class="muted">${esc(x.text)}</div>` : ''}${x.quelle ? `<div class="muted">aus <button class="link" type="button" data-ls="proto" data-v="${x.quelle}">${x.quelle}</button></div>` : ''}</td>
+    <td class="muted" style="white-space:nowrap">${esc(x.von)}<br>${relTime(x.ts)}</td>
+    <td>${x.foto ? `<img class="thumb" src="${imgSrc(x.foto)}" alt="Foto zu ${x.id}">` : '<span class="muted">–</span>'}</td>
+    <td>${x.status === 'erledigt' ? `<span class="muted">${esc(x.zust || '–')}</span>` : `<label class="sr" for="z-${x.id}">Zuständig für ${x.id}</label><select id="z-${x.id}" data-zust="${x.id}"><option value="">Nicht zugewiesen</option>${ZUST.map(z => `<option${x.zust === z ? ' selected' : ''}>${esc(z)}</option>`).join('')}</select>`}</td>
+    <td><span class="st st-${x.status === 'erledigt' ? 'ok' : x.status === 'in_arbeit' ? 'due' : 'def'}">${MSTAT[x.status]}</span>${x.status === 'erledigt' ? `<div class="muted" style="margin-top:3px">${fDm.format(x.doneTs)}, ${esc(x.doneBy)}</div>` : ''}</td>
+    <td>${x.status !== 'erledigt' ? `<button class="btn btn-s" type="button" data-ls="m-done" data-v="${x.id}">${ic('check')}Erledigt melden</button>` : ''}</td></tr>`; }).join('')}</tbody></table></div>` : `<div class="empty">${f === 'offen' ? 'Keine offenen Mängel. Neue Meldungen vom Handy erscheinen hier sofort.' : 'Keine Einträge.'}</div>`}`;
+}
+function panelAnlagen() {
+  return `<div class="toolbar"><span class="muted" style="color:var(--ink-2);font-size:13px">Sortiert nach Dringlichkeit</span><div class="r"><button class="btn btn-s" type="button" data-ls="csv-a">${ic('dl')}Anlagen als CSV</button></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Anlage</th><th>Bezeichnung</th><th>Standort</th><th>Status</th><th>Nächste Prüfung</th><th>Mängel</th><th style="text-align:right">Betriebsstunden</th></tr></thead><tbody>
+  ${ANL.slice().sort((x, y) => ['off', 'def', 'over', 'due', 'ok'].indexOf(status(x.id)) - ['off', 'def', 'over', 'due', 'ok'].indexOf(status(y.id)) || x.id.localeCompare(y.id)).map(a => {
+    const s = ST(a.id), stt = status(a.id), np = s.plans.map((p, i) => ({ p, d: nextDue(p) })).sort((x, y) => x.d - y.d)[0], dd = dayDiff(np.d), om = openM(a.id).length;
+    return `<tr><td><button class="link idc" type="button" data-ls="anl" data-v="${a.id}">${a.id}</button></td><td>${esc(a.name)}<div class="muted">${esc(a.modell)}, ${esc(a.her)}</div></td><td class="muted">${esc(a.halle)}, ${esc(a.linie)}</td><td><span class="st st-${stt}">${STATUS[stt]}</span></td><td>${esc(np.p.art)}<div class="muted"><span class="due-t ${dueCls(dd)}">${fD.format(np.d)}, ${dueText(dd)}</span></div></td><td>${om ? `<b>${om}</b>` : '<span class="muted">0</span>'}</td><td style="text-align:right" class="num">${nf0.format(s.bh)} h</td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+function panelProtokolle() {
+  const f = ui.pFilter;
+  let list = S.pruef.slice().sort((x, y) => y.ts - x.ts);
+  if (f === 'nio') list = list.filter(p => p.gesamt === 'nio');
+  const shown = list.slice(0, pLimit);
+  const chip = (k, l) => `<button class="chip" type="button" data-ls="p-filter" data-v="${k}" aria-pressed="${f === k}">${l}</button>`;
+  return `<div class="toolbar">${chip('alle', 'Alle')}${chip('nio', 'Mit Mängeln')}<div class="r"><button class="btn btn-s" type="button" data-ls="csv-p">${ic('dl')}Prüfungen als CSV</button><button class="btn btn-s" type="button" data-ls="csv-w">${ic('dl')}Messwerte als CSV</button></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Protokoll</th><th>Datum</th><th>Anlage</th><th>Prüfart</th><th>Prüfer</th><th>Ergebnis</th><th>Dauer</th></tr></thead><tbody>
+  ${shown.map(p => `<tr class="${p.id === lastNew.pruef && p.neu ? 'row-new' : ''}"><td><button class="link idc" type="button" data-ls="proto" data-v="${p.id}">${p.id}</button>${p.neu ? ' <span class="feed-new">Neu</span>' : ''}</td><td style="white-space:nowrap">${fDs.format(p.ts)}<div class="muted">${fT.format(p.ts)} Uhr</div></td><td><button class="link idc" type="button" data-ls="anl" data-v="${p.anlage}">${p.anlage}</button></td><td>${esc(p.art)}</td><td>${esc(p.pruefer)}</td><td><span class="res ${p.gesamt}">${p.gesamt === 'io' ? 'i. O.' : p.maengel.length + ' ' + (p.maengel.length === 1 ? 'Mangel' : 'Mängel')}</span></td><td class="muted">${p.dauer} Min.</td></tr>`).join('')}</tbody></table></div>
+  ${list.length > pLimit ? `<div class="toolbar" style="justify-content:center"><button class="btn" type="button" data-ls="p-more">Weitere ${Math.min(25, list.length - pLimit)} anzeigen</button></div>` : ''}`;
+}
+function panelQR() {
+  return `<p class="qr-hint">Diese Schilder hängen an den Anlagen. Öffnen Sie die Demo auf einem zweiten Handy, tippen Sie auf Scannen und halten Sie die Kamera auf ein Schild. Der Code enthält zum Beispiel ANLAGE:CNC-07.</p>
+  <div class="qr-grid">${ANL.map(a => `<button type="button" class="plate" data-ls="anl" data-v="${a.id}" aria-label="QR-Schild ${a.id}, Details öffnen" style="background:none;box-shadow:none;border-radius:9px">${plateHTML(a.id)}</button>`).join('')}</div>`;
+}
+
+/* ---------- Dialoge ---------- */
+const dlg = $('#dlg');
+function openDlg(html, small) {
+  dlg.className = 'dlg' + (small ? ' dlg-s' : '');
+  dlg.innerHTML = html;
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  const x = dlg.querySelector('.x'); if (x) x.focus();
+}
+const dlgHead = (title, extra = '') => `<div class="dlg-h">${extra}<h2 id="dlg-t">${title}</h2><button class="icon-btn x" type="button" data-ls="close" aria-label="Schließen">${ic('x')}</button></div>`;
+function openAnlageDlg(id) {
+  const a = DEF(id), s = ST(id), stt = status(id), om = openM(id), prs = S.pruef.filter(p => p.anlage === id).sort((x, y) => y.ts - x.ts).slice(0, 6);
+  openDlg(dlgHead(`${a.id} ${esc(a.name)}`, `<span class="st st-${stt}">${STATUS[stt]}</span>`) + `<div class="dlg-b"><div class="det-grid"><div>
+    ${plateHTML(id)}
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${s.still ? `<button class="btn btn-pri" type="button" data-ls="release" data-v="${id}">${ic('unlock')}Anlage freigeben</button>` : ''}<button class="btn" type="button" data-ls="print">${ic('print')}Drucken</button></div>
+    <h3 class="sec-t">Kenndaten</h3><dl class="kv"><dt>Bezeichnung</dt><dd>${esc(a.modell)}</dd><dt>Hersteller</dt><dd>${esc(a.her)}</dd><dt>Baujahr</dt><dd>${a.bj}</dd><dt>Serien-Nr.</dt><dd>${esc(a.sn)}</dd><dt>Standort</dt><dd>${esc(a.halle)}, ${esc(a.linie)}, ${esc(a.platz)}</dd><dt>Betriebsstunden</dt><dd>${nf0.format(s.bh)} h</dd></dl></div>
+    <div>${s.still ? `<div class="banner off" style="margin:0 0 6px">${ic('lock')}<div><b>Stillgelegt seit ${fDm.format(s.stillTs)}, ${fT.format(s.stillTs)} Uhr</b>Grund: ${s.stillRef}. Freigabe nur nach Behebung.</div></div>` : ''}
+    <h3 class="sec-t">Prüfungen und Wartung</h3><ul class="mini-list">${s.plans.map(p => { const dd = dayDiff(nextDue(p)); return `<li><span class="grow"><b>${esc(p.art)}</b><div class="muted" style="font-size:12.5px;color:var(--ink-2)">${CL[p.cl].code}, zuletzt ${fDm.format(p.last)}, alle ${p.int} Tage</div></span><span class="due-t ${dueCls(dd)}">${fDm.format(nextDue(p))}, ${dueText(dd)}</span></li>`; }).join('')}</ul>
+    <h3 class="sec-t">Offene Mängel</h3>${om.length ? `<ul class="mini-list">${om.map(x => `<li><span class="pr pr-${x.prio}">${PRIO[x.prio]}</span><span class="grow"><b>${x.id}</b> ${esc(x.titel)}<div style="font-size:12.5px;color:var(--ink-2)">${esc(x.von)}, ${relTime(x.ts)}${x.zust ? `, ${esc(x.zust)}` : ''}</div></span></li>`).join('')}</ul>` : '<p class="muted" style="margin:0;color:var(--ink-2)">Keine offenen Mängel.</p>'}
+    <h3 class="sec-t">Prüfprotokolle</h3><ul class="mini-list">${prs.map(p => `<li><span class="grow"><button class="link" type="button" data-ls="proto" data-v="${p.id}" style="border:0;background:none;padding:0;color:var(--accent-strong);font-weight:700;text-decoration:underline;text-underline-offset:3px">${p.id}</button> ${esc(p.art)}<div style="font-size:12.5px;color:var(--ink-2)">${fDs.format(p.ts)}, ${fT.format(p.ts)} Uhr, ${esc(p.pruefer)}</div></span><span class="res ${p.gesamt}">${p.gesamt === 'io' ? 'i. O.' : 'Mängel'}</span></li>`).join('')}</ul>
+  </div></div></div>`);
+}
+function openProtoDlg(pid) {
+  const p = S.pruef.find(x => x.id === pid); if (!p) return;
+  if (p.id === S.demo.pid && !S.demo.viewed) { S.demo.viewed = true; save(); renderLsTask(); renderTaskcard(); }
+  openDlg(dlgHead(`Prüfprotokoll ${p.id}`) + `<div class="dlg-b">${protoHTML(p)}<div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap"><button class="btn" type="button" data-ls="print">${ic('print')}Drucken</button><button class="btn" type="button" data-ls="anl" data-v="${p.anlage}">Anlagenakte ${p.anlage}</button></div></div>`);
+}
+function openExport() {
+  openDlg(dlgHead('CSV-Export') + `<div class="dlg-b"><p style="margin:0 0 14px;color:var(--ink-2)">Semikolon-getrennt mit deutschem Dezimalkomma, direkt in Excel lesbar.</p>
+  <div style="display:grid;gap:8px">
+  <button class="btn" type="button" data-ls="csv-p" style="justify-content:flex-start">${ic('dl')}Prüfungen (${S.pruef.length} Protokolle)</button>
+  <button class="btn" type="button" data-ls="csv-w" style="justify-content:flex-start">${ic('dl')}Messwerte aller Prüfpunkte</button>
+  <button class="btn" type="button" data-ls="csv-m" style="justify-content:flex-start">${ic('dl')}Mängel (${S.maengel.length} Meldungen)</button>
+  <button class="btn" type="button" data-ls="csv-a" style="justify-content:flex-start">${ic('dl')}Anlagen mit Status</button></div></div>`, true);
+}
+
+/* ---------- CSV ---------- */
+const cnum = v => v == null ? '' : String(v).replace('.', ',');
+const cdt = t => t ? fD.format(t) + ' ' + fT.format(t) : '';
+function csv(rows) { return '﻿' + rows.map(r => r.map(v => { v = v == null ? '' : String(v); return /[";\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(';')).join('\r\n'); }
+function download(name, rows) {
+  const b = new Blob([csv(rows)], { type: 'text/csv;charset=utf-8' }), u = URL.createObjectURL(b), a = document.createElement('a');
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 3000);
+  lsToast(`${name} heruntergeladen`);
+}
+const stamp = () => new Date().toISOString().slice(0, 10);
+function exportCSV(kind) {
+  if (kind === 'p') download(`pruefungen-${stamp()}.csv`, [['Protokoll', 'Datum', 'Anlage', 'Bezeichnung', 'Prüfart', 'Prüfplan', 'Prüfer', 'Ergebnis', 'i. O.', 'n. i. O.', 'n. a.', 'Mängel', 'Dauer Min.'],
+    ...S.pruef.slice().sort((x, y) => y.ts - x.ts).map(p => { const n = { io: 0, nio: 0, na: 0 }; p.results.forEach(r => n[r.res]++); return [p.id, cdt(p.ts), p.anlage, DEF(p.anlage).name, p.art, CL[p.cl].code, p.pruefer, p.gesamt === 'io' ? 'bestanden' : 'mit Mängeln', n.io, n.nio, n.na, p.maengel.join(' '), p.dauer]; })]);
+  if (kind === 'w') { const rows = [['Protokoll', 'Datum', 'Anlage', 'Nr.', 'Prüfpunkt', 'Ergebnis', 'Messwert', 'Einheit', 'Soll min', 'Soll max', 'Notiz']];
+    S.pruef.slice().sort((x, y) => y.ts - x.ts).forEach(p => p.results.forEach((r, i) => { const it = CL[p.cl].items.find(x => x.id === r.id); rows.push([p.id, cdt(p.ts), p.anlage, i + 1, it.t, RES[r.res], it.typ === 'm' ? cnum(r.val) : '', it.typ === 'm' ? it.u : '', cnum(it.min), cnum(it.max), r.note]); }));
+    download(`messwerte-${stamp()}.csv`, rows); }
+  if (kind === 'm') download(`maengel-${stamp()}.csv`, [['Nr.', 'Gemeldet am', 'Anlage', 'Mangel', 'Beschreibung', 'Priorität', 'Status', 'Zuständig', 'Gemeldet von', 'Stilllegung', 'Aus Prüfung', 'Erledigt am', 'Erledigt von'],
+    ...S.maengel.slice().sort((x, y) => y.ts - x.ts).map(x => [x.id, cdt(x.ts), x.anlage, x.titel, x.text, PRIO[x.prio], MSTAT[x.status], x.zust, x.von, x.still ? 'ja' : 'nein', x.quelle || '', cdt(x.doneTs), x.doneBy])]);
+  if (kind === 'a') download(`anlagen-${stamp()}.csv`, [['Anlage', 'Bezeichnung', 'Modell', 'Hersteller', 'Baujahr', 'Serien-Nr.', 'Halle', 'Linie', 'Status', 'Offene Mängel', 'Betriebsstunden', 'Nächste Prüfung'],
+    ...ANL.map(a => { const s = ST(a.id), nd = Math.min(...s.plans.map(nextDue)); return [a.id, a.name, a.modell, a.her, a.bj, a.sn, a.halle, a.linie, STATUS[status(a.id)], openM(a.id).length, s.bh, fD.format(nd)]; })]);
+}
+
+/* ---------- Toast Leitstand ---------- */
+function lsToast(msg, act) {
+  const box = $('#ls-toasts'), t = document.createElement('div');
+  t.className = 'toast'; t.setAttribute('role', 'status');
+  t.innerHTML = `<span style="flex:1">${esc(msg)}</span>${act ? `<button type="button">${esc(act.label)}</button>` : ''}`;
+  if (act) t.querySelector('button').onclick = () => { t.remove(); act.fn(); };
+  box.appendChild(t);
+  while (box.children.length > 3) box.firstChild.remove();
+  setTimeout(() => t.remove(), act ? 7000 : 3500);
+}
+
+/* ---------- Aktionen im Leitstand ---------- */
+function markDone(id) {
+  const x = S.maengel.find(m => m.id === id), a = ST(x.anlage);
+  const snapM = JSON.stringify(x), snapA = JSON.stringify(a), feedLen = S.feed.length;
+  x.status = 'erledigt'; x.doneTs = Date.now(); x.doneBy = LS_USER;
+  const ids = [addFeed({ kind: 'erledigt', anlage: x.anlage, ref: x.id, t: `${x.id} erledigt: ${x.titel}`, s: `${LS_USER}, Leitstand`, src: 'ls' }).id];
+  let rel = false;
+  if (a.still && (a.stillRef === id || !openM(x.anlage).some(m => m.still))) {
+    a.still = false; a.stillTs = null; a.stillRef = null; rel = true;
+    ids.push(addFeed({ kind: 'freigabe', anlage: x.anlage, t: `${x.anlage} wieder freigegeben`, s: `${LS_USER}, Leitstand`, src: 'ls' }).id);
+  }
+  changed([x.anlage]); refreshApp();
+  lsToast(`${x.id} als erledigt gemeldet${rel ? `, ${x.anlage} freigegeben` : ''}`, { label: 'Rückgängig', fn: () => {
+    Object.assign(x, JSON.parse(snapM)); Object.assign(a, JSON.parse(snapA));
+    S.feed = S.feed.filter(f => !ids.includes(f.id));
+    changed([x.anlage]); refreshApp();
+  } });
+}
+function release(id) {
+  const a = ST(id), snap = JSON.stringify(a);
+  a.still = false; a.stillTs = null; a.stillRef = null;
+  const fid = addFeed({ kind: 'freigabe', anlage: id, t: `${id} wieder freigegeben`, s: `${LS_USER}, Leitstand`, src: 'ls' }).id;
+  changed([id]); refreshApp();
+  if (dlg.open) openAnlageDlg(id);
+  lsToast(`${id} freigegeben`, { label: 'Rückgängig', fn: () => { Object.assign(a, JSON.parse(snap)); S.feed = S.feed.filter(f => f.id !== fid); changed([id]); refreshApp(); if (dlg.open) openAnlageDlg(id); } });
+}
+function doReset() {
+  const snap = JSON.stringify(S);
+  S = seed(); save(true);
+  Object.keys(freshFeed).forEach(k => delete freshFeed[k]);
+  renderLS(); setTab('aufgaben');
+  if (!isMobile()) setMode('center');
+  lsToast('Demo zurückgesetzt', { label: 'Rückgängig', fn: () => { S = JSON.parse(snap); save(true); renderLS(); setTab('aufgaben'); } });
+}
+function lsShow(pid) {
+  S.demo.viewed = S.demo.viewed || pid === S.demo.pid; save();
+  if (isMobile()) { setMobileLS(true); openProtoDlg(pid); return; }
+  ui.lsTab = 'protokolle'; saveUi();
+  setMode('side');
+  renderLS();
+  setTimeout(() => { $('#feed').scrollTop = 0; lsToast(`Protokoll ${pid} ist im Leitstand eingegangen`, { label: 'Öffnen', fn: () => openProtoDlg(pid) }); }, 500);
+}
+function setMobileLS(on) {
+  document.body.classList.toggle('m-ls', on);
+  layout(false);
+  window.scrollTo(0, 0);
+  if (on) { renderLS(); const b = $('.ls-head button'); b && b.focus({ preventScroll: true }); }
+  else { const h = viewsEl.querySelector('.view h1'); h && h.focus({ preventScroll: true }); }
+}
+function onLsAction(el) {
+  const a = el.dataset.ls, v = el.dataset.v;
+  switch (a) {
+    case 'export': openExport(); break;
+    case 'reset': doReset(); break;
+    case 'to-app': if (dlg.open) dlg.close(); setMobileLS(false); break;
+    case 'anl': openAnlageDlg(v); break;
+    case 'proto': openProtoDlg(v); break;
+    case 'close': dlg.close(); break;
+    case 'print': window.print(); break;
+    case 'release': release(v); break;
+    case 'm-done': markDone(v); break;
+    case 'm-filter': ui.mFilter = v; saveUi(); renderTabs(); $(`[data-ls="m-filter"][data-v="${v}"]`).focus(); break;
+    case 'p-filter': ui.pFilter = v; pLimit = 25; saveUi(); renderTabs(); $(`[data-ls="p-filter"][data-v="${v}"]`).focus(); break;
+    case 'p-more': pLimit += 25; renderTabs(); break;
+    case 'csv-p': exportCSV('p'); break;
+    case 'csv-w': exportCSV('w'); break;
+    case 'csv-m': exportCSV('m'); break;
+    case 'csv-a': exportCSV('a'); break;
+  }
+}
+document.addEventListener('click', e => {
+  const sh = e.target.closest('[data-shell]');
+  if (sh) { setMode(sh.dataset.shell); return; }
+  if (e.target.closest('#app')) return;
+  const el = e.target.closest('[data-ls]');
+  if (el) { onLsAction(el); return; }
+  const tk = e.target.closest('[data-tabk]');
+  if (tk) { ui.lsTab = tk.dataset.tabk; pLimit = 25; saveUi(); renderTabs(); $('#tab-' + ui.lsTab).focus(); return; }
+  const fi = e.target.closest('[data-f]');
+  if (fi) { const f = S.feed.find(x => x.id === fi.dataset.f); if (!f) return; if (f.ref && f.ref.startsWith('P-')) openProtoDlg(f.ref); else openAnlageDlg(f.anlage); return; }
+  const m = e.target.closest('.plan .m');
+  if (m) { openAnlageDlg(m.dataset.id); return; }
+  if (e.target === dlg) dlg.close();
+  if (e.target === $('#stage')) setMode('side');
+});
+$('#plan').addEventListener('keydown', e => { const m = e.target.closest('.m'); if (m && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openAnlageDlg(m.dataset.id); } });
+$('#tabs').addEventListener('keydown', e => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const ks = TABS.map(t => t[0]); let i = ks.indexOf(ui.lsTab);
+  i = e.key === 'Home' ? 0 : e.key === 'End' ? ks.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + ks.length) % ks.length;
+  ui.lsTab = ks[i]; saveUi(); renderTabs(); $('#tab-' + ks[i]).focus(); e.preventDefault();
+});
+document.addEventListener('change', e => {
+  const z = e.target.dataset && e.target.dataset.zust;
+  if (!z) return;
+  const x = S.maengel.find(m => m.id === z), prev = { zust: x.zust, status: x.status };
+  x.zust = e.target.value; x.status = x.zust ? 'in_arbeit' : 'offen';
+  const fid = addFeed({ kind: 'zuweisung', anlage: x.anlage, ref: x.id, t: x.zust ? `${x.id} an ${x.zust} zugewiesen` : `Zuweisung ${x.id} aufgehoben`, s: `${LS_USER}, Leitstand`, src: 'ls' }).id;
+  changed([x.anlage]); refreshApp();
+  const sel = $('#z-' + z); sel && sel.focus();
+  lsToast(x.zust ? `${x.id} zugewiesen` : 'Zuweisung aufgehoben', { label: 'Rückgängig', fn: () => { Object.assign(x, prev); S.feed = S.feed.filter(f => f.id !== fid); changed([x.anlage]); refreshApp(); } });
+});
+
+/* ======================================================================
+   BÜHNE: Handy aufpoppen, zur Seite, minimieren
+   ====================================================================== */
+const shell = $('#shell'), stage = $('#stage'), slot = $('#slot'), sideCtrl = $('#side-ctrl'), bubble = $('#bubble');
+const PW = 414, PH = 868;
+let mode = 'center', popped = false, geom = { x: 0, y: 0, s: 1 };
+function place(x, y, s) { geom = { x, y, s }; shell.style.transform = `translate(${Math.round(x)}px,${Math.round(y)}px) scale(${s.toFixed(4)})`; }
+function layout(anim) {
+  if (isMobile()) {
+    shell.classList.remove('anim', 'min', 'pop'); shell.style.transform = '';
+    stage.classList.add('hide'); sideCtrl.hidden = true; bubble.hidden = true;
+    lsEl.style.setProperty('--ls-pr', '0px'); lsEl.inert = false;
+    shell.inert = document.body.classList.contains('m-ls');
+    return;
+  }
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  shell.classList.toggle('anim', !!anim && popped);
+  shell.inert = false;
+  if (mode === 'center') {
+    const narrow = vw < 1080;
+    stage.classList.toggle('narrow', narrow);
+    const s = clamp(Math.min(1, (vh - (narrow ? 210 : 48)) / PH, (vw - 32) / PW), .42, 1);
+    stage.style.setProperty('--pw', PW * s + 'px'); stage.style.setProperty('--ph', PH * s + 'px');
+    stage.classList.remove('hide');
+    const r = slot.getBoundingClientRect();
+    place(r.left, r.top, s);
+    sideCtrl.hidden = true; bubble.hidden = true; shell.classList.remove('min');
+    lsEl.inert = true; lsEl.style.setProperty('--ls-pr', '0px');
+  } else if (mode === 'side') {
+    stage.classList.add('hide'); lsEl.inert = false;
+    const s = clamp(Math.min(1, (vh - 32) / PH, (vw * .36) / PW), .42, 1);
+    const x = vw - PW * s - 20, y = Math.max(16, (vh - PH * s) / 2);
+    place(x, y, s);
+    sideCtrl.hidden = false; sideCtrl.style.left = (x - 58) + 'px'; sideCtrl.style.top = (y + 80) + 'px';
+    bubble.hidden = true; shell.classList.remove('min');
+    lsEl.style.setProperty('--ls-pr', Math.round(PW * s + 20 + 70) + 'px');
+  } else {
+    stage.classList.add('hide'); lsEl.inert = false; sideCtrl.hidden = true; bubble.hidden = false;
+    const s = .22; place(vw - PW * s - 40, vh - PH * s * .3, s);
+    shell.classList.add('min'); shell.inert = true;
+    lsEl.style.setProperty('--ls-pr', '0px');
+  }
+}
+function setMode(m) {
+  if (isMobile()) { if (m === 'center' || m === 'side') setMobileLS(false); return; }
+  const prev = mode; mode = m;
+  if (!popped) { shell.classList.remove('pop'); popped = true; }
+  layout(true);
+  if (m === 'min') bubble.focus({ preventScroll: true });
+  else if (m === 'center' && prev !== 'center') { const h = viewsEl.querySelector('.view:not(.leaving) h1'); h && h.focus({ preventScroll: true }); }
+  else if (m === 'side' && prev === 'min') { const h = viewsEl.querySelector('.view:not(.leaving) h1'); h && h.focus({ preventScroll: true }); }
+  if (m !== 'center' && S.demo.done && !S.demo.viewed) { S.demo.viewed = true; save(); renderLsTask(); renderTaskcard(); }
+}
+function popIn() {
+  layout(false);
+  const { x, y, s } = geom;
+  shell.style.setProperty('--t0', `translate(${Math.round(x + PW * s * .1)}px,${Math.round(y + 110)}px) scale(${(s * .8).toFixed(4)})`);
+  shell.style.setProperty('--t1', `translate(${Math.round(x)}px,${Math.round(y)}px) scale(${s.toFixed(4)})`);
+  shell.classList.add('pop');
+  shell.addEventListener('animationend', () => { shell.classList.remove('pop'); popped = true; }, { once: true });
+}
+$('#btn-phone').addEventListener('click', () => setMode('center'));
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || e.defaultPrevented) return;
+  if (dlg.open || !sheetLayer.hidden) return;
+  if (!isMobile() && mode === 'center') setMode('side');
+});
+let rT = 0;
+window.addEventListener('resize', () => { cancelAnimationFrame(rT); rT = requestAnimationFrame(() => layout(false)); });
+mq.addEventListener('change', () => { layout(false); refreshApp(); renderLS(); });
+window.addEventListener('storage', e => { if (e.key === KEY && e.newValue) { try { S = JSON.parse(e.newValue); } catch (er) { return; } renderLS(); refreshApp(); } });
+
+/* ---------- Start ---------- */
+load();
+save(true);
+renderLS();
+show(cur(), null, false);
+if (!isMobile()) requestAnimationFrame(() => requestAnimationFrame(popIn));
+else layout(false);
+setInterval(() => {
+  renderClock();
+  const now = Date.now();
+  if (Object.values(freshFeed).some(t => now - t < 25000) || Math.random() < .25) renderFeed();
+}, 5000);
+})();
+</script>
+</body>
+</html>

@@ -12,9 +12,11 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#F2F4F8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1116" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 300 900; font-display: swap; src: url(shared-files/figtree-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(shared-files/geist-latin-wght-normal.woff2) format("woff2-variations"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(shared-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2-variations"); }
+</style>
 <style>
 /* Layout: Navigation links (farbige Kacheln), Inhalt in der Mitte; am Handy Kopfzeile + Tab-Leiste mit großem „Melden“.
    Karte: eigener Lageplan in Metern, Pins in fester Pixelgröße; Koordinaten immer in Mono-Schrift wie auf dem Vermessungsprotokoll. */
@@ -579,8 +581,8 @@ button.kpi { border: 0; width: 100%; font: inherit; cursor: pointer; }
 <script>
 /* GeoAuftrag: Feldaufträge mit Standortnachweis. Demo mit Beispieldaten, gespeichert nur im Browser. */
 document.documentElement.lang = 'de';
-const KEY = 'geoauftrag-demo-v3';
-const ORG = 'Muster Netzbau GmbH';
+const KEY = 'geoauftrag-demo-v4';
+const ORG = 'Muster GmbH 1';
 const ICONS = {
   home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
   map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
@@ -735,8 +737,8 @@ function seed() {
     P('p10', 'Nina Petrovic', 'monteur', 'Glasfaser-Monteurin', null, 'fl'),
     P('p11', 'Tobias Lange', 'monteur', 'Spleißer', null, 'fl')
   ];
-  const firmen = [{ id: 'mn', name: 'Muster Netzbau GmbH', kurz: 'Muster Netzbau', farbe: '#6E4AF2' }, { id: 'ts', name: 'Tiefbau Schröder GmbH', kurz: 'Schröder Tiefbau', farbe: '#0E8F83' }, { id: 'fl', name: 'FiberLine Montage GmbH', kurz: 'FiberLine', farbe: '#D9822B' }];
-  const kunden = [{ id: 'sw', name: 'Stadtwerke Musterstadt', kurz: 'Stadtwerke' }, { id: 'hk', name: 'Hausverwaltung Kramer', kurz: 'HV Kramer' }];
+  const firmen = [{ id: 'mn', name: 'Muster GmbH 1', kurz: 'Muster GmbH 1', farbe: '#6E4AF2' }, { id: 'ts', name: 'Muster GmbH 2', kurz: 'Muster GmbH 2', farbe: '#0E8F83' }, { id: 'fl', name: 'Muster GmbH 3', kurz: 'Muster GmbH 3', farbe: '#D9822B' }];
+  const kunden = [{ id: 'sw', name: 'Fiktive GmbH 1', kurz: 'Fiktive GmbH 1' }, { id: 'hk', name: 'Fiktive GmbH 2', kurz: 'Fiktive GmbH 2' }];
   const G = (id, name, sn, kat, pruef) => ({ id, name, sn, kat, pruef: pruef === null ? null : addDays(TODAY, pruef) });
   const geraete = [
     G('g1', 'Spleißgerät', 'SPL-90-114327', 'Glasfaser', 120), G('g2', 'OTDR-Messgerät', 'OTDR-7150-0098', 'Glasfaser', 40),
@@ -842,17 +844,17 @@ function seed() {
   BK('A-2026-0436', 1, 55, rep('A-2026-0436', 'p11', 'zwischen')); BK('A-2026-0436', 0, 72, rep('A-2026-0436', 'p11', 'zwischen')); BK('A-2026-0436', 2, 1, rep('A-2026-0436', 'p11', 'zwischen'));
   MP('A-2026-0428', [['Glasfaser-Mikrokabel 2 Fasern', 'm', 40], ['Speedpipe 1×7/4 mm', 'm', 35]]);
   BK('A-2026-0428', 0, 38, rep('A-2026-0428', 'p10', 'fertig')); BK('A-2026-0428', 1, 33, rep('A-2026-0428', 'p10', 'fertig'));
-  notes.push({ id: uid('n'), to: 'p6', text: 'Behinderung bei Schröder Tiefbau: A-2026-0433, Gehweg belegt.', at: at(0, '07:31'), read: false, link: 'auftrag-A-2026-0433' });
+  notes.push({ id: uid('n'), to: 'p6', text: 'Behinderung bei Muster GmbH 2: A-2026-0433, Gehweg belegt.', at: at(0, '07:31'), read: false, link: 'auftrag-A-2026-0433' });
   let user = 'p1';
   try { if (matchMedia('(max-width: 760px)').matches) user = 'p2'; } catch (e) {}
-  return { v: 3, user, route: { p: 'start', id: null }, af: { q: '', st: '', kd: '', an: '' }, layers: { orders: true, reports: true, trassen: true, marker: true }, pf: 'offen',
+  return { v: 4, user, route: { p: 'start', id: null }, af: { q: '', st: '', kd: '', an: '' }, layers: { orders: true, reports: true, trassen: true, marker: true }, pf: 'offen',
     people, kunden, firmen, geraete, orders, reports, trassen, marker, docs, rechnungen, notes, matlog };
 }
 
 /* ---------- Zustand ---------- */
 let S;
 function load() {
-  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 3 && Array.isArray(s.orders)) return s; } } catch (e) {}
+  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4 && Array.isArray(s.orders)) return s; } } catch (e) {}
   return seed();
 }
 function save() {
@@ -1333,7 +1335,7 @@ function renderFrame() {
   if (!$('bellPanel').hidden) renderBell();
 }
 function userOpts() {
-  const grp = [['admin', 'Büro · Muster Netzbau', p => p.rolle === 'admin'], ['kunde', 'Auftraggeber', p => p.rolle === 'kunde']];
+  const grp = [['admin', 'Büro · Muster GmbH 1', p => p.rolle === 'admin'], ['kunde', 'Auftraggeber', p => p.rolle === 'kunde']];
   S.firmen.forEach(f => grp.splice(grp.length - 1, 0, ['monteur', `Monteure · ${f.kurz}`, p => p.rolle === 'monteur' && p.firma === f.id]));
   return grp.map(([rl, l, fn]) => `<optgroup label="${esc(l)}">${S.people.filter(fn).map(p => `<option value="${p.id}"${p.id === S.user ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
 }
@@ -1991,7 +1993,7 @@ function kml(oids, title) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${x(title)}</name>${styles}${fold}</Document></kml>`;
 }
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
-async function needPdf() { if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); return window.jspdf.jsPDF; }
+async function needPdf() { if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('shared-files/jspdf.umd.min.js'); return window.jspdf.jsPDF; }
 const pdfTxt = s => String(s ?? '').replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/ /g, ' ').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');
 const RGB = { ink: [26, 30, 41], gray: [91, 98, 116], line: [226, 230, 238], acc: [110, 74, 242], land: [238, 241, 234], road: [255, 255, 255], roadc: [205, 210, 220], bld: [218, 221, 230], green: [211, 231, 203], water: [185, 215, 242], park: [227, 230, 238], cable: [232, 89, 12], ok: [31, 138, 85], rand: [244, 178, 63], ungenau: [244, 178, 63], weit: [217, 54, 68], manuell: [224, 112, 31], soft: [244, 246, 250] };
 function clipSeg(x0, y0, x1, y1, b) {

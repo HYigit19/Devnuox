@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="de" data-fs="0">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Hausarztpraxis Dr. med. Muster – Beispiel-Website</title>
+<meta name="description" content="Beispiel-Website einer fiktiven Hausarztpraxis: Online-Terminbuchung, Rezeptanfrage, Sprechzeiten mit Live-Status, Leistungen, Team und Anfahrt.">
+<meta name="theme-color" content="#FAF6EE">
+<style>
+/* Gestaltung: ruhiges Leinen, Salbei und Ziegel. Leitmotiv ist das Praxisschild an der Tür und die Linde aus der Lindenallee.
+   Newsreader (Überschriften) und Atkinson Hyperlegible Next (Text, für Menschen mit eingeschränktem Sehen entwickelt). */
+@font-face { font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap; src: url(praxis-files/newsreader-latin-opsz-normal.woff2) format("woff2"); }
+@font-face { font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap; src: url(praxis-files/newsreader-latin-opsz-italic.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Next"; font-style: normal; font-weight: 200 800; font-display: swap; src: url(praxis-files/atkinson-hyperlegible-next-latin-wght-normal.woff2) format("woff2"); }
+
+:root {
+  --leinen: #FAF6EE;
+  --papier: #FFFDF9;
+  --sand: #F1EADD;
+  --tinte: #1F2B25;
+  --tinte-2: #46524B;
+  --linie: #DCD4C4;
+  --linie-2: #C9BFAC;
+  --salbei: #4F6B58;
+  --salbei-tief: #3B5444;
+  --salbei-mittel: #A9BDA8;
+  --salbei-hell: #E4EBE0;
+  --ziegel: #A4482B;
+  --ziegel-tief: #86381F;
+  --ziegel-hell: #F5E1D5;
+  --honig: #E9C98B;
+  --ok: #2F7A45;
+  --fehler: #A3261B;
+  --fehler-hell: #FBE7E3;
+  --notfall: #A3261B;
+  --font-s: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-t: "Atkinson Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r-l: 28px;
+  --r-m: 18px;
+  --r-s: 12px;
+  --tab-h: 0px;
+  color-scheme: light;
+}
+html[data-fs="1"] { font-size: 112.5%; }
+html[data-fs="2"] { font-size: 125%; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body { margin: 0; background: var(--leinen); color: var(--tinte); font-family: var(--font-t); font-size: 1.125rem; line-height: 1.6; padding-bottom: var(--tab-h); overflow-x: hidden; }
+a { color: var(--salbei-tief); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+a:hover { color: var(--ziegel-tief); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button, a, label, input, select, summary { touch-action: manipulation; }
+button { cursor: pointer; }
+img, svg { max-width: 100%; }
+:focus-visible { outline: 3px solid var(--ziegel); outline-offset: 3px; border-radius: 6px; }
+[hidden] { display: none !important; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(1.25rem, env(safe-area-inset-left, 0px)); padding-right: max(1.25rem, env(safe-area-inset-right, 0px)); }
+h1, h2, h3, h4 { font-family: var(--font-s); font-weight: 480; line-height: 1.12; margin: 0; letter-spacing: -.005em; text-wrap: balance; color: var(--tinte); }
+h1 { font-size: clamp(2.35rem, 3.4vw + 1.2rem, 4.1rem); font-variation-settings: "opsz" 72; letter-spacing: -.018em; line-height: 1.04; }
+h2 { font-size: clamp(1.9rem, 1.6vw + 1.3rem, 2.75rem); font-variation-settings: "opsz" 60; letter-spacing: -.012em; }
+h3 { font-size: 1.45rem; font-variation-settings: "opsz" 30; }
+p { margin: 0; }
+.lead { font-size: 1.28rem; line-height: 1.55; color: var(--tinte-2); max-width: 36em; }
+.muted { color: var(--tinte-2); }
+.skip { position: absolute; left: 1rem; top: -100px; z-index: 100; background: var(--tinte); color: #fff; padding: .7rem 1rem; border-radius: var(--r-s); font-weight: 700; }
+.skip:focus { top: 1rem; color: #fff; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 3.25rem; padding: .7rem 1.5rem; border-radius: 999px; border: 2px solid var(--tinte); background: transparent; color: var(--tinte); font-weight: 700; font-size: 1.06rem; line-height: 1.2; text-decoration: none; transition: background-color .15s, color .15s, border-color .15s; text-align: center; }
+.btn:hover { background: var(--tinte); color: var(--papier); }
+.btn svg { width: 1.25rem; height: 1.25rem; flex: none; }
+.btn.prim { background: var(--ziegel); border-color: var(--ziegel); color: #fff; }
+.btn.prim:hover { background: var(--ziegel-tief); border-color: var(--ziegel-tief); color: #fff; }
+.btn.sage { background: var(--salbei); border-color: var(--salbei); color: #fff; }
+.btn.sage:hover { background: var(--salbei-tief); border-color: var(--salbei-tief); }
+.btn.quiet { border-color: var(--linie-2); }
+.btn.quiet:hover { border-color: var(--tinte); }
+.btn.small { min-height: 2.75rem; padding: .45rem 1.1rem; font-size: 1rem; }
+.linkbtn { background: none; border: 0; padding: .25rem 0; color: var(--salbei-tief); text-decoration: underline; text-underline-offset: .18em; font-weight: 700; min-height: 2.75rem; }
+.linkbtn:hover { color: var(--ziegel-tief); }
+
+/* Hinweisleiste */
+.demo-strip { background: var(--salbei-tief); color: #F4F7F2; font-size: .95rem; }
+.demo-strip .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .3rem 1.25rem; padding-block: .5rem; }
+.demo-strip a { color: #fff; font-weight: 700; }
+.demo-strip a:hover { color: var(--honig); }
+
+/* Kopf */
+.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--leinen) 94%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--linie); }
+.top .wrap { max-width: 1360px; display: flex; align-items: center; gap: 1rem; min-height: 4.5rem; }
+.brand { display: flex; align-items: center; gap: .75rem; text-decoration: none; color: var(--tinte); min-width: 0; }
+.brand:hover { color: var(--tinte); }
+.brand svg { width: 2.75rem; height: 2.75rem; flex: none; }
+.brand-t { min-width: 0; }
+.brand b { display: block; white-space: nowrap; font-family: var(--font-s); font-weight: 520; font-size: 1.22rem; line-height: 1.1; font-variation-settings: "opsz" 24; }
+.brand small { display: block; white-space: nowrap; font-size: .86rem; color: var(--tinte-2); line-height: 1.3; }
+.nav { display: flex; gap: .15rem; margin-left: auto; }
+.nav a { padding: .55rem .75rem; border-radius: 999px; text-decoration: none; color: var(--tinte); font-weight: 600; font-size: 1rem; white-space: nowrap; }
+.nav a:hover { background: var(--salbei-hell); color: var(--tinte); }
+.fs { display: flex; align-items: center; gap: .1rem; border: 1px solid var(--linie-2); border-radius: 999px; padding: .2rem; background: var(--papier); flex: none; }
+.fs button { min-width: 2.6rem; height: 2.6rem; border: 0; background: transparent; border-radius: 999px; font-family: var(--font-s); font-weight: 600; color: var(--tinte); line-height: 1; padding: 0 .4rem; }
+.fs button[data-fs="0"] { font-size: 1rem; }
+.fs button[data-fs="1"] { font-size: 1.15rem; }
+.fs button[data-fs="2"] { font-size: 1.3rem; }
+.fs button[aria-pressed="true"] { background: var(--tinte); color: var(--papier); }
+.fs button:not([aria-pressed="true"]):hover { background: var(--salbei-hell); }
+.menu-btn { display: none; align-items: center; gap: .4rem; height: 2.9rem; padding: 0 .9rem; border: 1px solid var(--linie-2); border-radius: 999px; background: var(--papier); font-weight: 700; flex: none; }
+.menu-btn svg { width: 1.3rem; height: 1.3rem; }
+.top .call { flex: none; }
+@media (max-width: 1400px) { .nav a { padding: .55rem .5rem; font-size: .98rem; } }
+@media (max-width: 1300px) { .nav { display: none; } .menu-btn { display: inline-flex; } .fs { margin-left: auto; } }
+@media (max-width: 900px) { .top .call { display: none; } }
+@media (max-width: 620px) {
+  .brand small { display: none; }
+  .brand b { font-size: 1.05rem; white-space: normal; }
+  .brand svg { width: 2.4rem; height: 2.4rem; }
+  .fs button { min-width: 2.4rem; height: 2.4rem; }
+  .menu-btn .lbl { display: none; }
+  .menu-btn { width: 2.9rem; justify-content: center; padding: 0; }
+  .top .wrap { gap: .5rem; }
+}
+@media (max-width: 380px) { .brand svg { display: none; } }
+
+/* Menü-Dialog */
+dialog.sheet { border: 0; padding: 0; margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(26rem, 100vw); max-width: 100vw; background: var(--leinen); color: var(--tinte); box-shadow: -20px 0 60px rgba(31,43,37,.18); }
+dialog.sheet::backdrop { background: rgba(31,43,37,.42); }
+.sheet-in { display: flex; flex-direction: column; height: 100%; padding: max(1rem, env(safe-area-inset-top)) 1.25rem max(1.25rem, env(safe-area-inset-bottom)); overflow-y: auto; }
+.sheet-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.sheet-h h2 { font-size: 1.6rem; }
+.x-btn { width: 3rem; height: 3rem; border-radius: 999px; border: 1px solid var(--linie-2); background: var(--papier); display: grid; place-items: center; }
+.x-btn svg { width: 1.3rem; height: 1.3rem; }
+.sheet nav a { display: block; padding: .95rem .25rem; border-bottom: 1px solid var(--linie); text-decoration: none; color: var(--tinte); font-weight: 700; font-size: 1.15rem; }
+.sheet .notfall-mini { margin-top: 1.5rem; }
+
+/* Hero */
+.hero { position: relative; padding: clamp(2.5rem, 5vw, 4.5rem) 0 clamp(3rem, 6vw, 5.5rem); overflow: hidden; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.hero-copy { display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
+.status { display: flex; gap: .9rem; align-items: flex-start; padding: 1rem 1.25rem 1.05rem 1rem; border-radius: var(--r-m); background: var(--papier); border: 1px solid var(--linie); max-width: 34rem; }
+.lamp { width: 1rem; height: 1rem; border-radius: 50%; flex: none; margin-top: .45rem; background: var(--linie-2); box-shadow: 0 0 0 4px color-mix(in srgb, var(--linie-2) 30%, transparent); }
+.status[data-s="open"] .lamp { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent); animation: glow 2.8s ease-in-out infinite; }
+.status[data-s="pause"] .lamp, .status[data-s="soon"] .lamp { background: #C08A1E; box-shadow: 0 0 0 4px rgba(192,138,30,.22); }
+.status[data-s="closed"] .lamp { background: var(--ziegel); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ziegel) 20%, transparent); }
+@keyframes glow { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--ok) 10%, transparent); } }
+.status-main { font-family: var(--font-s); font-size: 1.55rem; font-weight: 520; line-height: 1.2; font-variation-settings: "opsz" 36; }
+.status-sub { color: var(--tinte-2); margin-top: .2rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.hero-note { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; color: var(--tinte-2); font-size: 1rem; }
+.hero-note a { font-weight: 700; }
+.hero-art { position: relative; min-width: 0; display: grid; place-items: center; padding: 1.5rem 0; }
+.hero-blob { position: absolute; inset: -6% -14% -8% -4%; z-index: 0; }
+.hero-branch { position: absolute; z-index: 0; width: 56%; right: -12%; top: -14%; pointer-events: none; }
+.schild { position: relative; z-index: 1; width: min(100%, 25rem); background: linear-gradient(180deg, #FFFEFB, #FBF7EF); border-radius: 22px; padding: 2.3rem 2.1rem 1.6rem; box-shadow: 0 1px 0 #fff inset, 0 2px 0 rgba(31,43,37,.06), 0 22px 44px -18px rgba(59,84,68,.42), 0 0 0 1px #E3DACA; }
+.schild::before { content: ""; position: absolute; inset: .55rem; border: 1.5px solid var(--salbei-mittel); border-radius: 15px; pointer-events: none; }
+.schraube { position: absolute; width: .8rem; height: .8rem; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F4F1EA, #B7AE9C 70%); box-shadow: inset 0 0 0 1px rgba(31,43,37,.18); }
+.schraube::after { content: ""; position: absolute; left: 18%; right: 18%; top: 46%; height: 1.5px; background: rgba(31,43,37,.35); transform: rotate(-35deg); }
+.schraube.a { top: 1.05rem; left: 1.05rem; } .schraube.b { top: 1.05rem; right: 1.05rem; } .schraube.c { bottom: 1.05rem; left: 1.05rem; } .schraube.d { bottom: 1.05rem; right: 1.05rem; }
+.schild-kind { font-family: var(--font-s); font-style: italic; font-size: 1.15rem; color: var(--salbei-tief); text-align: center; }
+.schild-names { text-align: center; margin: .5rem 0 .35rem; font-family: var(--font-s); font-size: 1.6rem; line-height: 1.22; font-weight: 520; font-variation-settings: "opsz" 40; }
+.schild-fach { text-align: center; font-size: .92rem; color: var(--tinte-2); line-height: 1.4; }
+.schild-rule { height: 1px; background: var(--linie-2); margin: 1.1rem 1.2rem; }
+.schild dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .2rem 1rem; font-size: .95rem; padding: 0 .3rem; }
+.schild dt { font-weight: 700; }
+.schild dd { margin: 0; color: var(--tinte-2); font-variant-numeric: tabular-nums; }
+.schild-lamp { margin: 1.1rem auto 0; display: flex; align-items: center; justify-content: center; gap: .5rem; font-size: .92rem; font-weight: 700; color: var(--tinte-2); }
+.schild-lamp i { width: .6rem; height: .6rem; border-radius: 50%; background: var(--linie-2); }
+.schild-lamp[data-s="open"] i { background: var(--ok); }
+.schild-lamp[data-s="pause"] i, .schild-lamp[data-s="soon"] i { background: #C08A1E; }
+.schild-lamp[data-s="closed"] i { background: var(--ziegel); }
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-art { padding: 1rem 0 0; }
+  .schild { width: min(100%, 22rem); }
+  .hero-branch { width: 46%; right: -4%; top: -10%; }
+}
+
+/* Hinweis Urlaub */
+.notice { display: flex; gap: 1rem; align-items: flex-start; background: var(--ziegel-hell); border-radius: var(--r-m); padding: 1.1rem 1.35rem; }
+.notice svg { width: 1.6rem; height: 1.6rem; flex: none; color: var(--ziegel-tief); margin-top: .15rem; }
+.notice b { display: block; }
+.notice p { color: var(--tinte); }
+.notice-band { padding: 0 0 clamp(2.5rem, 5vw, 4rem); }
+
+/* Abschnitte */
+.sec { padding: clamp(3.5rem, 7vw, 6.5rem) 0; }
+.sec.paper { background: var(--papier); }
+.sec.sage { background: var(--salbei-hell); }
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem 3rem; align-items: end; margin-bottom: clamp(2rem, 4vw, 3rem); }
+.sec-head p { color: var(--tinte-2); max-width: 34em; }
+@media (max-width: 820px) { .sec-head { grid-template-columns: minmax(0, 1fr); } }
+.demo-tag { display: inline-flex; align-items: center; gap: .45rem; font-size: .92rem; font-weight: 700; color: var(--salbei-tief); background: var(--salbei-hell); border-radius: 999px; padding: .3rem .8rem; }
+.sec.sage .demo-tag { background: var(--papier); }
+.demo-tag svg { width: 1rem; height: 1rem; }
+
+/* Terminbuchung */
+.booking { display: grid; grid-template-columns: 17rem minmax(0, 1fr); background: var(--papier); border-radius: var(--r-l); border: 1px solid var(--linie); overflow: hidden; }
+.steps { list-style: none; margin: 0; padding: 1.75rem 1.25rem; background: var(--sand); display: flex; flex-direction: column; gap: .35rem; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .1rem .7rem; padding: .6rem .6rem; border-radius: var(--r-s); color: var(--tinte-2); }
+.steps li::before { content: counter(st); grid-row: span 2; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--linie-2); font-weight: 700; font-size: .95rem; background: var(--papier); }
+.steps li b { font-weight: 700; color: var(--tinte); line-height: 1.3; align-self: center; }
+.steps li span { font-size: .9rem; line-height: 1.35; overflow-wrap: anywhere; }
+.steps li[aria-current="step"] { background: var(--papier); }
+.steps li[aria-current="step"]::before { background: var(--ziegel); border-color: var(--ziegel); color: #fff; }
+.steps li.done::before { content: "✓"; background: var(--salbei); border-color: var(--salbei); color: #fff; }
+.step-mobile { display: none; }
+.panel { padding: clamp(1.4rem, 3vw, 2.4rem); min-width: 0; }
+.panel h3 { margin-bottom: .4rem; outline: none; }
+.panel > .muted { margin-bottom: 1.4rem; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: .75rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.choice-grid legend { padding: 0; }
+.choice { position: relative; display: flex; gap: .9rem; align-items: flex-start; padding: 1rem 1.1rem; border: 1.5px solid var(--linie); border-radius: var(--r-m); background: var(--papier); cursor: pointer; transition: border-color .15s, background-color .15s; }
+.choice:hover { border-color: var(--salbei-mittel); }
+.choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.choice:has(input:checked) { border-color: var(--salbei); background: var(--salbei-hell); box-shadow: inset 0 0 0 1px var(--salbei); }
+.choice:has(input:focus-visible) { outline: 3px solid var(--ziegel); outline-offset: 2px; }
+.choice .ic { width: 3rem; height: 3rem; flex: none; display: grid; place-items: center; background: var(--salbei-hell); color: var(--salbei-tief); border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%; }
+.choice:has(input:checked) .ic { background: var(--papier); }
+.choice .ic svg { width: 1.6rem; height: 1.6rem; }
+.choice > span:not(.ic):not(.tick) { padding-right: 1.4rem; min-width: 0; }
+.choice b { display: block; line-height: 1.3; }
+.choice small { display: block; color: var(--tinte-2); font-size: .95rem; line-height: 1.4; margin-top: .15rem; }
+.choice .tick { position: absolute; top: .7rem; right: .75rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 1.5px solid var(--linie-2); background: var(--papier); }
+.choice:has(input:checked) .tick { background: var(--salbei); border-color: var(--salbei); }
+.choice:has(input:checked) .tick::after { content: ""; position: absolute; left: .42rem; top: .2rem; width: .38rem; height: .7rem; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.choice .portrait-s { width: 3.4rem; height: 3.4rem; flex: none; }
+.panel-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--linie); }
+.panel-foot .spacer { flex: 1; }
+.step-err { color: var(--fehler); font-weight: 700; margin-top: 1rem; display: flex; gap: .5rem; align-items: center; }
+.step-err svg { width: 1.2rem; height: 1.2rem; flex: none; }
+.days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; border: 0; padding: 0; margin: 0 0 1.5rem; min-width: 0; }
+.day { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: .05rem; padding: .7rem .8rem; border: 1.5px solid var(--linie); border-radius: var(--r-s); cursor: pointer; background: var(--papier); min-width: 0; }
+.day input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.day b { font-size: 1.02rem; line-height: 1.25; }
+.day span { font-size: .88rem; color: var(--tinte-2); }
+.day:hover { border-color: var(--salbei-mittel); }
+.day:has(input:checked) { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
+.day:has(input:checked) span { color: #D6DDD6; }
+.day:has(input:focus-visible) { outline: 3px solid var(--ziegel); outline-offset: 2px; }
+.day.none { background: var(--sand); cursor: not-allowed; }
+.day.none b { color: var(--tinte-2); }
+.slot-group { margin-bottom: 1.25rem; border: 0; padding: 0; min-width: 0; }
+.slot-group legend { font-weight: 700; margin-bottom: .55rem; padding: 0; }
+.slots { display: flex; flex-wrap: wrap; gap: .5rem; }
+.slot { position: relative; }
+.slot input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.slot span { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 5.2rem; min-height: 3rem; padding: .35rem .75rem; border-radius: 999px; border: 1.5px solid var(--salbei-mittel); font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; background: var(--papier); line-height: 1.2; }
+.slot small { font-weight: 500; font-size: .78rem; color: var(--tinte-2); }
+.slot span:hover { background: var(--salbei-hell); }
+.slot input:checked + span { background: var(--salbei); border-color: var(--salbei); color: #fff; }
+.slot input:checked + span small { color: #E7EEE6; }
+.slot input:focus-visible + span { outline: 3px solid var(--ziegel); outline-offset: 2px; }
+.empty { padding: 1.25rem; border-radius: var(--r-m); background: var(--sand); color: var(--tinte-2); }
+.chosen { margin-top: .5rem; font-weight: 700; color: var(--salbei-tief); min-height: 1.6em; }
+@media (max-width: 900px) {
+  .booking { grid-template-columns: minmax(0, 1fr); }
+  .steps { display: none; }
+  .step-mobile { display: block; padding: 1.1rem 1.4rem 0; }
+  .step-mobile p { font-size: .98rem; color: var(--tinte-2); }
+  .bar { height: .45rem; background: var(--sand); border-radius: 999px; margin-top: .5rem; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--ziegel); border-radius: 999px; transition: width .3s; }
+  .days { display: flex; overflow-x: auto; scroll-snap-type: x proximity; padding: .2rem .2rem .6rem; margin-inline: -.2rem; }
+  .day { flex: 0 0 7.2rem; scroll-snap-align: start; }
+}
+
+/* Formulare */
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem 1.25rem; }
+.form-grid .full { grid-column: 1 / -1; }
+@media (max-width: 640px) { .form-grid { grid-template-columns: minmax(0, 1fr); } }
+.field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.field > label, .field > .lbl, fieldset.field legend { font-weight: 700; line-height: 1.35; padding: 0; }
+.field .hint { font-size: .95rem; color: var(--tinte-2); line-height: 1.4; }
+.opt { font-weight: 400; color: var(--tinte-2); }
+input[type=text], input[type=tel], input[type=email], select, textarea { width: 100%; min-height: 3.25rem; padding: .7rem .95rem; border: 1.5px solid var(--linie-2); border-radius: var(--r-s); background: #fff; font-size: 1.1rem; line-height: 1.4; }
+select { appearance: none; -webkit-appearance: none; padding-right: 2.6rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%231F2B25' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .85rem center; background-size: 1.2rem; }
+textarea { min-height: 6.5rem; resize: vertical; }
+input:hover, select:hover, textarea:hover { border-color: var(--tinte-2); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--ziegel); outline-offset: 1px; border-color: var(--tinte); border-radius: var(--r-s); }
+[aria-invalid="true"] { border-color: var(--fehler) !important; background: var(--fehler-hell) !important; }
+.err { color: var(--fehler); font-weight: 700; font-size: .98rem; display: flex; gap: .4rem; align-items: flex-start; line-height: 1.4; }
+.err:empty { display: none; }
+.err::before { content: ""; width: 1.05rem; height: 1.05rem; flex: none; margin-top: .15rem; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='black'/%3E%3Cpath d='M10 5.5v5.5M10 14v.5' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='black'/%3E%3Cpath d='M10 5.5v5.5M10 14v.5' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+fieldset.field { border: 0; padding: 0; margin: 0; }
+.radios { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem; }
+.radios.col { flex-direction: column; }
+.rad { display: flex; align-items: flex-start; gap: .7rem; padding: .7rem 1rem; border: 1.5px solid var(--linie-2); border-radius: var(--r-s); background: #fff; cursor: pointer; min-height: 3.25rem; line-height: 1.4; }
+.rad:hover { border-color: var(--tinte-2); }
+.rad:has(input:checked) { border-color: var(--salbei); background: var(--salbei-hell); }
+.rad small { display: block; color: var(--tinte-2); font-size: .92rem; }
+input[type=radio], input[type=checkbox] { width: 1.35rem; height: 1.35rem; margin: .12rem 0 0; flex: none; accent-color: var(--salbei); }
+.field > label.check, .check { font-weight: 400; display: flex; gap: .75rem; align-items: flex-start; cursor: pointer; line-height: 1.45; }
+.err-summary { border: 2px solid var(--fehler); background: var(--fehler-hell); border-radius: var(--r-m); padding: 1rem 1.25rem; margin-bottom: 1.5rem; outline: none; }
+.err-summary h4 { font-family: var(--font-t); font-size: 1.1rem; font-weight: 700; color: var(--fehler); margin-bottom: .35rem; }
+.err-summary ul { margin: 0; padding-left: 1.2rem; }
+.err-summary a { color: var(--fehler); font-weight: 700; }
+
+/* Bestätigung */
+.confirm { display: grid; gap: 1.25rem; }
+.confirm-h { display: flex; gap: 1rem; align-items: center; }
+.confirm-h .seal { width: 4rem; height: 4rem; flex: none; }
+.confirm-h h3 { font-size: 1.8rem; }
+.sum { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .45rem 1.5rem; padding: 1.25rem 1.4rem; background: var(--salbei-hell); border-radius: var(--r-m); }
+.sum dt { color: var(--tinte-2); }
+.sum dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .sum { grid-template-columns: minmax(0, 1fr); gap: 0; } .sum dd { margin-bottom: .6rem; } }
+.demo-note { display: flex; gap: .7rem; align-items: flex-start; padding: .9rem 1.1rem; border-radius: var(--r-s); border: 1.5px dashed var(--salbei-mittel); color: var(--tinte-2); font-size: 1rem; }
+.demo-note svg { width: 1.3rem; height: 1.3rem; flex: none; color: var(--salbei); margin-top: .1rem; }
+.bring { margin: 0; padding-left: 1.3rem; }
+.bring li { margin: .15rem 0; }
+.my { margin-top: 2rem; }
+.my h3 { font-size: 1.35rem; margin-bottom: .75rem; }
+.my ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.my li { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; padding: .9rem 1.1rem; background: var(--papier); border: 1px solid var(--linie); border-radius: var(--r-m); }
+.my li b { display: block; }
+.my li span { color: var(--tinte-2); font-size: .98rem; }
+
+/* Rezept */
+.rx { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
+.rx-form { background: var(--papier); border: 1px solid var(--linie); border-radius: var(--r-l); padding: clamp(1.3rem, 3vw, 2.3rem); min-width: 0; }
+.rx-aside { display: grid; gap: 1.25rem; min-width: 0; }
+.aside-card { padding: 1.3rem 1.4rem; border-radius: var(--r-m); background: var(--papier); border: 1px solid var(--linie); }
+.aside-card h3 { font-size: 1.25rem; margin-bottom: .5rem; }
+.aside-card ul { margin: 0; padding-left: 1.2rem; color: var(--tinte-2); }
+.aside-card li { margin: .25rem 0; }
+.type-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-bottom: 1.6rem; }
+@media (max-width: 560px) { .type-switch { grid-template-columns: minmax(0, 1fr); } }
+.med-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto; gap: .6rem; align-items: end; padding: .9rem; border-radius: var(--r-s); background: var(--leinen); }
+.med-list { display: grid; gap: .6rem; }
+.med-row .rm { width: 3.25rem; height: 3.25rem; border-radius: var(--r-s); border: 1.5px solid var(--linie-2); background: #fff; display: grid; place-items: center; }
+.med-row .rm svg { width: 1.2rem; height: 1.2rem; }
+.med-row .rm:disabled { opacity: .4; cursor: not-allowed; }
+@media (max-width: 640px) { .med-row { grid-template-columns: minmax(0, 1fr) auto; } .med-row .field:first-child { grid-column: 1 / -1; } }
+@media (max-width: 960px) { .rx { grid-template-columns: minmax(0, 1fr); } }
+.form-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-top: 1.75rem; }
+
+/* Leistungen */
+.svc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; }
+@media (max-width: 860px) { .svc { grid-template-columns: minmax(0, 1fr); } }
+.svc-item { border-top: 1px solid var(--linie-2); }
+.svc-col:last-child .svc-item:last-child, .svc-col .svc-item:last-child { border-bottom: 1px solid var(--linie-2); }
+@media (max-width: 860px) { .svc-col:first-child .svc-item:last-child { border-bottom: 0; } }
+.svc-btn { font-family: var(--font-t); width: 100%; display: grid; grid-template-columns: 3.4rem minmax(0, 1fr) 2.4rem; gap: 1rem; align-items: center; text-align: left; padding: 1.15rem 0; background: none; border: 0; color: var(--tinte); }
+.svc-btn .ic { width: 3.4rem; height: 3.4rem; display: grid; place-items: center; color: var(--salbei-tief); background: var(--salbei-hell); border-radius: 55% 45% 48% 52% / 52% 44% 56% 48%; }
+.svc-item:nth-child(even) .svc-btn .ic { background: var(--ziegel-hell); color: var(--ziegel-tief); border-radius: 46% 54% 58% 42% / 50% 58% 42% 50%; }
+.svc-btn .ic svg { width: 1.75rem; height: 1.75rem; }
+.svc-btn b { display: block; font-family: var(--font-s); font-size: 1.4rem; font-weight: 520; line-height: 1.2; font-variation-settings: "opsz" 30; }
+.svc-btn span.s { display: block; color: var(--tinte-2); font-size: 1rem; line-height: 1.4; margin-top: .15rem; }
+.svc-btn .pm { width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1.5px solid var(--linie-2); display: grid; place-items: center; transition: transform .2s, background-color .15s; }
+.svc-btn .pm svg { width: 1rem; height: 1rem; }
+.svc-btn:hover .pm { background: var(--papier); border-color: var(--tinte-2); }
+.svc-btn[aria-expanded="true"] .pm { transform: rotate(45deg); background: var(--tinte); color: var(--papier); border-color: var(--tinte); }
+.svc-body { padding: 0 0 1.5rem 4.4rem; }
+@media (max-width: 520px) { .svc-body { padding-left: 0; } .svc-btn { grid-template-columns: 2.9rem minmax(0, 1fr) 2.4rem; gap: .8rem; } .svc-btn .ic { width: 2.9rem; height: 2.9rem; } .svc-btn b { font-size: 1.25rem; } }
+.svc-body p { max-width: 36em; }
+.facts { margin: 1rem 0 1.1rem; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .3rem 1.25rem; font-size: 1rem; }
+.facts dt { color: var(--tinte-2); }
+.facts dd { margin: 0; font-weight: 600; }
+@media (max-width: 520px) { .facts { grid-template-columns: minmax(0, 1fr); gap: 0; } .facts dd { margin-bottom: .45rem; } }
+.svc-tools { display: flex; justify-content: flex-end; margin-bottom: .5rem; }
+
+/* Team */
+.docs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 3rem); margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.doc { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.portrait { width: 100%; aspect-ratio: 1; display: block; }
+.doc h3 { font-size: 1.75rem; }
+.doc .role { color: var(--salbei-tief); font-weight: 700; margin: .25rem 0 .7rem; }
+.doc p { color: var(--tinte-2); }
+.tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; list-style: none; padding: 0; }
+.tags li { font-size: .92rem; padding: .25rem .7rem; border-radius: 999px; background: var(--papier); border: 1px solid var(--linie); }
+.crew { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
+.crew li { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr); gap: 1rem; align-items: center; }
+.crew b { display: block; font-family: var(--font-s); font-size: 1.22rem; font-weight: 520; line-height: 1.2; }
+.crew span { display: block; color: var(--tinte-2); font-size: .98rem; line-height: 1.4; }
+@media (max-width: 1060px) { .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 860px) { .docs { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .doc { grid-template-columns: minmax(0, 1fr); } .doc .portrait { width: 8rem; } .crew { grid-template-columns: minmax(0, 1fr); } }
+.team-sub { font-size: 1.5rem; margin-bottom: 1.25rem; }
+
+/* Sprechzeiten */
+.hours-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+@media (max-width: 900px) { .hours-grid { grid-template-columns: minmax(0, 1fr); } }
+.tbl-wrap { background: var(--papier); border-radius: var(--r-l); padding: .6rem 1.4rem 1rem; border: 1px solid var(--linie); overflow-x: auto; }
+table.hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hours td { white-space: nowrap; }
+.d-s { display: none; }
+@media (max-width: 560px) { .hours { font-size: .95rem; } .hours .today-tag { display: none; } .d-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .d-s { display: inline; } .tbl-wrap { padding: .4rem .9rem .8rem; } .hours th, .hours td { padding: .75rem .4rem; } .today-tag { display: none; } }
+.hours caption { text-align: left; font-family: var(--font-s); font-size: 1.35rem; padding: .9rem 0 .4rem; font-weight: 520; }
+.hours th, .hours td { text-align: left; padding: .85rem .6rem; border-bottom: 1px solid var(--linie); vertical-align: top; }
+.hours thead th { font-size: .95rem; color: var(--tinte-2); font-weight: 700; }
+.hours tbody tr:last-child th, .hours tbody tr:last-child td { border-bottom: 0; }
+.hours tbody th { font-weight: 700; }
+.hours tr.today { background: var(--salbei-hell); }
+.hours tr.today th:first-child { border-radius: 10px 0 0 10px; }
+.hours tr.today td:last-child { border-radius: 0 10px 10px 0; }
+.today-tag { display: inline-block; margin-left: .5rem; font-size: .8rem; font-weight: 700; background: var(--salbei); color: #fff; border-radius: 999px; padding: .05rem .55rem; vertical-align: .1em; }
+.closed { color: var(--tinte-2); }
+.extra { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.extra div { background: var(--papier); border-radius: var(--r-m); padding: 1rem 1.15rem; border: 1px solid var(--linie); }
+.extra b { display: block; font-family: var(--font-s); font-size: 1.15rem; font-weight: 560; margin-bottom: .2rem; }
+.extra p { font-size: .98rem; color: var(--tinte-2); }
+@media (max-width: 640px) { .extra { grid-template-columns: minmax(0, 1fr); } }
+.side-stack { display: grid; gap: 1.25rem; }
+.notfall { background: var(--tinte); color: #F4F2EC; border-radius: var(--r-l); padding: 1.5rem 1.6rem; }
+.notfall h3 { color: #fff; font-size: 1.55rem; margin-bottom: 1rem; }
+.nf-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .2rem 1.1rem; align-items: center; padding: .9rem 0; border-top: 1px solid rgba(255,255,255,.16); text-decoration: none; color: #F4F2EC; }
+.nf-row:hover { color: #fff; }
+@media (max-width: 560px) { .nf-row { grid-template-columns: minmax(0, 1fr); } }
+.nf-row:hover .nf-num { text-decoration: underline; text-underline-offset: .12em; text-decoration-thickness: 2px; }
+.nf-row .nf-num { font-family: var(--font-s); font-size: 2.6rem; line-height: 1; font-weight: 560; color: #fff; font-variant-numeric: lining-nums; white-space: nowrap; }
+.nf-row .nf-num.red { color: #FFB5A8; }
+.nf-row b { display: block; color: #fff; }
+.nf-row > span:last-child span { display: block; font-size: .98rem; color: #CFD5CF; line-height: 1.4; }
+.notfall-mini { display: flex; flex-wrap: wrap; gap: .4rem .9rem; align-items: center; padding: .75rem 1rem; border-radius: var(--r-s); background: var(--tinte); color: #F4F2EC; font-size: 1rem; }
+.notfall-mini a { color: #fff; font-weight: 700; }
+.notfall-mini a:hover { color: var(--honig); }
+.notfall-mini .n { font-family: var(--font-s); font-size: 1.3rem; font-weight: 600; text-decoration: none; }
+
+/* Anfahrt */
+.route-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+@media (max-width: 900px) { .route-grid { grid-template-columns: minmax(0, 1fr); } }
+.map-box { background: var(--papier); border-radius: var(--r-l); border: 1px solid var(--linie); overflow: hidden; }
+.map-box svg { display: block; width: 100%; height: auto; }
+.mode-bar { display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem 1.1rem; border-top: 1px solid var(--linie); }
+.mode-bar button { min-height: 2.9rem; padding: .4rem 1.05rem; border-radius: 999px; border: 1.5px solid var(--linie-2); background: var(--papier); font-weight: 700; display: inline-flex; align-items: center; gap: .5rem; }
+.mode-bar button svg { width: 1.2rem; height: 1.2rem; }
+.mode-bar button[aria-pressed="true"] { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
+.mode-bar button:not([aria-pressed="true"]):hover { border-color: var(--tinte); }
+@media (max-width: 600px) { #map .ml { font-size: 21px; } }
+.route { opacity: 0; transition: opacity .25s; }
+.route.on { opacity: 1; }
+.mk-hl { transition: transform .25s; transform-box: fill-box; transform-origin: center; }
+.addr { font-style: normal; font-size: 1.2rem; line-height: 1.5; }
+.addr b { font-family: var(--font-s); font-size: 1.45rem; font-weight: 520; display: block; margin-bottom: .2rem; }
+.mode-info { margin-top: 1.25rem; padding: 1.2rem 1.3rem; border-radius: var(--r-m); background: var(--salbei-hell); }
+.mode-info h3 { font-size: 1.3rem; margin-bottom: .45rem; }
+.mode-info ul { margin: 0; padding-left: 1.2rem; }
+.mode-info li { margin: .3rem 0; }
+
+/* FAQ */
+.faq { max-width: 52rem; }
+.faq details { border-top: 1px solid var(--linie-2); }
+.faq details:last-child { border-bottom: 1px solid var(--linie-2); }
+.faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) 2.4rem; gap: 1rem; align-items: center; padding: 1.15rem 0; font-family: var(--font-s); font-size: 1.32rem; font-weight: 500; line-height: 1.3; font-variation-settings: "opsz" 28; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary .pm { width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1.5px solid var(--linie-2); display: grid; place-items: center; transition: transform .2s; }
+.faq summary .pm svg { width: 1rem; height: 1rem; }
+.faq details[open] summary .pm { transform: rotate(45deg); background: var(--tinte); color: var(--papier); border-color: var(--tinte); }
+.faq details > div { padding: 0 3.4rem 1.4rem 0; color: var(--tinte-2); }
+.faq details > div p + p { margin-top: .6rem; }
+
+/* Fuß */
+.foot { background: var(--salbei-tief); color: #E9EEE7; padding: clamp(3rem, 6vw, 4.5rem) 0 calc(2rem + env(safe-area-inset-bottom, 0px)); }
+.foot a { color: #fff; }
+.foot a:hover { color: var(--honig); }
+.foot-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 2rem; }
+.foot h2 { font-size: 1.2rem; color: #fff; margin-bottom: .6rem; font-variation-settings: "opsz" 20; }
+.foot p, .foot li { font-size: 1rem; line-height: 1.6; }
+.foot ul { list-style: none; margin: 0; padding: 0; }
+.foot-brand b { font-family: var(--font-s); font-size: 1.5rem; font-weight: 500; color: #fff; display: block; margin-bottom: .4rem; line-height: 1.2; }
+.foot-bottom { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.18); display: flex; flex-wrap: wrap; gap: .75rem 2rem; justify-content: space-between; align-items: center; font-size: .95rem; color: #CBD5CB; }
+.foot .linkbtn { color: #fff; min-height: 2.75rem; }
+.foot .linkbtn:hover { color: var(--honig); }
+@media (max-width: 900px) { .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .foot-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Tab-Leiste Handy */
+.tabbar { display: none; }
+@media (max-width: 900px) {
+  :root { --tab-h: calc(4.4rem + env(safe-area-inset-bottom, 0px)); }
+  .tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--papier); border-top: 1px solid var(--linie-2); padding: .3rem max(.25rem, env(safe-area-inset-left)) calc(.3rem + env(safe-area-inset-bottom, 0px)) max(.25rem, env(safe-area-inset-right)); box-shadow: 0 -8px 24px rgba(31,43,37,.07); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 3.8rem; text-decoration: none; color: var(--tinte); font-size: .8rem; font-weight: 700; border-radius: var(--r-s); line-height: 1.15; text-align: center; }
+  .tabbar a svg { width: 1.5rem; height: 1.5rem; color: var(--salbei-tief); }
+  .tabbar a.call-tab { background: var(--ziegel); color: #fff; margin: .15rem; }
+  .tabbar a.call-tab svg { color: #fff; }
+  html { scroll-padding-top: 5.5rem; }
+}
+html[data-fs="2"] .tabbar a { font-size: .72rem; }
+
+/* Toast */
+.toast { position: fixed; left: 50%; bottom: calc(var(--tab-h) + 1.25rem); transform: translate(-50%, 1rem); z-index: 60; display: flex; gap: 1rem; align-items: center; max-width: calc(100vw - 2rem); background: var(--tinte); color: #fff; padding: .8rem .9rem .8rem 1.2rem; border-radius: 999px; box-shadow: 0 12px 30px rgba(31,43,37,.3); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { background: var(--papier); color: var(--tinte); border: 0; border-radius: 999px; min-height: 2.6rem; padding: 0 1rem; font-weight: 700; flex: none; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<div class="demo-strip" role="note"><div class="wrap"><span>Beispiel-Website. Name, Personen und Daten sind aus Datenschutzgründen geändert.</span><a href="../de/websites.html">Zurück zu den Demos</a></div></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#main" aria-label="Hausarztpraxis Dr. med. Muster, zum Seitenanfang">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#E4EBE0"/><path d="M24 37c-7-4.5-12-10-12-16.2 0-4.4 3.3-7.6 7.1-7.6 2.3 0 4 1 4.9 2.6.9-1.6 2.6-2.6 4.9-2.6 3.8 0 7.1 3.2 7.1 7.6C36 27 31 32.5 24 37z" fill="#4F6B58"/><path d="M24 36V17.5M24 24l-5-3.5M24 29l5-4" stroke="#E4EBE0" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M24 37v5" stroke="#4F6B58" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="brand-t"><b>Hausarztpraxis Dr. med. Muster</b><small>Allgemeinmedizin in Musterstadt</small></span>
+    </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#termin">Termin</a><a href="#rezept">Rezept</a><a href="#leistungen">Leistungen</a><a href="#team">Team</a><a href="#zeiten">Sprechzeiten</a><a href="#anfahrt">Anfahrt</a><a href="#fragen">Fragen</a>
+    </nav>
+    <div class="fs" role="group" aria-label="Schriftgröße">
+      <button type="button" data-fs="0" aria-pressed="true" aria-label="Schriftgröße normal">A</button>
+      <button type="button" data-fs="1" aria-pressed="false" aria-label="Schriftgröße groß">A+</button>
+      <button type="button" data-fs="2" aria-pressed="false" aria-label="Schriftgröße sehr groß">A++</button>
+    </div>
+    <a class="btn sage small call" href="tel:+49123456780"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a11 11 0 005.5 5.5l1.3-2 4 1.5v2.6a2 2 0 01-2.2 2A16 16 0 014.6 5.7a2 2 0 012-2.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>0123 456 78-0</a>
+    <button type="button" class="menu-btn" id="menuOpen" aria-haspopup="dialog" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl">Menü</span><span class="sr">Menü öffnen</span></button>
+  </div>
+</header>
+
+<dialog class="sheet" id="menu" aria-labelledby="menuTitle">
+  <div class="sheet-in">
+    <div class="sheet-h"><h2 id="menuTitle">Menü</h2><button type="button" class="x-btn" id="menuClose"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="sr">Menü schließen</span></button></div>
+    <nav aria-label="Menü">
+      <a href="#termin">Termin online buchen</a><a href="#rezept">Rezept und Überweisung</a><a href="#leistungen">Leistungen</a><a href="#team">Team</a><a href="#zeiten">Sprechzeiten und Notfall</a><a href="#anfahrt">Anfahrt</a><a href="#fragen">Häufige Fragen</a>
+    </nav>
+    <a class="btn sage" style="margin-top:1.5rem" href="tel:+49123456780">Praxis anrufen</a>
+    <div class="notfall-mini"><span>Notfall:</span><a class="n" href="tel:112">112</a><span>Bereitschaftsdienst:</span><a class="n" href="tel:116117">116 117</a></div>
+  </div>
+</dialog>
+
+<main id="main" tabindex="-1">
+
+<section class="hero" aria-labelledby="heroTitle">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1 id="heroTitle">Ihre Hausarztpraxis im Lindenviertel</h1>
+      <p class="lead">Wir begleiten Sie und Ihre Familie über viele Jahre. Bei akuten Beschwerden, zur Vorsorge und bei chronischen Erkrankungen.</p>
+      <div class="status" id="status" data-s="open" role="status" aria-live="polite">
+        <span class="lamp" aria-hidden="true"></span>
+        <div><p class="status-main" id="statusMain">Sprechzeiten werden geladen</p><p class="status-sub" id="statusSub"></p></div>
+      </div>
+      <div class="hero-actions">
+        <a class="btn prim" href="#termin" data-goto="termin"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Termin online buchen</a>
+        <a class="btn quiet" href="tel:+49123456780"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a11 11 0 005.5 5.5l1.3-2 4 1.5v2.6a2 2 0 01-2.2 2A16 16 0 014.6 5.7a2 2 0 012-2.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>0123 456 78-0</a>
+      </div>
+      <div class="hero-note">
+        <span>Folgerezept oder Überweisung? <a href="#rezept" data-goto="rezept">Online anfragen</a></span>
+        <span>Lebensgefahr: <a href="tel:112">112</a>. Nachts und am Wochenende: <a href="tel:116117">116 117</a></span>
+      </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg class="hero-blob" viewBox="0 0 600 560" preserveAspectRatio="xMidYMid meet"><path d="M318 22c86 6 176 52 222 132 44 78 38 182-10 262-50 82-146 132-244 122-92-9-184-58-232-138C8 320 22 210 70 136 122 58 226 16 318 22z" fill="#E4EBE0"/><path d="M470 400c40 6 74 40 72 82-3 44-46 70-90 66-40-4-70-38-66-78 4-42 42-76 84-70z" fill="#F5E1D5"/></svg>
+      <div class="schild">
+        <span class="schraube a"></span><span class="schraube b"></span><span class="schraube c"></span><span class="schraube d"></span>
+        <p class="schild-kind">Hausarztpraxis</p>
+        <p class="schild-names">Dr. med. Anna Muster<br>Dr. med. Jonas Keller</p>
+        <p class="schild-fach">Fachärztin und Facharzt<br>für Allgemeinmedizin</p>
+        <div class="schild-rule"></div>
+        <dl>
+          <dt>Mo, Di</dt><dd>8 bis 12 und 15 bis 18 Uhr</dd>
+          <dt>Mi</dt><dd>8 bis 12 Uhr</dd>
+          <dt>Do</dt><dd>8 bis 12 und 15 bis 19 Uhr</dd>
+          <dt>Fr</dt><dd>8 bis 13 Uhr</dd>
+        </dl>
+        <p class="schild-lamp" id="schildLamp" data-s="open"><i></i><span id="schildLampT">Jetzt geöffnet</span></p>
+      </div>
+      <svg class="hero-branch" viewBox="0 0 260 240">
+        <path d="M250 8C205 30 170 60 140 98 112 134 86 168 40 196" fill="none" stroke="#3B5444" stroke-width="3.2" stroke-linecap="round"/>
+        <g fill="#4F6B58"><path d="M196 44c-6-22 4-40 22-42 10-1 14 8 12 16 7-6 18-4 20 6 4 18-18 30-54 20z"/></g>
+        <g fill="#6E8B76"><path d="M150 88c-28-4-44-22-38-40 3-10 13-11 20-6-2-9 5-17 15-14 18 6 20 30 3 60z"/></g>
+        <g fill="#4F6B58"><path d="M120 132c18-22 42-26 54-12 7 8 2 17-6 19 9 3 11 13 3 19-15 11-37-1-51-26z"/></g>
+        <g fill="#86A08B"><path d="M78 168c-28 2-48-12-46-32 1-10 11-13 18-9-3-8 2-17 12-16 19 2 26 26 16 57z"/></g>
+        <path d="M170 104c10 14 14 26 12 40" fill="none" stroke="#A4482B" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M168 112c14-2 26 6 30 18-12 4-24-4-30-18z" fill="#E9C98B"/>
+        <g fill="#E9C98B" stroke="#C9A35E" stroke-width="1"><circle cx="182" cy="146" r="5"/><circle cx="192" cy="141" r="4.5"/><circle cx="176" cy="156" r="4.5"/><circle cx="188" cy="153" r="4"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="notice-band"><div class="wrap">
+  <div class="notice" role="note" id="vacNotice">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5.5M12 16.2v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <p><b>Urlaub und Vertretung</b><span id="vacText">Dr. Jonas Keller ist bald im Urlaub.</span></p>
+  </div>
+</div></div>
+
+<!-- Terminbuchung -->
+<section class="sec paper" id="termin" aria-labelledby="terminTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="terminTitle" tabindex="-1">Termin online buchen</h2></div>
+      <div><p>Wählen Sie Ihr Anliegen und einen freien Termin. Bei starken Schmerzen, Atemnot oder Brustschmerz rufen Sie bitte sofort die 112.</p><p style="margin-top:.6rem"><span class="demo-tag"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.8v3.6M8 10.8v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Demo: Es wird nichts gesendet</span></p></div>
+    </div>
+
+    <div class="booking">
+      <ol class="steps" id="stepList" aria-label="Fortschritt">
+        <li data-step="1"><b>Anliegen</b><span data-sum="1">Noch nicht gewählt</span></li>
+        <li data-step="2"><b>Ärztin oder Arzt</b><span data-sum="2"></span></li>
+        <li data-step="3"><b>Termin</b><span data-sum="3"></span></li>
+        <li data-step="4"><b>Ihre Daten</b><span data-sum="4"></span></li>
+        <li data-step="5"><b>Bestätigung</b><span data-sum="5"></span></li>
+      </ol>
+      <div>
+        <div class="step-mobile" aria-hidden="true"><p id="stepMobileT">Schritt 1 von 5: Anliegen</p><div class="bar"><i id="stepBar" style="width:20%"></i></div></div>
+        <form class="panel" id="bookForm" novalidate>
+          <!-- Schritt 1 -->
+          <div data-panel="1">
+            <h3 tabindex="-1">Worum geht es?</h3>
+            <p class="muted">Das hilft uns, genug Zeit für Sie einzuplanen.</p>
+            <fieldset class="choice-grid" id="anlGrid"><legend class="sr">Anliegen</legend></fieldset>
+            <p class="step-err" id="err1" hidden></p>
+          </div>
+          <!-- Schritt 2 -->
+          <div data-panel="2" hidden>
+            <h3 tabindex="-1">Bei wem möchten Sie den Termin?</h3>
+            <p class="muted" id="docHint">Sie können auch den ersten freien Termin wählen.</p>
+            <fieldset class="choice-grid" id="docGrid"><legend class="sr">Ärztin oder Arzt</legend></fieldset>
+            <p class="step-err" id="err2" hidden></p>
+          </div>
+          <!-- Schritt 3 -->
+          <div data-panel="3" hidden>
+            <h3 tabindex="-1">Wann passt es Ihnen?</h3>
+            <p class="muted" id="slotHint">Freie Termine der nächsten 10 Werktage.</p>
+            <fieldset class="days" id="dayGrid"><legend class="sr">Tag wählen</legend></fieldset>
+            <div id="slotArea"></div>
+            <p class="chosen" id="chosen" aria-live="polite"></p>
+            <p class="step-err" id="err3" hidden></p>
+          </div>
+          <!-- Schritt 4 -->
+          <div data-panel="4" hidden>
+            <h3 tabindex="-1">Ihre Angaben</h3>
+            <p class="muted">Pflichtfelder sind alle Felder ohne den Zusatz „freiwillig“.</p>
+            <div class="err-summary" id="bookErrSum" tabindex="-1" hidden><h4 id="bookErrSumT">Bitte prüfen Sie Ihre Angaben</h4><ul></ul></div>
+            <div class="form-grid">
+              <div class="field"><label for="b-first">Vorname</label><input type="text" id="b-first" name="first" autocomplete="given-name" aria-describedby="b-first-e"><p class="err" id="b-first-e"></p></div>
+              <div class="field"><label for="b-last">Nachname</label><input type="text" id="b-last" name="last" autocomplete="family-name" aria-describedby="b-last-e"><p class="err" id="b-last-e"></p></div>
+              <div class="field"><label for="b-bday">Geburtsdatum</label><span class="hint" id="b-bday-h">Zum Beispiel 14.03.1958</span><input type="text" id="b-bday" name="bday" autocomplete="bday" inputmode="text" aria-describedby="b-bday-h b-bday-e"><p class="err" id="b-bday-e"></p></div>
+              <div class="field"><label for="b-phone">Telefonnummer</label><span class="hint" id="b-phone-h">Für Rückfragen und falls wir den Termin verschieben müssen</span><input type="tel" id="b-phone" name="phone" autocomplete="tel" aria-describedby="b-phone-h b-phone-e"><p class="err" id="b-phone-e"></p></div>
+              <div class="field full"><label for="b-mail">E-Mail <span class="opt">(freiwillig)</span></label><input type="email" id="b-mail" name="mail" autocomplete="email" spellcheck="false" aria-describedby="b-mail-e"><p class="err" id="b-mail-e"></p></div>
+              <fieldset class="field" id="b-ins" aria-describedby="b-ins-e"><legend>Versicherung</legend><div class="radios"><label class="rad"><input type="radio" name="ins" value="gesetzlich">Gesetzlich</label><label class="rad"><input type="radio" name="ins" value="privat">Privat</label></div><p class="err" id="b-ins-e"></p></fieldset>
+              <fieldset class="field" id="b-known" aria-describedby="b-known-e"><legend>Waren Sie schon bei uns?</legend><div class="radios"><label class="rad"><input type="radio" name="known" value="ja">Ja</label><label class="rad"><input type="radio" name="known" value="nein">Nein, zum ersten Mal</label></div><p class="err" id="b-known-e"></p></fieldset>
+              <div class="field full"><label for="b-note">Kurz zum Anliegen <span class="opt">(freiwillig)</span></label><textarea id="b-note" name="note" maxlength="300" aria-describedby="b-note-h"></textarea><span class="hint" id="b-note-h">Höchstens 300 Zeichen. Bitte keine ausführlichen Befunde.</span></div>
+              <div class="field full"><label class="check"><input type="checkbox" id="b-ok" name="ok" aria-describedby="b-ok-e"><span>Ich bin einverstanden, dass die Praxis meine Angaben zur Terminvergabe speichert. <a href="#">Datenschutzhinweise</a></span></label><p class="err" id="b-ok-e"></p></div>
+            </div>
+          </div>
+          <!-- Schritt 5 -->
+          <div data-panel="5" hidden>
+            <div class="confirm" id="confirmBox"></div>
+          </div>
+
+          <div class="panel-foot" id="panelFoot">
+            <button type="button" class="btn quiet small" id="backBtn" hidden>Zurück</button>
+            <span class="spacer"></span>
+            <button type="submit" class="btn prim" id="nextBtn">Weiter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="my" id="myBookings" hidden>
+      <h3>Ihre vorgemerkten Termine</h3>
+      <p class="muted" style="margin-bottom:.8rem">Nur in diesem Browser gespeichert.</p>
+      <ul id="myList"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- Rezept -->
+<section class="sec" id="rezept" aria-labelledby="rezeptTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="rezeptTitle" tabindex="-1">Rezept oder Überweisung anfragen</h2></div>
+      <div><p>Für Patientinnen und Patienten, die bei uns in Behandlung sind. Wir bearbeiten Anfragen innerhalb eines Werktags.</p><p style="margin-top:.6rem"><span class="demo-tag"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.8v3.6M8 10.8v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Demo: Es wird nichts gesendet</span></p></div>
+    </div>
+    <div class="rx">
+      <div class="rx-form">
+        <form id="rxForm" novalidate>
+          <div class="err-summary" id="rxErrSum" tabindex="-1" hidden><h4 id="rxErrSumT">Bitte prüfen Sie Ihre Angaben</h4><ul></ul></div>
+          <fieldset class="field" style="margin-bottom:1.4rem"><legend style="margin-bottom:.4rem">Was brauchen Sie?</legend>
+            <div class="type-switch">
+              <label class="rad"><input type="radio" name="rxType" value="rezept" checked><span><b>Folgerezept</b><small>Für Medikamente, die Sie dauerhaft nehmen</small></span></label>
+              <label class="rad"><input type="radio" name="rxType" value="ueberweisung"><span><b>Überweisung</b><small>Zur Fachärztin oder zum Facharzt</small></span></label>
+            </div>
+          </fieldset>
+          <div class="form-grid">
+            <div class="field"><label for="r-name">Vor- und Nachname</label><input type="text" id="r-name" autocomplete="name" aria-describedby="r-name-e"><p class="err" id="r-name-e"></p></div>
+            <div class="field"><label for="r-bday">Geburtsdatum</label><span class="hint" id="r-bday-h">Zum Beispiel 14.03.1958</span><input type="text" id="r-bday" autocomplete="bday" aria-describedby="r-bday-h r-bday-e"><p class="err" id="r-bday-e"></p></div>
+            <div class="field"><label for="r-phone">Telefonnummer</label><input type="tel" id="r-phone" autocomplete="tel" aria-describedby="r-phone-e"><p class="err" id="r-phone-e"></p></div>
+            <fieldset class="field" id="r-card" aria-describedby="r-card-h r-card-e"><legend>Karte in diesem Quartal schon eingelesen?</legend><span class="hint" id="r-card-h">Ohne eingelesene Karte können wir kein E-Rezept ausstellen.</span><div class="radios"><label class="rad"><input type="radio" name="card" value="ja">Ja</label><label class="rad"><input type="radio" name="card" value="nein">Nein</label><label class="rad"><input type="radio" name="card" value="unsicher">Weiß nicht</label></div><p class="err" id="r-card-e"></p></fieldset>
+          </div>
+
+          <div id="rxRezept" style="margin-top:1.6rem">
+            <h3 style="font-size:1.3rem;margin-bottom:.3rem">Medikamente</h3>
+            <p class="muted" style="margin-bottom:.9rem;font-size:1rem">Name und Stärke stehen auf der Packung oder in Ihrem Medikationsplan.</p>
+            <div class="med-list" id="medList"></div>
+            <button type="button" class="linkbtn" id="medAdd" style="margin-top:.5rem">Weiteres Medikament hinzufügen</button>
+            <fieldset class="field" style="margin-top:1.2rem"><legend>Wie möchten Sie das Rezept bekommen?</legend>
+              <div class="radios col">
+                <label class="rad"><input type="radio" name="pickup" value="karte" checked><span>E-Rezept auf die Gesundheitskarte<small>In jeder Apotheke mit Ihrer Karte einlösen</small></span></label>
+                <label class="rad"><input type="radio" name="pickup" value="app"><span>E-Rezept in der App<small>Für Nutzerinnen und Nutzer der E-Rezept-App</small></span></label>
+                <label class="rad"><input type="radio" name="pickup" value="praxis"><span>Papierrezept in der Praxis abholen<small>Zum Beispiel für Privatversicherte</small></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div id="rxUeber" hidden style="margin-top:1.6rem">
+            <div class="form-grid">
+              <div class="field"><label for="u-fach">Fachrichtung</label><select id="u-fach" aria-describedby="u-fach-e"><option value="">Bitte wählen</option><option>Kardiologie</option><option>Orthopädie</option><option>Dermatologie</option><option>Gastroenterologie</option><option>Neurologie</option><option>Urologie</option><option>Radiologie</option><option>Hals-Nasen-Ohren-Heilkunde</option><option>Andere Fachrichtung</option></select><p class="err" id="u-fach-e"></p></div>
+              <div class="field"><label for="u-when">Facharzttermin am <span class="opt">(freiwillig)</span></label><input type="text" id="u-when" placeholder="TT.MM.JJJJ" aria-describedby="u-when-e"><p class="err" id="u-when-e"></p></div>
+              <div class="field full"><label for="u-why">Grund der Überweisung</label><span class="hint" id="u-why-h">Zum Beispiel „Kontrolle Herzklappe, jährlich“</span><textarea id="u-why" maxlength="300" aria-describedby="u-why-h u-why-e"></textarea><p class="err" id="u-why-e"></p></div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:1.4rem"><label class="check"><input type="checkbox" id="r-ok" aria-describedby="r-ok-e"><span>Ich bin einverstanden, dass die Praxis meine Angaben zur Bearbeitung speichert. <a href="#">Datenschutzhinweise</a></span></label><p class="err" id="r-ok-e"></p></div>
+          <div class="form-actions"><button type="submit" class="btn prim">Anfrage senden</button><span class="muted" style="font-size:.98rem">In der Demo wird nichts übertragen.</span></div>
+        </form>
+        <div id="rxDone" hidden tabindex="-1"></div>
+      </div>
+      <aside class="rx-aside" aria-label="Hinweise zur Rezeptanfrage">
+        <div class="aside-card"><h3>Gut zu wissen</h3><ul><li>Bearbeitung innerhalb eines Werktags</li><li>Neue Medikamente verordnen wir nur nach einem Gespräch</li><li>Betäubungsmittel nur persönlich in der Praxis</li></ul></div>
+        <div class="aside-card"><h3>Ihre Anfragen</h3><div id="rxListBox"><p class="muted" style="font-size:1rem">Noch keine Anfrage in diesem Browser.</p></div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Leistungen -->
+<section class="sec paper" id="leistungen" aria-labelledby="lTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="lTitle">Leistungen</h2></div>
+      <div><p>Als Hausarztpraxis sind wir Ihre erste Anlaufstelle. Vieles können wir direkt bei uns untersuchen. Wenn nötig, überweisen wir Sie gezielt weiter.</p></div>
+    </div>
+    <div class="svc-tools"><button type="button" class="linkbtn" id="svcAll" aria-controls="svcWrap">Alle aufklappen</button></div>
+    <div class="svc" id="svcWrap"></div>
+  </div>
+</section>
+
+<!-- Team -->
+<section class="sec" id="team" aria-labelledby="tTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="tTitle">Unser Team</h2></div>
+      <div><p>Zwei Ärztinnen und Ärzte, vier Menschen am Empfang, im Labor und unterwegs bei Hausbesuchen. Viele von uns kennen Sie seit Jahren.</p></div>
+    </div>
+    <div class="docs">
+      <article class="doc">
+        <svg class="portrait" viewBox="0 0 160 160" role="img" aria-label="Porträt-Platzhalter mit Initialen AM"><path d="M84 6c38 2 66 30 70 66 4 40-22 78-62 84-42 6-82-20-88-62C-2 54 32 4 84 6z" fill="#E4EBE0"/><path d="M118 108c16 4 28 18 26 34-2 14-18 20-32 16-14-4-22-18-18-32 4-12 14-20 24-18z" fill="#F5E1D5"/><text x="80" y="98" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-style="italic" font-size="58" fill="#3B5444">AM</text></svg>
+        <div>
+          <h3>Dr. med. Anna Muster</h3>
+          <p class="role">Fachärztin für Allgemeinmedizin, Praxisinhaberin</p>
+          <p>Seit 2011 Hausärztin in Musterstadt. Schwerpunkte sind Vorsorge, Diabetes und die Begleitung älterer Menschen zu Hause.</p>
+          <ul class="tags" aria-label="Qualifikationen und Sprachen"><li>Hautkrebs-Screening</li><li>Diabetologie DDG</li><li>Palliativmedizin</li><li>Deutsch, Englisch</li></ul>
+        </div>
+      </article>
+      <article class="doc">
+        <svg class="portrait" viewBox="0 0 160 160" role="img" aria-label="Porträt-Platzhalter mit Initialen JK"><path d="M74 6c42-4 78 26 82 66 4 42-28 82-70 84C44 158 6 128 4 86 2 44 34 10 74 6z" fill="#F5E1D5"/><path d="M34 112c-14 2-26 16-24 30 2 12 16 18 28 14 12-4 18-16 16-28-2-10-10-18-20-16z" fill="#E4EBE0"/><text x="80" y="98" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-style="italic" font-size="58" fill="#86381F">JK</text></svg>
+        <div>
+          <h3>Dr. med. Jonas Keller</h3>
+          <p class="role">Facharzt für Allgemeinmedizin</p>
+          <p>Seit 2019 in der Praxis. Er betreut viele berufstätige Patientinnen und Patienten in der Abendsprechstunde am Donnerstag.</p>
+          <ul class="tags" aria-label="Qualifikationen und Sprachen"><li>Reisemedizin</li><li>Sportmedizin</li><li>Ultraschall</li><li>Deutsch, Englisch, Spanisch</li></ul>
+        </div>
+      </article>
+    </div>
+    <h3 class="team-sub">Praxisteam</h3>
+    <ul class="crew" id="crew"></ul>
+  </div>
+</section>
+
+<!-- Sprechzeiten -->
+<section class="sec sage" id="zeiten" aria-labelledby="zTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="zTitle">Sprechzeiten und Notfall</h2></div>
+      <div><p>Termine vergeben wir telefonisch und online. In der Akutsprechstunde kommen Sie ohne Termin.</p></div>
+    </div>
+    <div class="hours-grid">
+      <div>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-labelledby="hoursCap">
+          <table class="hours">
+            <caption id="hoursCap">Sprechzeiten in Uhr</caption>
+            <thead><tr><th scope="col">Tag</th><th scope="col">Vormittag</th><th scope="col">Nachmittag</th></tr></thead>
+            <tbody id="hoursBody"></tbody>
+          </table>
+        </div>
+        <div class="extra">
+          <div><b>Akutsprechstunde</b><p>Mo bis Fr, 8:00 bis 9:30 Uhr, ohne Termin</p></div>
+          <div><b>Telefon</b><p>Mo bis Fr 7:45 bis 12:00 Uhr, Mo, Di, Do 14:30 bis 17:30 Uhr</p></div>
+          <div><b>Blutabnahme</b><p>Mo bis Fr, 8:00 bis 10:00 Uhr, mit Termin</p></div>
+        </div>
+        <div class="notice" style="margin-top:1.25rem;background:var(--papier)" role="note">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <p><b>Vertretung bei Praxisurlaub</b><span id="vacText2"></span> Ist die ganze Praxis geschlossen, vertritt uns die Praxis Dr. med. Petra Lange, Bahnhofstraße 12, Telefon 0123 998 87-0.</p>
+        </div>
+      </div>
+      <div class="side-stack">
+        <div class="notfall" aria-labelledby="nfTitle" role="region">
+          <h3 id="nfTitle">Im Notfall</h3>
+          <a class="nf-row" href="tel:112"><span class="nf-num red">112</span><span><b>Rettungsdienst und Notarzt</b><span>Bei Lebensgefahr, zum Beispiel Brustschmerz, Atemnot, Schlaganfall</span></span></a>
+          <a class="nf-row" href="tel:116117"><span class="nf-num">116 117</span><span><b>Ärztlicher Bereitschaftsdienst</b><span>Außerhalb der Sprechzeiten, wenn es nicht bis morgen warten kann. Kostenlos</span></span></a>
+        </div>
+        <div class="aside-card">
+          <h3>Jetzt in der Praxis</h3>
+          <p id="statusSide" aria-live="off">Sprechzeiten werden geladen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Anfahrt -->
+<section class="sec" id="anfahrt" aria-labelledby="aTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="aTitle">Anfahrt</h2></div>
+      <div><p>Die Praxis liegt im Erdgeschoss, mit stufenlosem Eingang. Bushaltestelle und Parkplätze sind wenige Schritte entfernt.</p></div>
+    </div>
+    <div class="route-grid">
+      <div class="map-box">
+        <svg viewBox="0 0 640 420" role="img" aria-labelledby="mapT mapD" id="map">
+          <title id="mapT">Stilisierte Karte der Umgebung</title>
+          <desc id="mapD">Die Praxis liegt an der Lindenallee 14. Westlich davon an der Ecke Kirchstraße liegt die Bushaltestelle Lindenplatz. Südöstlich an der Parkstraße liegt das Parkhaus Marktplatz. Direkt vor dem Haus sind zwei Behindertenparkplätze.</desc>
+          <rect width="640" height="420" fill="#F1EADD"/>
+          <path d="M430 20c70-10 160 6 196 40 16 50 6 100-34 116-60 22-140 8-170-30-24-32-28-116 8-126z" fill="#D7E1D3"/>
+          <g fill="#A9BDA8"><circle cx="490" cy="70" r="14"/><circle cx="530" cy="100" r="18"/><circle cx="580" cy="66" r="12"/><circle cx="470" cy="120" r="11"/><circle cx="560" cy="140" r="10"/></g>
+          <text class="ml" x="520" y="172" font-family="Atkinson Next, sans-serif" font-size="15" fill="#3B5444" text-anchor="middle">Stadtpark</text>
+          <g fill="#E6DECF">
+            <rect x="30" y="40" width="130" height="120" rx="14"/><rect x="240" y="40" width="150" height="120" rx="14"/>
+            <rect x="30" y="250" width="130" height="140" rx="14"/><rect x="240" y="262" width="170" height="128" rx="14"/>
+            <rect x="500" y="262" width="110" height="128" rx="14"/>
+          </g>
+          <g stroke="#FFFDF9" stroke-linecap="round" fill="none">
+            <path d="M0 210H640" stroke-width="34"/>
+            <path d="M200 0V420" stroke-width="28"/>
+            <path d="M455 210V420" stroke-width="26"/>
+          </g>
+          <g font-family="Atkinson Next, sans-serif" font-size="14" fill="#46524B">
+            <text class="ml" x="636" y="216" text-anchor="end">Lindenallee</text>
+            <text class="ml" x="194" y="400" transform="rotate(-90 194 380)">Kirchstraße</text>
+            <text class="ml" x="449" y="410" transform="rotate(-90 449 400)">Parkstraße</text>
+          </g>
+          <!-- Routen -->
+          <path class="route" data-mode="bus" d="M222 236C260 236 300 232 318 222" fill="none" stroke="#A4482B" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 10"/>
+          <path class="route" data-mode="auto" d="M472 318H470V230C470 222 440 226 380 226" fill="none" stroke="#A4482B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 10"/>
+          <path class="route" data-mode="barrierefrei" d="M398 236C380 226 350 222 332 222" fill="none" stroke="#A4482B" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/>
+          <!-- Praxis -->
+          <g id="mkPraxis">
+            <rect x="282" y="120" width="96" height="62" rx="12" fill="#4F6B58"/>
+            <path d="M330 202l-12-20h24z" fill="#4F6B58"/>
+            <text x="330" y="148" text-anchor="middle" font-family="Newsreader, serif" font-size="17" fill="#fff" font-weight="560">Praxis</text>
+            <text x="330" y="168" text-anchor="middle" font-family="Atkinson Next, sans-serif" font-size="13" fill="#E4EBE0">Lindenallee 14</text>
+          </g>
+          <!-- Haltestelle -->
+          <g id="mkBus" class="mk-hl">
+            <circle cx="222" cy="244" r="17" fill="#FFFDF9" stroke="#1F2B25" stroke-width="2.5"/>
+            <text x="222" y="250" text-anchor="middle" font-family="Atkinson Next, sans-serif" font-size="17" font-weight="700" fill="#1F2B25">H</text>
+            <text class="ml" x="246" y="252" font-family="Atkinson Next, sans-serif" font-size="14" fill="#1F2B25" font-weight="700">Lindenplatz</text>
+            <text class="ml" x="246" y="272" font-family="Atkinson Next, sans-serif" font-size="13" fill="#46524B">Bus 4, 17</text>
+          </g>
+          <!-- Parkhaus -->
+          <g id="mkPark" class="mk-hl">
+            <rect x="472" y="300" width="36" height="36" rx="8" fill="#1F2B25"/>
+            <text x="490" y="325" text-anchor="middle" font-family="Atkinson Next, sans-serif" font-size="20" font-weight="700" fill="#fff">P</text>
+            <text class="ml" x="516" y="316" font-family="Atkinson Next, sans-serif" font-size="13" fill="#1F2B25" font-weight="700">Parkhaus</text>
+            <text class="ml" x="516" y="334" font-family="Atkinson Next, sans-serif" font-size="13" fill="#1F2B25" font-weight="700">Marktplatz</text>
+          </g>
+          <!-- Behindertenparkplatz -->
+          <g transform="translate(48 0)"><g id="mkBf" class="mk-hl">
+            <rect x="344" y="232" width="30" height="30" rx="7" fill="#2B5C8A"/>
+            <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="361" cy="238" r="1.6" fill="#fff"/><path d="M360 242v7h6l2 6"/><path d="M357 246a6 6 0 108 7"/></g>
+            <text class="ml" x="380" y="252" font-family="Atkinson Next, sans-serif" font-size="13" fill="#1F2B25" font-weight="700">2 Plätze</text>
+          </g></g>
+        </svg>
+        <div class="mode-bar" role="group" aria-label="Anfahrt anzeigen">
+          <button type="button" data-mode="bus" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 11h14M8 20.5v-3M16 20.5v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Bus</button>
+          <button type="button" data-mode="auto" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16v-4l2-5h12l2 5v4zM4 16v2.5M20 16v2.5M4 12h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>Auto</button>
+          <button type="button" data-mode="barrierefrei" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="4.5" r="1.8" fill="currentColor"/><path d="M11 8v6h5l2.5 6M8 11.5a6 6 0 108.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Barrierefrei</button>
+        </div>
+      </div>
+      <div>
+        <address class="addr"><b>Hausarztpraxis Dr. med. Muster</b>Lindenallee 14<br>12345 Musterstadt<br><a href="tel:+49123456780">0123 456 78-0</a></address>
+        <div class="mode-info" id="modeInfo" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec paper" id="fragen" aria-labelledby="fTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="fTitle">Häufige Fragen</h2></div>
+      <div><p>Ihre Frage ist nicht dabei? Rufen Sie uns an. Wir helfen gern weiter.</p></div>
+    </div>
+    <div class="faq" id="faq"></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><b>Hausarztpraxis Dr. med. Muster</b><p>Lindenallee 14<br>12345 Musterstadt</p></div>
+      <div><h2>Kontakt</h2><ul><li>Telefon <a href="tel:+49123456780">0123 456 78-0</a></li><li>Fax 0123 456 78-9</li><li>praxis@praxis-muster.example</li></ul></div>
+      <div><h2>Notfall</h2><ul><li>Lebensgefahr: <a href="tel:112">112</a></li><li>Bereitschaftsdienst: <a href="tel:116117">116 117</a></li></ul></div>
+      <div><h2>Rechtliches</h2><ul><li><a href="#">Impressum</a></li><li><a href="#">Datenschutz</a></li><li><a href="#">Erklärung zur Barrierefreiheit</a></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>Beispiel-Website einer fiktiven Praxis. Alle Namen und Daten sind erfunden.</span><button type="button" class="linkbtn" id="resetBtn">Demo zurücksetzen</button></div>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="Schnellzugriff">
+  <a href="#termin" data-goto="termin"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Termin</a>
+  <a href="#rezept" data-goto="rezept"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.5h6M9 12h6M9 15.5h3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Rezept</a>
+  <a href="#zeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Zeiten</a>
+  <a href="#anfahrt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0113 0c0 5-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Anfahrt</a>
+  <a class="call-tab" href="tel:+49123456780"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a11 11 0 005.5 5.5l1.3-2 4 1.5v2.6a2 2 0 01-2.2 2A16 16 0 014.6 5.7a2 2 0 012-2.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Anrufen</a>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastT"></span><button type="button" id="toastBtn" hidden>Rückgängig</button></div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "praxis-demo-v1";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]; }); };
+
+  /* ---------- Speicher ---------- */
+  var mem = { fs: 0, bookings: [], requests: [] };
+  function load() {
+    try { var raw = localStorage.getItem(KEY); if (raw) { var d = JSON.parse(raw); if (d && typeof d === "object") { mem.fs = d.fs | 0; mem.bookings = Array.isArray(d.bookings) ? d.bookings : []; mem.requests = Array.isArray(d.requests) ? d.requests : []; } } } catch (e) {}
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} }
+  load();
+
+  /* ---------- Zeit ---------- */
+  function getNow() {
+    try { var p = new URLSearchParams(location.search).get("jetzt"); if (p) { var d = new Date(p); if (!isNaN(d)) return d; } } catch (e) {}
+    return new Date();
+  }
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var keyOf = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+  var fromKey = function (k) { var p = k.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+  var tm = function (m) { return Math.floor(m / 60) + ":" + pad(m % 60); };
+  var addDays = function (d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); return x; };
+  var fWeekday = new Intl.DateTimeFormat("de-DE", { weekday: "long" });
+  var fShortW = new Intl.DateTimeFormat("de-DE", { weekday: "short" });
+  var fDM = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" });
+  var fLong = new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "numeric", month: "long" });
+  var fLongY = new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  var fDateShort = new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "numeric", month: "short" });
+
+  var HOURS = { 1: [[480, 720], [900, 1080]], 2: [[480, 720], [900, 1080]], 3: [[480, 720]], 4: [[480, 720], [900, 1140]], 5: [[480, 780]] };
+  var holidayCache = {};
+  function easter(y) {
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(y, mo - 1, da);
+  }
+  function holidays(y) {
+    if (holidayCache[y]) return holidayCache[y];
+    var e = easter(y), o = {};
+    o[y + "-01-01"] = "Neujahr"; o[y + "-05-01"] = "Tag der Arbeit"; o[y + "-10-03"] = "Tag der Deutschen Einheit";
+    o[y + "-12-24"] = "Heiligabend"; o[y + "-12-25"] = "1. Weihnachtstag"; o[y + "-12-26"] = "2. Weihnachtstag"; o[y + "-12-31"] = "Silvester";
+    o[keyOf(addDays(e, -2))] = "Karfreitag"; o[keyOf(addDays(e, 1))] = "Ostermontag"; o[keyOf(addDays(e, 39))] = "Christi Himmelfahrt"; o[keyOf(addDays(e, 50))] = "Pfingstmontag";
+    holidayCache[y] = o; return o;
+  }
+  function holidayName(d) { return holidays(d.getFullYear())[keyOf(d)] || ""; }
+  function periodsOf(d) { if (holidayName(d)) return []; return HOURS[d.getDay()] || []; }
+
+  /* Urlaub Dr. Keller: Montag bis Freitag in der übernächsten Woche */
+  var TODAY = getNow();
+  var vacStart = (function () { var d = addDays(TODAY, 7); while (d.getDay() !== 1) d = addDays(d, 1); return d; })();
+  var vacEnd = addDays(vacStart, 4);
+  function onVacation(doc, d) { return doc === "keller" && d >= vacStart && d <= addDays(vacEnd, 0); }
+
+  function nextOpen(from) {
+    for (var i = 1; i < 30; i++) { var d = addDays(from, i); var p = periodsOf(d); if (p.length) return { d: d, i: i, start: p[0][0] }; }
+    return null;
+  }
+  function dayLabel(n, now) {
+    if (n.i === 1) return "morgen";
+    if (n.i < 7) return fWeekday.format(n.d);
+    return fLong.format(n.d);
+  }
+  function computeStatus(now) {
+    var p = periodsOf(now), m = now.getHours() * 60 + now.getMinutes(), hol = holidayName(now);
+    if (p.length) {
+      var last = p[p.length - 1][1];
+      if (m < p[0][0]) return { s: "soon", main: "Heute geöffnet von " + tm(p[0][0]) + " bis " + tm(last), sub: "Noch geschlossen. Telefonisch erreichbar ab 7:45 Uhr.", lamp: "Öffnet um " + tm(p[0][0]) };
+      for (var i = 0; i < p.length; i++) {
+        if (m >= p[i][0] && m < p[i][1]) {
+          var sub = "Jetzt geöffnet.";
+          if (p[i + 1]) sub += " Mittagspause von " + tm(p[i][1]) + " bis " + tm(p[i + 1][0]) + ".";
+          else if (p[i][1] - m <= 30) sub += " Schließt in " + (p[i][1] - m) + " Minuten.";
+          return { s: "open", main: "Heute geöffnet bis " + tm(last), sub: sub, lamp: "Jetzt geöffnet" };
+        }
+        if (p[i + 1] && m >= p[i][1] && m < p[i + 1][0]) return { s: "pause", main: "Mittagspause bis " + tm(p[i + 1][0]), sub: "Heute wieder geöffnet von " + tm(p[i + 1][0]) + " bis " + tm(last) + ".", lamp: "Mittagspause" };
+      }
+    }
+    var n = nextOpen(now);
+    var lead = hol ? "Heute geschlossen (" + hol + ")" : "Jetzt geschlossen";
+    return { s: "closed", main: lead + ", öffnet " + (n ? dayLabel(n, now) + " " + tm(n.start) : "bald"), sub: "Wenn es nicht warten kann: Bereitschaftsdienst 116 117. Bei Lebensgefahr 112.", lamp: "Geschlossen" };
+  }
+  var lastStatusKey = "";
+  function renderStatus() {
+    var now = getNow(), st = computeStatus(now);
+    var k = st.s + st.main + st.sub;
+    if (k !== lastStatusKey) {
+      lastStatusKey = k;
+      $("#status").setAttribute("data-s", st.s);
+      $("#statusMain").textContent = st.main;
+      $("#statusSub").textContent = st.sub;
+      $("#schildLamp").setAttribute("data-s", st.s);
+      $("#schildLampT").textContent = st.lamp;
+      $("#statusSide").textContent = st.main + ". " + st.sub;
+    }
+  }
+  function renderHours() {
+    var now = getNow(), names = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"], html = "";
+    for (var i = 0; i < 7; i++) {
+      var wd = (i + 1) % 7, p = HOURS[wd] || [], today = now.getDay() === wd;
+      var am = p[0] ? tm(p[0][0]) + " bis " + tm(p[0][1]) : '<span class="closed">geschlossen</span>';
+      var pm = p[1] ? tm(p[1][0]) + " bis " + tm(p[1][1]) : '<span class="closed">geschlossen</span>';
+      if (wd === 0 || wd === 6) { am = '<span class="closed">geschlossen</span>'; pm = am; }
+      html += '<tr' + (today ? ' class="today"' : "") + '><th scope="row"><span class="d-l">' + names[i] + '</span><span class="d-s" aria-hidden="true">' + names[i].slice(0, 2) + "</span>" + (today ? '<span class="sr"> (heute)</span>' : "") + (today ? '<span class="today-tag" aria-hidden="true">heute</span>' : "") + "</th><td>" + am + "</td><td>" + pm + "</td></tr>";
+    }
+    $("#hoursBody").innerHTML = html;
+  }
+  function renderVacation() {
+    var a = fLong.format(vacStart), b = fLong.format(vacEnd);
+    var t = " Dr. Jonas Keller ist von " + a + " bis " + b + " im Urlaub. Dr. Anna Muster übernimmt in dieser Zeit seine Patientinnen und Patienten. Die Praxis ist normal geöffnet.";
+    $("#vacText").textContent = t;
+    $("#vacText2").textContent = " Dr. Jonas Keller: Urlaub von " + a + " bis " + b + ", Vertretung durch Dr. Anna Muster.";
+  }
+
+  /* ---------- Schriftgröße ---------- */
+  function setFs(v, persist) {
+    v = Math.max(0, Math.min(2, v | 0));
+    document.documentElement.setAttribute("data-fs", String(v));
+    $$(".fs button").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.fs === v)); });
+    if (persist) { mem.fs = v; save(); }
+  }
+  $$(".fs button").forEach(function (b) { b.addEventListener("click", function () { setFs(+b.dataset.fs, true); }); });
+  setFs(mem.fs, false);
+
+  /* ---------- Toast ---------- */
+  var toastTimer, toastUndo = null;
+  function toast(msg, undo) {
+    var t = $("#toast"); $("#toastT").textContent = msg; toastUndo = undo || null;
+    $("#toastBtn").hidden = !undo; t.classList.add("on");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("on"); toastUndo = null; }, undo ? 7000 : 4000);
+  }
+  $("#toastBtn").addEventListener("click", function () { if (toastUndo) toastUndo(); toastUndo = null; $("#toast").classList.remove("on"); });
+
+  /* ---------- Icons ---------- */
+  var IC = {
+    akut: '<path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    vorsorge: '<path d="M12 3l7 3v5c0 5-3.2 8.3-7 10-3.8-1.7-7-5-7-10V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.8 12.2l2.2 2.2 4.2-4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    impfung: '<path d="M17 3l4 4M19 5l-9.5 9.5M14.5 5.5l4 4M8 12l4 4-3.5 3.5h-4v-4zM4.5 19.5L3 21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    blut: '<path d="M12 3.5c3 4 6 7.4 6 10.8a6 6 0 01-12 0c0-3.4 3-6.8 6-10.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 14.5a2.6 2.6 0 002.5 2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    gespraech: '<path d="M4 5.5h11a2 2 0 012 2V13a2 2 0 01-2 2H9l-4 3.5V15H4a2 2 0 01-2-2V7.5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19.5 9H20a2 2 0 012 2v5a2 2 0 01-2 2h-1v3l-3.5-3H12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>',
+    checkup: '<path d="M12 20s-8-4.6-8-10.6A4.4 4.4 0 0112 7a4.4 4.4 0 018 2.4C20 15.4 12 20 12 20z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.5 12h3l1.5-2.5 2 4.5 1.5-2h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    haut: '<circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="9.5" r="1.3" fill="currentColor"/><circle cx="12.3" cy="12" r=".9" fill="currentColor"/>',
+    dmp: '<path d="M20 12a8 8 0 11-2.4-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4.5l2.8 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    haus: '<path d="M3.5 11L12 4l8.5 7M6 9.5V20h12V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M12 12v5M9.5 14.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    labor: '<path d="M9 3h6M10 3v6.5L5 18.5A1.7 1.7 0 006.5 21h11a1.7 1.7 0 001.5-2.5L14 9.5V3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M7.5 15h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    ekg: '<rect x="2.5" y="5" width="19" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 12.5h3l1.5-3.5 2.5 7 2-5 1 1.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    schall: '<path d="M8 21v-6.5a4 4 0 018 0V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 8.5a8.5 8.5 0 0112 0M8.5 11a5 5 0 017 0M3.5 6a12 12 0 0117 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    reise: '<rect x="3.5" y="7.5" width="17" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 7.5V5.5A1.5 1.5 0 0110.5 4h3A1.5 1.5 0 0115 5.5v2M3.5 12.5h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    team: '<circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0114 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    any: '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+  };
+  var svgI = function (k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[k] + "</svg>"; };
+  var PLUS = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M2.5 8h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+  /* ---------- Buchung: Daten ---------- */
+  var ANL = [
+    { id: "akut", name: "Akutsprechstunde", desc: "Akute Beschwerden wie Infekt, Fieber oder Schmerzen", dur: 10, icon: "akut" },
+    { id: "vorsorge", name: "Vorsorge oder Check-up", desc: "Check-up 35, Hautkrebs-Screening, Krebsfrüherkennung", dur: 30, icon: "vorsorge" },
+    { id: "impfung", name: "Impfung", desc: "Grippe, Corona, Tetanus, Gürtelrose, Reiseimpfungen", dur: 10, icon: "impfung" },
+    { id: "blut", name: "Blutabnahme", desc: "Morgens beim Praxisteam, oft nüchtern", dur: 10, icon: "blut", team: true },
+    { id: "gespraech", name: "Gespräch", desc: "Befunde besprechen, Beratung, chronische Erkrankungen", dur: 20, icon: "gespraech" }
+  ];
+  var DOCS = {
+    muster: { name: "Dr. med. Anna Muster", short: "Dr. Muster", ini: "AM", fill: "#E4EBE0", ink: "#3B5444" },
+    keller: { name: "Dr. med. Jonas Keller", short: "Dr. Keller", ini: "JK", fill: "#F5E1D5", ink: "#86381F" },
+    team: { name: "Praxisteam", short: "Praxisteam", ini: "", fill: "#F1EADD", ink: "#46524B" }
+  };
+  function anlById(id) { for (var i = 0; i < ANL.length; i++) if (ANL[i].id === id) return ANL[i]; return null; }
+  function hash(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0); }
+  function bookedSet() { var s = {}; mem.bookings.forEach(function (b) { s[b.date + "|" + b.doc + "|" + b.t] = 1; }); return s; }
+
+  function workdays() {
+    var now = getNow(), out = [], d = new Date(now.getFullYear(), now.getMonth(), now.getDate()), m = now.getHours() * 60 + now.getMinutes();
+    var p = periodsOf(d);
+    if (p.length && m < p[p.length - 1][1] - 40) out.push(d);
+    var i = 1;
+    while (out.length < 10 && i < 40) { var x = addDays(d, i++); if (periodsOf(x).length) out.push(x); }
+    return out;
+  }
+  function slotsFor(day, docId, anl) {
+    var now = getNow(), isToday = keyOf(day) === keyOf(now), nm = now.getHours() * 60 + now.getMinutes();
+    var p = periodsOf(day), wins;
+    if (!p.length) return [];
+    if (onVacation(docId, day)) return [];
+    if (anl.id === "akut") wins = [[480, 570]];
+    else if (anl.id === "blut") wins = [[480, 600]];
+    else { wins = p.map(function (w) { return [w[0] === 480 ? 570 : w[0], w[1]]; }); }
+    var rate = anl.id === "akut" ? 42 : anl.id === "blut" ? 48 : 30;
+    var bs = bookedSet(), out = [], k = keyOf(day);
+    wins.forEach(function (w) {
+      for (var t = w[0]; t + anl.dur <= w[1]; t += anl.dur) {
+        if (isToday && t < nm + 20) continue;
+        if (hash(k + "|" + docId + "|" + t + "|" + anl.dur) % 100 >= rate) continue;
+        if (bs[k + "|" + docId + "|" + t]) continue;
+        out.push({ t: t, doc: docId });
+      }
+    });
+    return out;
+  }
+  function slotsMerged(day, docSel, anl) {
+    if (anl.team) return slotsFor(day, "team", anl);
+    if (docSel !== "egal") return slotsFor(day, docSel, anl);
+    var a = slotsFor(day, "muster", anl), b = slotsFor(day, "keller", anl), map = {};
+    a.concat(b).forEach(function (s) { if (!map[s.t]) map[s.t] = s; });
+    return Object.keys(map).map(function (t) { return map[t]; }).sort(function (x, y) { return x.t - y.t; });
+  }
+
+  /* ---------- Buchung: Zustand und Ablauf ---------- */
+  var B = { step: 1, anl: null, doc: null, day: null, slot: null, data: null, last: null };
+  var form = $("#bookForm");
+
+  function renderAnl() {
+    $("#anlGrid").innerHTML = '<legend class="sr">Anliegen</legend>' + ANL.map(function (a) {
+      return '<label class="choice"><input type="radio" name="anl" value="' + a.id + '"' + (B.anl === a.id ? " checked" : "") + '><span class="ic">' + svgI(a.icon) + '</span><span><b>' + a.name + "</b><small>" + a.desc + '</small></span><span class="tick" aria-hidden="true"></span></label>';
+    }).join("");
+  }
+  function portraitSmall(id) {
+    var d = DOCS[id];
+    if (id === "egal") return '<span class="ic">' + svgI("any") + "</span>";
+    if (id === "team") return '<span class="ic">' + svgI("team") + "</span>";
+    return '<svg class="portrait-s" viewBox="0 0 60 60" aria-hidden="true"><path d="M32 2c15 1 26 12 26 27 0 16-12 29-28 29C14 58 2 46 2 31 2 15 16 1 32 2z" fill="' + d.fill + '"/><text x="30" y="38" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-style="italic" font-size="22" fill="' + d.ink + '">' + d.ini + "</text></svg>";
+  }
+  function renderDocs() {
+    var a = anlById(B.anl), opts;
+    if (a && a.team) {
+      opts = [{ id: "team", name: "Praxisteam", desc: "Blutabnahmen übernehmen unsere Medizinischen Fachangestellten" }];
+      B.doc = "team";
+      $("#docHint").textContent = "Die Blutabnahme macht das Praxisteam. Sie müssen hier nichts auswählen.";
+    } else {
+      if (B.doc === "team") B.doc = null;
+      opts = [
+        { id: "egal", name: "Erster freier Termin", desc: "Bei Dr. Muster oder Dr. Keller" },
+        { id: "muster", name: DOCS.muster.name, desc: "Fachärztin für Allgemeinmedizin" },
+        { id: "keller", name: DOCS.keller.name, desc: "Facharzt für Allgemeinmedizin. Urlaub ab " + fDateShort.format(vacStart) }
+      ];
+      $("#docHint").textContent = "Wenn Sie schon bei uns sind, wählen Sie am besten Ihre Ärztin oder Ihren Arzt.";
+    }
+    $("#docGrid").innerHTML = '<legend class="sr">Ärztin oder Arzt</legend>' + opts.map(function (o) {
+      return '<label class="choice"><input type="radio" name="doc" value="' + o.id + '"' + (B.doc === o.id ? " checked" : "") + ">" + portraitSmall(o.id) + "<span><b>" + o.name + "</b><small>" + o.desc + '</small></span><span class="tick" aria-hidden="true"></span></label>';
+    }).join("");
+  }
+  var dayCache = [];
+  function renderDays() {
+    var a = anlById(B.anl), days = workdays();
+    if (a.id === "akut") days = days.slice(0, 3);
+    $("#slotHint").textContent = a.id === "akut" ? "Akuttermine vergeben wir online nur für heute und die nächsten zwei Werktage. Ohne Termin kommen Sie von 8:00 bis 9:30 Uhr." : a.id === "blut" ? "Blutabnahme von 8:00 bis 10:00 Uhr. Freie Termine der nächsten 10 Werktage." : "Freie Termine der nächsten 10 Werktage. Termine dauern etwa " + a.dur + " Minuten.";
+    dayCache = days.map(function (d) { return { d: d, slots: slotsMerged(d, B.doc, a) }; });
+    if (B.day && !dayCache.some(function (x) { return keyOf(x.d) === B.day && x.slots.length; })) { B.day = null; B.slot = null; }
+    if (!B.day) { var f = dayCache.filter(function (x) { return x.slots.length; })[0]; B.day = f ? keyOf(f.d) : null; }
+    var todayK = keyOf(getNow()), tomorrowK = keyOf(addDays(getNow(), 1));
+    $("#dayGrid").innerHTML = '<legend class="sr">Tag wählen</legend>' + dayCache.map(function (x) {
+      var k = keyOf(x.d), n = x.slots.length, label = k === todayK ? "Heute" : k === tomorrowK ? "Morgen" : fShortW.format(x.d).replace(".", "");
+      var vac = B.doc === "keller" && onVacation("keller", x.d);
+      var info = vac ? "Urlaub" : n ? n + (n === 1 ? " frei" : " frei") : "ausgebucht";
+      return '<label class="day' + (n ? "" : " none") + '"><input type="radio" name="day" value="' + k + '"' + (B.day === k ? " checked" : "") + (n ? "" : " disabled") + ' aria-label="' + esc(fLong.format(x.d) + ", " + (vac ? "Urlaub, keine Termine" : n ? n + " freie Termine" : "ausgebucht")) + '"><b>' + label + " " + fDM.format(x.d) + "</b><span>" + info + "</span></label>";
+    }).join("");
+    renderSlots();
+  }
+  function renderSlots() {
+    var area = $("#slotArea"), x = dayCache.filter(function (y) { return keyOf(y.d) === B.day; })[0];
+    if (!x) { area.innerHTML = '<p class="empty">In den nächsten Tagen ist online nichts mehr frei. Rufen Sie uns bitte an: 0123 456 78-0.</p>'; updateChosen(); return; }
+    var am = x.slots.filter(function (s) { return s.t < 780; }), pm = x.slots.filter(function (s) { return s.t >= 780; });
+    var showDoc = B.doc === "egal";
+    function grp(title, list) {
+      if (!list.length) return "";
+      return '<fieldset class="slot-group"><legend>' + title + '</legend><div class="slots">' + list.map(function (s) {
+        var v = s.t + "|" + s.doc, sel = B.slot && B.slot.t === s.t && B.slot.doc === s.doc;
+        return '<label class="slot"><input type="radio" name="slot" value="' + v + '"' + (sel ? " checked" : "") + ' aria-label="' + tm(s.t) + " Uhr" + (showDoc ? ", " + DOCS[s.doc].short : "") + '"><span>' + tm(s.t) + (showDoc ? "<small>" + DOCS[s.doc].short + "</small>" : "") + "</span></label>";
+      }).join("") + "</div></fieldset>";
+    }
+    area.innerHTML = '<p style="font-weight:700;margin-bottom:.8rem">' + esc(fLong.format(x.d)) + "</p>" + grp("Vormittag", am) + grp("Nachmittag", pm);
+    if (B.slot && !x.slots.some(function (s) { return s.t === B.slot.t && s.doc === B.slot.doc; })) B.slot = null;
+    updateChosen();
+  }
+  function updateChosen() {
+    var c = $("#chosen");
+    if (B.slot && B.day) c.textContent = "Gewählt: " + fLong.format(fromKey(B.day)) + ", " + tm(B.slot.t) + " Uhr, " + DOCS[B.slot.doc].name;
+    else c.textContent = "";
+  }
+
+  form.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.name === "anl") { B.anl = t.value; B.slot = null; B.day = null; hideErr(1); updateSums(); }
+    if (t.name === "doc") { B.doc = t.value; B.slot = null; B.day = null; hideErr(2); updateSums(); }
+    if (t.name === "day") { B.day = t.value; B.slot = null; renderSlots(); hideErr(3); updateSums(); }
+    if (t.name === "slot") { var p = t.value.split("|"); B.slot = { t: +p[0], doc: p[1] }; updateChosen(); hideErr(3); updateSums(); }
+  });
+  function hideErr(n) { var e = $("#err" + n); if (e) { e.hidden = true; e.textContent = ""; } }
+  function showErr(n, msg) {
+    var e = $("#err" + n);
+    e.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M10 5.5v5.5M10 14v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span>' + esc(msg) + "</span>";
+    e.hidden = false; e.setAttribute("role", "alert");
+  }
+
+  var STEPNAMES = ["Anliegen", "Ärztin oder Arzt", "Termin", "Ihre Daten", "Bestätigung"];
+  function updateSums() {
+    var a = anlById(B.anl);
+    var s = [a ? a.name : "Noch nicht gewählt", B.doc ? (B.doc === "egal" ? "Erster freier Termin" : DOCS[B.doc].name) : "", B.slot && B.day ? fDateShort.format(fromKey(B.day)) + ", " + tm(B.slot.t) + " Uhr" : "", B.data ? B.data.first + " " + B.data.last : "", ""];
+    for (var i = 1; i <= 5; i++) { var el = $('[data-sum="' + i + '"]'); if (el) el.textContent = i <= B.step || s[i - 1] ? s[i - 1] : ""; }
+  }
+  function go(step, focus) {
+    B.step = step;
+    $$("[data-panel]").forEach(function (p) { p.hidden = +p.dataset.panel !== step; });
+    $$("#stepList li").forEach(function (li) {
+      var n = +li.dataset.step;
+      if (n === step) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      li.classList.toggle("done", n < step);
+    });
+    $("#stepMobileT").textContent = "Schritt " + step + " von 5: " + STEPNAMES[step - 1];
+    $("#stepBar").style.width = (step * 20) + "%";
+    $("#backBtn").hidden = step === 1 || step === 5;
+    $("#panelFoot").hidden = step === 5;
+    $("#nextBtn").textContent = step === 4 ? "Termin buchen" : "Weiter";
+    if (step === 2) renderDocs();
+    if (step === 3) renderDays();
+    updateSums();
+    if (focus !== false) {
+      var h = $('[data-panel="' + step + '"] h3') || $("#confirmBox h3");
+      if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+      var top = $(".booking").getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * .6) $(".booking").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+  }
+  $("#backBtn").addEventListener("click", function () { go(Math.max(1, B.step - 1)); });
+
+  /* Validierung */
+  function parseDate(s) {
+    var m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(s || "");
+    if (!m) return null;
+    var d = new Date(+m[3], +m[2] - 1, +m[1]);
+    if (d.getDate() !== +m[1] || d.getMonth() !== +m[2] - 1) return null;
+    return d;
+  }
+  function vBday(v) {
+    if (!v.trim()) return "Bitte geben Sie Ihr Geburtsdatum ein.";
+    var d = parseDate(v);
+    if (!d) return "Bitte im Format TT.MM.JJJJ eingeben, zum Beispiel 14.03.1958.";
+    if (d > getNow()) return "Das Geburtsdatum liegt in der Zukunft.";
+    if (d.getFullYear() < 1900) return "Bitte prüfen Sie das Geburtsjahr.";
+    return "";
+  }
+  function vPhone(v) {
+    if (!v.trim()) return "Bitte geben Sie eine Telefonnummer ein.";
+    if (!/^[+\d][\d\s\/()\-]*$/.test(v.trim()) || v.replace(/\D/g, "").length < 6) return "Bitte nur Ziffern, Leerzeichen, + oder / verwenden, mindestens 6 Ziffern.";
+    return "";
+  }
+  function vMail(v) { if (!v.trim()) return ""; return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Bitte prüfen Sie die E-Mail-Adresse, zum Beispiel name@beispiel.de."; }
+  function setFieldErr(id, msg) {
+    var el = document.getElementById(id), e = document.getElementById(id + "-e");
+    if (!el || !e) return;
+    e.textContent = msg;
+    if (el.tagName === "FIELDSET") { $$("input", el).forEach(function (i) { if (msg) i.setAttribute("aria-invalid", "true"); else i.removeAttribute("aria-invalid"); }); }
+    else if (msg) el.setAttribute("aria-invalid", "true"); else el.removeAttribute("aria-invalid");
+  }
+  function radioVal(name, root) { var r = $('input[name="' + name + '"]:checked', root || document); return r ? r.value : ""; }
+  function summary(boxSel, errs) {
+    var box = $(boxSel), ul = $("ul", box);
+    if (!errs.length) { box.hidden = true; return; }
+    $("h4", box).textContent = errs.length === 1 ? "Bitte prüfen Sie 1 Angabe" : "Bitte prüfen Sie " + errs.length + " Angaben";
+    ul.innerHTML = errs.map(function (e) { return '<li><a href="#' + e.id + '" data-focus="' + e.id + '">' + esc(e.label) + ": " + esc(e.msg) + "</a></li>"; }).join("");
+    box.hidden = false; box.focus();
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("[data-focus]");
+    if (!a) return;
+    e.preventDefault();
+    var el = document.getElementById(a.dataset.focus);
+    if (el) { var f = el.tagName === "FIELDSET" ? $("input", el) : el; f.focus(); el.scrollIntoView({ block: "center" }); }
+  });
+
+  function validateBook(showSum, only) {
+    var v = function (id) { return document.getElementById(id).value; }, errs = [];
+    var checks = [
+      ["b-first", "Vorname", v("b-first").trim() ? "" : "Bitte geben Sie Ihren Vornamen ein."],
+      ["b-last", "Nachname", v("b-last").trim() ? "" : "Bitte geben Sie Ihren Nachnamen ein."],
+      ["b-bday", "Geburtsdatum", vBday(v("b-bday"))],
+      ["b-phone", "Telefonnummer", vPhone(v("b-phone"))],
+      ["b-mail", "E-Mail", vMail(v("b-mail"))],
+      ["b-ins", "Versicherung", radioVal("ins", form) ? "" : "Bitte wählen Sie Ihre Versicherung."],
+      ["b-known", "Waren Sie schon bei uns?", radioVal("known", form) ? "" : "Bitte wählen Sie Ja oder Nein."],
+      ["b-ok", "Einverständnis", $("#b-ok").checked ? "" : "Bitte bestätigen Sie Ihr Einverständnis."]
+    ];
+    checks.forEach(function (c) { if (!only || only === c[0]) setFieldErr(c[0], c[2]); if (c[2]) errs.push({ id: c[0], label: c[1], msg: c[2] }); });
+    if (showSum) summary("#bookErrSum", errs); else if (!errs.length) $("#bookErrSum").hidden = true;
+    return !errs.length;
+  }
+  var bookTried = false;
+  ["b-first", "b-last", "b-bday", "b-phone", "b-mail"].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener("blur", function () { if (bookTried) validateBook(false, id); });
+    el.addEventListener("input", function () { if (el.getAttribute("aria-invalid") === "true") validateBook(false, id); });
+  });
+  $$('#b-ins input, #b-known input, #b-ok').forEach(function (i) { i.addEventListener("change", function () { if (bookTried) validateBook(false, i.closest("fieldset") ? i.closest("fieldset").id : i.id); }); });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (B.step === 1) { if (!B.anl) return showErr(1, "Bitte wählen Sie ein Anliegen."); return go(2); }
+    if (B.step === 2) { if (!B.doc) return showErr(2, "Bitte wählen Sie eine Ärztin, einen Arzt oder den ersten freien Termin."); return go(3); }
+    if (B.step === 3) { if (!B.slot) return showErr(3, "Bitte wählen Sie eine Uhrzeit."); return go(4); }
+    if (B.step === 4) {
+      bookTried = true;
+      if (!validateBook(true)) return;
+      B.data = { first: $("#b-first").value.trim(), last: $("#b-last").value.trim(), phone: $("#b-phone").value.trim(), mail: $("#b-mail").value.trim(), ins: radioVal("ins", form), known: radioVal("known", form) };
+      var bk = { id: "T" + Date.now().toString(36), anl: B.anl, doc: B.slot.doc, date: B.day, t: B.slot.t, first: B.data.first, last: B.data.last, created: Date.now() };
+      mem.bookings.push(bk); save(); B.last = bk;
+      renderConfirm(bk); go(5); renderMy();
+    }
+  });
+
+  function renderConfirm(bk) {
+    var a = anlById(bk.anl), d = fromKey(bk.date), bring = ["Ihre Versichertenkarte", "Ihren aktuellen Medikationsplan"];
+    if (bk.anl === "impfung") bring.push("Ihren Impfpass");
+    if (bk.anl === "blut") bring.push("Bitte nüchtern kommen: 12 Stunden vorher nichts essen, Wasser ist erlaubt");
+    if (bk.anl === "vorsorge") bring.push("Bei Check-up mit Blutwerten bitte nüchtern kommen");
+    if (B.data && B.data.known === "nein") bring.push("Vorbefunde und Arztbriefe, falls vorhanden");
+    $("#confirmBox").innerHTML =
+      '<div class="confirm-h"><svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M34 3c16 1 27 13 27 29 0 17-13 30-30 29C15 60 3 47 3 31 3 15 17 2 34 3z" fill="#E4EBE0"/><path d="M20 33l8 8 16-18" fill="none" stroke="#3B5444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3 tabindex="-1">Ihr Termin ist vorgemerkt</h3></div>' +
+      '<dl class="sum"><dt>Anliegen</dt><dd>' + esc(a.name) + "</dd><dt>Datum</dt><dd>" + esc(fLongY.format(d)) + "</dd><dt>Uhrzeit</dt><dd>" + tm(bk.t) + " Uhr, etwa " + a.dur + " Minuten</dd><dt>Bei</dt><dd>" + esc(DOCS[bk.doc].name) + "</dd><dt>Für</dt><dd>" + esc(bk.first + " " + bk.last) + "</dd></dl>" +
+      '<div><p style="font-weight:700;margin-bottom:.3rem">Bitte mitbringen</p><ul class="bring">' + bring.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></div>" +
+      '<p class="demo-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5.5M12 16.2v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Demo: Es wurde nichts gesendet. Der Termin ist nur in diesem Browser gespeichert. In einer echten Praxis bekämen Sie jetzt eine Bestätigung per E-Mail oder SMS.</span></p>' +
+      '<div class="hero-actions"><button type="button" class="btn sage" id="icsBtn">In den Kalender eintragen</button><button type="button" class="btn quiet" id="againBtn">Weiteren Termin buchen</button></div>';
+    $("#icsBtn").addEventListener("click", function () { downloadIcs(bk); });
+    $("#againBtn").addEventListener("click", resetBooking);
+  }
+  function resetBooking() {
+    B = { step: 1, anl: null, doc: null, day: null, slot: null, data: null, last: null };
+    bookTried = false;
+    form.reset(); $$("[aria-invalid]", form).forEach(function (i) { i.removeAttribute("aria-invalid"); }); $$(".err", form).forEach(function (e) { e.textContent = ""; }); $("#bookErrSum").hidden = true;
+    renderAnl(); go(1);
+  }
+  function downloadIcs(bk) {
+    var a = anlById(bk.anl), d = fromKey(bk.date);
+    var f = function (dt, min) { return dt.getFullYear() + pad(dt.getMonth() + 1) + pad(dt.getDate()) + "T" + pad(Math.floor(min / 60)) + pad(min % 60) + "00"; };
+    var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Beispiel//Praxis Demo//DE", "BEGIN:VEVENT", "UID:" + bk.id + "@praxis-muster.example", "DTSTAMP:" + f(new Date(), new Date().getHours() * 60 + new Date().getMinutes()), "DTSTART:" + f(d, bk.t), "DTEND:" + f(d, bk.t + a.dur), "SUMMARY:" + a.name + " Hausarztpraxis Dr. Muster (Demo)", "LOCATION:Lindenallee 14\\, 12345 Musterstadt", "DESCRIPTION:Beispieltermin aus einer Demo-Website.", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    try {
+      var url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+      var l = document.createElement("a"); l.href = url; l.download = "termin-praxis-muster.ics"; document.body.appendChild(l); l.click(); l.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      toast("Kalenderdatei wurde erstellt.");
+    } catch (e) { toast("Kalenderdatei konnte nicht erstellt werden."); }
+  }
+  function renderMy() {
+    var now = getNow(), nowK = keyOf(now), nm = now.getHours() * 60 + now.getMinutes();
+    var list = mem.bookings.filter(function (b) { return b.date > nowK || (b.date === nowK && b.t >= nm); }).sort(function (x, y) { return (x.date + pad(Math.floor(x.t / 60)) + pad(x.t % 60)).localeCompare(y.date + pad(Math.floor(y.t / 60)) + pad(y.t % 60)); });
+    $("#myBookings").hidden = !list.length;
+    $("#myList").innerHTML = list.map(function (b) {
+      var a = anlById(b.anl) || { name: "Termin" };
+      return '<li><div><b>' + esc(fLong.format(fromKey(b.date))) + ", " + tm(b.t) + " Uhr</b><span>" + esc(a.name) + " bei " + esc(DOCS[b.doc] ? DOCS[b.doc].name : "") + '</span></div><button type="button" class="btn quiet small" data-cancel="' + esc(b.id) + '">Termin absagen<span class="sr"> am ' + esc(fLong.format(fromKey(b.date))) + " um " + tm(b.t) + " Uhr</span></button></li>";
+    }).join("");
+  }
+  $("#myList").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-cancel]"); if (!btn) return;
+    var id = btn.dataset.cancel, idx = -1;
+    mem.bookings.forEach(function (b, i) { if (b.id === id) idx = i; });
+    if (idx < 0) return;
+    var removed = mem.bookings.splice(idx, 1)[0]; save(); renderMy(); if (B.step === 3) renderDays();
+    toast("Termin am " + fDM.format(fromKey(removed.date)) + " abgesagt.", function () { mem.bookings.push(removed); save(); renderMy(); if (B.step === 3) renderDays(); toast("Termin wiederhergestellt."); });
+    var first = $("#myList button"); if (first) first.focus(); else $("#terminTitle").focus();
+  });
+
+  /* ---------- Rezept und Überweisung ---------- */
+  var rx = $("#rxForm"), medN = 0, rxTried = false;
+  function medRow(focus) {
+    medN++;
+    var id = "m" + medN, row = document.createElement("div");
+    row.className = "med-row"; row.dataset.row = id;
+    row.innerHTML = '<div class="field"><label for="' + id + '-n">Medikament und Stärke</label><input type="text" id="' + id + '-n" placeholder="z. B. Ramipril 5 mg" aria-describedby="' + id + '-n-e"><p class="err" id="' + id + '-n-e"></p></div>' +
+      '<div class="field"><label for="' + id + '-p">Packung</label><select id="' + id + '-p"><option value="N1">N1, klein</option><option value="N2">N2, mittel</option><option value="N3" selected>N3, groß</option><option value="?">Weiß nicht</option></select></div>' +
+      '<button type="button" class="rm" data-rm="' + id + '"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="sr">Medikament entfernen</span></button>';
+    $("#medList").appendChild(row);
+    var mi = $("#" + id + "-n");
+    mi.addEventListener("blur", function () { if (rxTried) validateRx(false, mi.id); });
+    mi.addEventListener("input", function () { if (mi.getAttribute("aria-invalid") === "true") validateRx(false, mi.id); });
+    syncRm();
+    if (focus) $("#" + id + "-n").focus();
+  }
+  function syncRm() { var rows = $$(".med-row"), only = rows.length === 1; $$(".rm").forEach(function (b) { b.disabled = only; }); $("#medAdd").hidden = rows.length >= 5; }
+  $("#medAdd").addEventListener("click", function () { medRow(true); });
+  $("#medList").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rm]"); if (!b || b.disabled) return;
+    var row = b.closest(".med-row"), prev = row.previousElementSibling || row.nextElementSibling;
+    row.remove(); syncRm();
+    if (prev) $("input", prev).focus();
+  });
+  medRow(false);
+  function rxType() { return radioVal("rxType", rx); }
+  rx.addEventListener("change", function (e) {
+    if (e.target.name === "rxType") { var r = rxType() === "rezept"; $("#rxRezept").hidden = !r; $("#rxUeber").hidden = r; }
+    if (e.target.name === "card") { if (rxTried) validateRx(false, "r-card"); }
+    if (e.target.id === "r-ok" || e.target.id === "u-fach") { if (rxTried) validateRx(false, e.target.id); }
+  });
+  ["r-name", "r-bday", "r-phone", "u-why", "u-when"].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener("blur", function () { if (rxTried) validateRx(false, id); });
+    el.addEventListener("input", function () { if (el.getAttribute("aria-invalid") === "true") validateRx(false, id); });
+  });
+  function validateRx(showSum, only) {
+    var errs = [], g = function (id) { return document.getElementById(id).value; };
+    var checks = [
+      ["r-name", "Name", g("r-name").trim().length >= 3 ? "" : "Bitte geben Sie Vor- und Nachnamen ein."],
+      ["r-bday", "Geburtsdatum", vBday(g("r-bday"))],
+      ["r-phone", "Telefonnummer", vPhone(g("r-phone"))],
+      ["r-card", "Versichertenkarte", radioVal("card", rx) ? "" : "Bitte wählen Sie eine Antwort."]
+    ];
+    if (rxType() === "rezept") {
+      $$(".med-row").forEach(function (row, i) { var inp = $("input", row); checks.push([inp.id, "Medikament " + (i + 1), inp.value.trim().length >= 3 ? "" : "Bitte Name und Stärke eintragen oder die Zeile entfernen."]); });
+      if (!only) ["u-fach", "u-why", "u-when"].forEach(function (id) { setFieldErr(id, ""); });
+    } else {
+      if (!only) $$(".med-row input").forEach(function (inp) { setFieldErr(inp.id, ""); });
+      checks.push(["u-fach", "Fachrichtung", g("u-fach") ? "" : "Bitte wählen Sie eine Fachrichtung."]);
+      checks.push(["u-why", "Grund", g("u-why").trim().length >= 5 ? "" : "Bitte beschreiben Sie kurz den Grund."]);
+      var w = g("u-when").trim(), wd = w ? parseDate(w) : null;
+      checks.push(["u-when", "Facharzttermin", !w ? "" : !wd ? "Bitte im Format TT.MM.JJJJ eingeben." : wd < new Date(getNow().getFullYear(), getNow().getMonth(), getNow().getDate()) ? "Der Termin liegt in der Vergangenheit." : ""]);
+    }
+    checks.push(["r-ok", "Einverständnis", $("#r-ok").checked ? "" : "Bitte bestätigen Sie Ihr Einverständnis."]);
+    checks.forEach(function (c) { if (!only || only === c[0]) setFieldErr(c[0], c[2]); if (c[2]) errs.push({ id: c[0], label: c[1], msg: c[2] }); });
+    if (showSum) summary("#rxErrSum", errs); else if (!errs.length) $("#rxErrSum").hidden = true;
+    return !errs.length;
+  }
+  function readyDate() {
+    var now = getNow(), p = periodsOf(now), m = now.getHours() * 60 + now.getMinutes();
+    if (p.length && m < 600) return { d: now, t: 900, same: true };
+    var n = nextOpen(now); return { d: n.d, t: 660, same: false };
+  }
+  rx.addEventListener("submit", function (e) {
+    e.preventDefault(); rxTried = true;
+    if (!validateRx(true)) return;
+    var type = rxType(), rd = readyDate(), id = (type === "rezept" ? "R-" : "U-") + pad(getNow().getDate()) + pad(getNow().getMonth() + 1) + "-" + (100 + (hash(String(Date.now())) % 900));
+    var card = radioVal("card", rx), what, how;
+    if (type === "rezept") {
+      var meds = $$(".med-row").map(function (r) { return $("input", r).value.trim() + " (" + $("select", r).value + ")"; });
+      what = meds.join(", ");
+      var pk = radioVal("pickup", rx);
+      how = pk === "karte" ? "Einlösbar mit Ihrer Gesundheitskarte in jeder Apotheke" : pk === "app" ? "Erscheint in Ihrer E-Rezept-App" : "Abholbereit am Empfang";
+    } else { what = "Überweisung " + $("#u-fach").value; how = "Abholbereit am Empfang oder per Post"; }
+    var readyTxt = (rd.same ? "heute" : fLong.format(rd.d)) + " ab " + tm(rd.t) + " Uhr";
+    var req = { id: id, type: type, what: what, ready: readyTxt, created: Date.now() };
+    mem.requests.unshift(req); mem.requests = mem.requests.slice(0, 6); save();
+    var done = $("#rxDone");
+    done.innerHTML = '<div class="confirm"><div class="confirm-h"><svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M34 3c16 1 27 13 27 29 0 17-13 30-30 29C15 60 3 47 3 31 3 15 17 2 34 3z" fill="#E4EBE0"/><path d="M20 33l8 8 16-18" fill="none" stroke="#3B5444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Anfrage ist eingegangen</h3></div>' +
+      '<dl class="sum"><dt>Anfragenummer</dt><dd>' + esc(id) + "</dd><dt>Angefragt</dt><dd>" + esc(what) + "</dd><dt>Fertig</dt><dd>" + esc(readyTxt) + "</dd><dt>So bekommen Sie es</dt><dd>" + esc(how) + "</dd></dl>" +
+      (card !== "ja" ? '<p class="notice" style="padding:.9rem 1.1rem"><span>Bitte lesen Sie Ihre Versichertenkarte in diesem Quartal noch am Empfang ein. Erst dann können wir das Rezept ausstellen.</span></p>' : "") +
+      '<p class="demo-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5.5M12 16.2v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Demo: Es wurde nichts gesendet. Die Anfrage ist nur in diesem Browser gespeichert.</span></p>' +
+      '<div><button type="button" class="btn quiet" id="rxAgain">Weitere Anfrage stellen</button></div></div>';
+    rx.hidden = true; done.hidden = false; done.focus();
+    $("#rxAgain").addEventListener("click", function () {
+      rx.reset(); rxTried = false; $("#medList").innerHTML = ""; medRow(false); $("#rxRezept").hidden = false; $("#rxUeber").hidden = true;
+      $$("[aria-invalid]", rx).forEach(function (i) { i.removeAttribute("aria-invalid"); }); $$(".err", rx).forEach(function (x) { x.textContent = ""; }); $("#rxErrSum").hidden = true;
+      done.hidden = true; rx.hidden = false; $("#r-name").focus();
+    });
+    renderRxList();
+  });
+  function renderRxList() {
+    var box = $("#rxListBox");
+    if (!mem.requests.length) { box.innerHTML = '<p class="muted" style="font-size:1rem">Noch keine Anfrage in diesem Browser.</p>'; return; }
+    box.innerHTML = '<ul style="list-style:none;padding:0;margin:0;color:var(--tinte)">' + mem.requests.map(function (r) {
+      return '<li style="padding:.55rem 0;border-top:1px solid var(--linie)"><b>' + esc(r.id) + "</b> " + (r.type === "rezept" ? "Folgerezept" : "Überweisung") + '<br><span class="muted" style="font-size:.95rem">Fertig ' + esc(r.ready) + "</span></li>";
+    }).join("") + "</ul>";
+  }
+
+  /* ---------- Leistungen ---------- */
+  var SVC = [
+    { id: "vorsorge", t: "Vorsorge", ic: "vorsorge", s: "Früherkennung nach den Richtlinien der Krankenkassen", b: "Wir beraten Sie, welche Untersuchungen in Ihrem Alter sinnvoll sind, und führen viele davon direkt bei uns durch. Dazu gehören zum Beispiel der Test auf verborgenes Blut im Stuhl ab 50 und der Ultraschall der Bauchschlagader für Männer ab 65.", f: [["Für wen", "Alle Altersgruppen, je nach Untersuchung"], ["Kosten", "Leistung der Krankenkasse"], ["Dauer", "20 bis 30 Minuten"]], book: "vorsorge" },
+    { id: "checkup", t: "Check-up 35", ic: "checkup", s: "Gesundheitsuntersuchung mit Blutwerten und ausführlichem Gespräch", b: "Wir fragen nach Erkrankungen in Ihrer Familie, messen den Blutdruck, untersuchen Sie körperlich und bestimmen Cholesterin und Blutzucker. Einmalig ab 35 gehört ein Test auf Hepatitis B und C dazu. Zwischen 18 und 34 Jahren gibt es den Check-up einmal.", f: [["Für wen", "Ab 35 Jahren alle drei Jahre"], ["Ablauf", "Blutabnahme nüchtern, eine Woche später Befundgespräch"], ["Kosten", "Leistung der Krankenkasse"]], book: "vorsorge" },
+    { id: "impfung", t: "Impfungen", ic: "impfung", s: "Standardimpfungen nach STIKO, Grippe und Corona", b: "Bringen Sie bitte Ihren Impfpass mit. Wir prüfen, welche Impfungen fehlen, und frischen sie auf, zum Beispiel Tetanus, Diphtherie und Keuchhusten. Ab 60 empfehlen wir die Impfung gegen Gürtelrose und Pneumokokken.", f: [["Für wen", "Jugendliche und Erwachsene"], ["Grippeimpfung", "Ab Oktober, ohne lange Wartezeit"], ["Kosten", "Leistung der Krankenkasse bei STIKO-Empfehlung"]], book: "impfung" },
+    { id: "haut", t: "Hautkrebs-Screening", ic: "haut", s: "Sorgfältige Untersuchung der gesamten Haut", b: "Dr. Anna Muster hat die Qualifikation für das Hautkrebs-Screening. Wir sehen uns die gesamte Haut an, auch Kopfhaut und Fußsohlen. Auffällige Stellen besprechen wir sofort mit Ihnen und überweisen bei Bedarf zur Hautärztin.", f: [["Für wen", "Ab 35 Jahren alle zwei Jahre"], ["Dauer", "Etwa 15 Minuten"], ["Kosten", "Leistung der Krankenkasse"]], book: "vorsorge" },
+    { id: "dmp", t: "Chronikerprogramme (DMP)", ic: "dmp", s: "Regelmäßige Betreuung bei Diabetes, KHK, Asthma und COPD", b: "In den Programmen für chronische Erkrankungen sehen wir Sie regelmäßig, meist einmal im Quartal. Marta Nowak bereitet die Termine vor, misst Werte und schult Sie, etwa zum Blutzuckermessen oder zur richtigen Inhalation.", f: [["Für wen", "Diabetes Typ 2, koronare Herzkrankheit, Asthma, COPD"], ["Rhythmus", "Alle drei bis sechs Monate"], ["Kosten", "Leistung der Krankenkasse"]], book: "gespraech" },
+    { id: "haus", t: "Hausbesuche", ic: "haus", s: "Für Menschen, die nicht in die Praxis kommen können", b: "Hausbesuche machen wir dienstags und donnerstags nach der Vormittagssprechstunde. Bitte melden Sie den Besuch bis 10 Uhr telefonisch an. Marta Nowak übernimmt als Versorgungsassistentin auch Kontrollbesuche, Blutabnahmen und Verbandswechsel.", f: [["Wann", "Dienstag und Donnerstag ab 12:30 Uhr"], ["Anmeldung", "Telefonisch bis 10:00 Uhr am selben Tag"], ["Gebiet", "Musterstadt und Ortsteile"]], book: null },
+    { id: "labor", t: "Labor", ic: "labor", s: "Blutabnahme morgens, Ergebnisse meist am nächsten Werktag", b: "Für viele Werte sollten Sie nüchtern kommen: 12 Stunden nichts essen, Wasser und ungesüßter Tee sind erlaubt. Ihre Medikamente nehmen Sie bitte nach Absprache. Werte wie CRP oder Blutzucker messen wir direkt in der Praxis.", f: [["Wann", "Montag bis Freitag, 8:00 bis 10:00 Uhr"], ["Ergebnis", "Meist am nächsten Werktag"], ["Befund", "Im Gespräch oder telefonisch durch Ihre Ärztin oder Ihren Arzt"]], book: "blut" },
+    { id: "ekg", t: "EKG und Langzeitmessungen", ic: "ekg", s: "Ruhe-EKG, Langzeit-EKG und Langzeit-Blutdruck", b: "Das Ruhe-EKG dauert wenige Minuten. Für das Langzeit-EKG tragen Sie ein kleines Gerät 24 Stunden lang und bringen es am nächsten Tag zurück. Die Langzeit-Blutdruckmessung läuft genauso.", f: [["Dauer", "Ruhe-EKG etwa 10 Minuten, Langzeit 24 Stunden"], ["Vorbereitung", "Keine"], ["Kosten", "Leistung der Krankenkasse bei medizinischem Grund"]], book: "gespraech" },
+    { id: "schall", t: "Ultraschall", ic: "schall", s: "Bauchorgane, Schilddrüse und Halsgefäße", b: "Mit dem Ultraschall sehen wir uns Leber, Gallenblase, Nieren, Milz und Bauchschlagader an, außerdem die Schilddrüse und die Halsschlagadern. Für den Ultraschall des Bauchs kommen Sie bitte nüchtern.", f: [["Dauer", "15 bis 20 Minuten"], ["Vorbereitung", "Nüchtern beim Ultraschall des Bauchs"], ["Kosten", "Leistung der Krankenkasse bei medizinischem Grund"]], book: "vorsorge" },
+    { id: "reise", t: "Reisemedizin", ic: "reise", s: "Beratung und Impfungen vor Fernreisen", b: "Kommen Sie möglichst sechs bis acht Wochen vor der Reise. Wir besprechen Impfungen, Malariaschutz und Ihre Reiseapotheke. Dr. Jonas Keller hat die Zusatzqualifikation Reisemedizin. Viele Krankenkassen erstatten Reiseimpfungen ganz oder teilweise.", f: [["Wann", "Sechs bis acht Wochen vor Abreise"], ["Kosten", "Oft Privatleistung, viele Kassen erstatten"], ["Mitbringen", "Impfpass und Reiseroute"]], book: "impfung" }
+  ];
+  function renderSvc() {
+    var half = Math.ceil(SVC.length / 2);
+    function item(s) {
+      return '<div class="svc-item"><h3 style="font-size:inherit;font-weight:inherit"><button type="button" class="svc-btn" aria-expanded="false" aria-controls="svc-' + s.id + '" id="svcb-' + s.id + '"><span class="ic">' + svgI(s.ic) + '</span><span><b>' + s.t + '</b><span class="s">' + s.s + '</span></span><span class="pm" aria-hidden="true">' + PLUS + "</span></button></h3>" +
+        '<div class="svc-body" id="svc-' + s.id + '" role="region" aria-labelledby="svcb-' + s.id + '" hidden><p>' + s.b + '</p><dl class="facts">' + s.f.map(function (x) { return "<dt>" + x[0] + "</dt><dd>" + x[1] + "</dd>"; }).join("") + "</dl>" +
+        (s.book ? '<button type="button" class="btn sage small" data-book="' + s.book + '">Termin dafür buchen</button>' : '<a class="btn quiet small" href="tel:+49123456780">Hausbesuch telefonisch anmelden</a>') + "</div></div>";
+    }
+    $("#svcWrap").innerHTML = '<div class="svc-col">' + SVC.slice(0, half).map(item).join("") + '</div><div class="svc-col">' + SVC.slice(half).map(item).join("") + "</div>";
+  }
+  function syncSvcAll() { var all = $$(".svc-btn").every(function (b) { return b.getAttribute("aria-expanded") === "true"; }); $("#svcAll").textContent = all ? "Alle zuklappen" : "Alle aufklappen"; }
+  $("#svcWrap").addEventListener("click", function (e) {
+    var b = e.target.closest(".svc-btn");
+    if (b) { var open = b.getAttribute("aria-expanded") !== "true"; b.setAttribute("aria-expanded", String(open)); document.getElementById(b.getAttribute("aria-controls")).hidden = !open; syncSvcAll(); return; }
+    var bk = e.target.closest("[data-book]");
+    if (bk) {
+      resetBooking(); B.anl = bk.dataset.book; renderAnl(); updateSums();
+      go(2, false); $("#termin").scrollIntoView({ block: "start" }); var h = $('[data-panel="2"] h3'); h.focus({ preventScroll: true });
+      toast("Anliegen gewählt: " + anlById(B.anl).name);
+    }
+  });
+  $("#svcAll").addEventListener("click", function () {
+    var all = $$(".svc-btn").every(function (b) { return b.getAttribute("aria-expanded") === "true"; });
+    $$(".svc-btn").forEach(function (b) { b.setAttribute("aria-expanded", String(!all)); document.getElementById(b.getAttribute("aria-controls")).hidden = all; });
+    syncSvcAll();
+  });
+
+  /* ---------- Team ---------- */
+  var CREW = [
+    ["SR", "Sabine Roth", "Praxismanagerin, Medizinische Fachangestellte", "#E4EBE0", "#3B5444"],
+    ["LD", "Leyla Demir", "Medizinische Fachangestellte, Labor und Impfungen. Spricht Türkisch", "#F5E1D5", "#86381F"],
+    ["MN", "Marta Nowak", "Versorgungsassistentin (VERAH), Hausbesuche und Chronikerprogramme", "#F1E2BF", "#6B4E12"],
+    ["TH", "Tim Hoffmann", "Auszubildender zum Medizinischen Fachangestellten, 2. Lehrjahr", "#DDE6EA", "#2E4A57"]
+  ];
+  var BLOBS = ["M34 3c16 1 27 13 27 29 0 17-13 30-30 29C15 60 3 47 3 31 3 15 17 2 34 3z", "M30 3c17-1 30 12 30 28 0 16-13 29-30 29C14 60 2 48 3 31 4 15 15 4 30 3z", "M32 4c14 0 28 10 28 27 0 18-14 28-30 28S3 47 3 31C3 14 18 4 32 4z", "M28 3c18-2 32 13 31 30-1 15-14 27-30 27C13 60 2 46 3 30 4 15 14 4 28 3z"];
+  $("#crew").innerHTML = CREW.map(function (c, i) {
+    return '<li><svg viewBox="0 0 64 64" role="img" aria-label="Porträt-Platzhalter mit Initialen ' + c[0] + '"><path d="' + BLOBS[i] + '" fill="' + c[3] + '"/><text x="32" y="40" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-style="italic" font-size="23" fill="' + c[4] + '">' + c[0] + "</text></svg><div><b>" + c[1] + "</b><span>" + c[2] + "</span></div></li>";
+  }).join("");
+
+  /* ---------- Anfahrt ---------- */
+  var MODES = {
+    bus: { h: "Mit Bus", li: ["Haltestelle Lindenplatz, Linien 4 und 17", "Zu Fuß 2 Minuten entlang der Lindenallee", "Busse fahren tagsüber alle 10 Minuten", "Die Haltestelle hat einen erhöhten Bordstein"], hl: "mkBus" },
+    auto: { h: "Mit dem Auto", li: ["Parkhaus Marktplatz an der Parkstraße, 150 Meter entfernt", "Die erste Stunde ist mit Parkschein aus der Praxis kostenlos", "Vor dem Haus: Kurzzeitparken bis 30 Minuten", "Fahrradbügel direkt am Eingang"], hl: "mkPark" },
+    barrierefrei: { h: "Barrierefreier Zugang", li: ["Zwei Behindertenparkplätze direkt vor dem Haus", "Stufenloser Eingang mit automatischer Tür", "Praxis im Erdgeschoss, breite Türen, barrierefreies WC", "Induktive Höranlage am Empfang", "Assistenzhunde sind willkommen"], hl: "mkBf" }
+  };
+  function setMode(m) {
+    $$(".mode-bar button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mode === m)); });
+    $$("#map .route").forEach(function (r) { r.classList.toggle("on", r.dataset.mode === m); });
+    ["mkBus", "mkPark", "mkBf"].forEach(function (id) { document.getElementById(id).style.transform = MODES[m].hl === id ? "scale(1.12)" : ""; });
+    var d = MODES[m];
+    $("#modeInfo").innerHTML = "<h3>" + d.h + "</h3><ul>" + d.li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+  $$(".mode-bar button").forEach(function (b) { b.addEventListener("click", function () { setMode(b.dataset.mode); }); });
+  setMode("bus");
+
+  /* ---------- FAQ ---------- */
+  var FAQ = [
+    ["Nehmen Sie neue Patientinnen und Patienten auf?", ["Ja, wenn Sie in Musterstadt oder den Ortsteilen wohnen. Buchen Sie online einen Termin für ein Gespräch und wählen Sie bei „Waren Sie schon bei uns?“ die Antwort Nein.", "Bringen Sie bitte Vorbefunde, Arztbriefe und Ihren Medikationsplan mit."]],
+    ["Muss ich jedes Quartal meine Versichertenkarte vorlegen?", ["Ja. Wir müssen Ihre Karte einmal pro Quartal einlesen. Ohne eingelesene Karte können wir keine E-Rezepte und Überweisungen ausstellen."]],
+    ["Kann ich mich telefonisch krankschreiben lassen?", ["Bei leichten Erkrankungen und wenn Sie bei uns bekannt sind, ist eine Krankschreibung nach telefonischer Rücksprache für bis zu fünf Kalendertage möglich. Rufen Sie dafür bitte vormittags an."]],
+    ["Wie lange dauert ein Folgerezept?", ["Anfragen bearbeiten wir innerhalb eines Werktags. Was bis 10 Uhr bei uns ist, ist meist am selben Tag ab 15 Uhr fertig."]],
+    ["Bekomme ich Befunde am Telefon?", ["Normale Laborwerte teilen wir Ihnen nach Rücksprache mit der Ärztin oder dem Arzt telefonisch mit. Auffällige Befunde besprechen wir lieber persönlich mit Ihnen."]],
+    ["Wie lange warte ich in der Akutsprechstunde?", ["Meist 20 bis 45 Minuten, im Winter auch länger. Mit einem Online-Termin für die Akutsprechstunde warten Sie in der Regel kürzer."]],
+    ["Ich kann meinen Termin nicht wahrnehmen. Was tun?", ["Bitte sagen Sie spätestens 24 Stunden vorher ab, telefonisch oder über „Termin absagen“ bei Ihren vorgemerkten Terminen. So kann jemand anderes den Termin nutzen."]],
+    ["Behandeln Sie auch Privatversicherte?", ["Ja. Für Privatversicherte und Selbstzahler rechnen wir nach der Gebührenordnung für Ärzte (GOÄ) ab."]]
+  ];
+  $("#faq").innerHTML = FAQ.map(function (q) { return '<details><summary><span>' + q[0] + '</span><span class="pm" aria-hidden="true">' + PLUS + "</span></summary><div>" + q[1].map(function (p) { return "<p>" + p + "</p>"; }).join("") + "</div></details>"; }).join("");
+
+  /* ---------- Menü-Dialog ---------- */
+  var dlg = $("#menu");
+  $("#menuOpen").addEventListener("click", function () { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); $("#menuClose").focus(); });
+  $("#menuClose").addEventListener("click", function () { dlg.close(); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); if (e.target.closest && e.target.closest("nav a")) dlg.close(); });
+  dlg.addEventListener("close", function () { $("#menuOpen").focus({ preventScroll: true }); });
+
+  /* Sprungziele: Fokus auf die Überschrift */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("[data-goto]"); if (!a) return;
+    var id = a.dataset.goto, h = id === "termin" ? $("#terminTitle") : $("#rezeptTitle");
+    setTimeout(function () { h.focus({ preventScroll: true }); }, 0);
+  });
+
+  /* ---------- Zurücksetzen ---------- */
+  $("#resetBtn").addEventListener("click", function () {
+    var backup = JSON.parse(JSON.stringify(mem));
+    mem = { fs: 0, bookings: [], requests: [] }; save(); setFs(0, false); resetBooking(); renderMy(); renderRxList();
+    toast("Demo wurde zurückgesetzt.", function () { mem = backup; save(); setFs(mem.fs, false); renderMy(); renderRxList(); toast("Wiederhergestellt."); });
+  });
+
+  /* ---------- Start ---------- */
+  renderStatus(); renderHours(); renderVacation(); renderAnl(); renderSvc(); renderMy(); renderRxList(); go(1, false);
+  setInterval(function () { renderStatus(); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) renderStatus(); });
+})();
+</script>
+</body>
+</html>

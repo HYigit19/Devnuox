@@ -505,3 +505,28 @@ mark.ph { background: var(--o-soft); color: var(--fg); border-radius: 4px; paddi
 .demo-sub { font: 700 clamp(1.3rem, 1rem + 1vw, 1.7rem)/1.2 var(--font-display); letter-spacing: -0.035em; margin-top: 12px; scroll-margin-top: 100px; }
 .real-note { border-left-color: var(--ok); }
 .real-note .fit-ic { background: var(--ok-soft); color: var(--ok); }
+
+/* Hover: die Kachel unter der Maus wird orange, KI-Kachel tritt dann zurück */
+.tile, .tile .tile-icon, .tile p, .tile .tags li { transition: background-color .2s, color .2s, border-color .2s, transform .25s; }
+@media (hover: hover) {
+  .bento:hover .t1:not(:hover):not(:focus-visible) { background: var(--card); color: var(--fg); }
+  .bento:hover .t1:not(:hover):not(:focus-visible) .tile-icon { background: var(--soft); color: var(--fg); }
+  .bento:hover .t1:not(:hover):not(:focus-visible) p { color: var(--muted); }
+  .bento:hover .t1:not(:hover):not(:focus-visible) .tags li { color: var(--muted); border-color: var(--line); }
+  .bento:hover .t1:not(:hover):not(:focus-visible) .round-arrow { border-color: var(--line); }
+}
+.tile:hover, .tile:focus-visible { background: var(--o); color: var(--ink); }
+.tile:hover .tile-icon, .tile:focus-visible .tile-icon { background: var(--ink); color: var(--o); }
+.tile:hover p, .tile:focus-visible p { color: rgba(20, 20, 23, .78); }
+.tile:hover .tags li, .tile:focus-visible .tags li { color: var(--ink); border-color: rgba(20, 20, 23, .3); }
+.tile:hover .round-arrow, .tile:focus-visible .round-arrow { background: var(--ink); color: var(--o); border-color: var(--ink); }
+
+/* Ablauf: Schritt unter der Maus orange markieren */
+.path .dot, .path .pill, .path h3 { transition: background-color .2s, color .2s, border-color .2s, transform .2s; }
+@media (hover: hover) {
+  .path:hover li:first-child:not(:hover) .dot { background: var(--fg); color: var(--bg); }
+  .path li:hover .dot { background: var(--o); color: var(--ink); transform: scale(1.08); }
+  .path li:hover .pill { background: var(--o); border-color: var(--o); color: var(--ink); }
+  .path li:hover h3 { color: var(--o-text); }
+}
+@media (prefers-reduced-motion: reduce) { .path li:hover .dot { transform: none; } }

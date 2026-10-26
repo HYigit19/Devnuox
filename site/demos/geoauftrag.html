@@ -12,11 +12,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#F2F4F8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1116" media="(prefers-color-scheme: dark)">
-<style>
-@font-face { font-family: "Figtree"; font-style: normal; font-weight: 300 900; font-display: swap; src: url(shared-files/figtree-latin-wght-normal.woff2) format("woff2-variations"); }
-@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(shared-files/geist-latin-wght-normal.woff2) format("woff2-variations"); }
-@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url(shared-files/jetbrains-mono-latin-wght-normal.woff2) format("woff2-variations"); }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: Navigation links (farbige Kacheln), Inhalt in der Mitte; am Handy Kopfzeile + Tab-Leiste mit großem „Melden“.
    Karte: eigener Lageplan in Metern, Pins in fester Pixelgröße; Koordinaten immer in Mono-Schrift wie auf dem Vermessungsprotokoll. */
@@ -581,7 +579,7 @@ button.kpi { border: 0; width: 100%; font: inherit; cursor: pointer; }
 <script>
 /* GeoAuftrag: Feldaufträge mit Standortnachweis. Demo mit Beispieldaten, gespeichert nur im Browser. */
 document.documentElement.lang = 'de';
-const KEY = 'geoauftrag-demo-v4';
+const KEY = 'geoauftrag-demo-v5';
 const ORG = 'Muster GmbH 1';
 const ICONS = {
   home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
@@ -726,7 +724,7 @@ function seed() {
   const P = (id, name, rolle, fach, kunde, firma) => ({ id, name, rolle, fach, kunde: kunde || null, firma: kunde ? null : (firma || 'mn') });
   const people = [
     P('p1', 'Sabine Krüger', 'admin', 'Büro und Disposition'),
-    P('p2', 'Ahmet Demir', 'monteur', 'Glasfaser-Monteur, Spleißer'),
+    P('p2', 'Max Mustermann', 'monteur', 'Glasfaser-Monteur, Spleißer'),
     P('p3', 'Jonas Weber', 'monteur', 'Tiefbau, Vorarbeiter'),
     P('p4', 'Marek Nowak', 'monteur', 'Tiefbau, Baggerfahrer'),
     P('p5', 'Lisa Hoffmann', 'monteur', 'Pflaster und Wegebau'),
@@ -847,14 +845,14 @@ function seed() {
   notes.push({ id: uid('n'), to: 'p6', text: 'Behinderung bei Muster GmbH 2: A-2026-0433, Gehweg belegt.', at: at(0, '07:31'), read: false, link: 'auftrag-A-2026-0433' });
   let user = 'p1';
   try { if (matchMedia('(max-width: 760px)').matches) user = 'p2'; } catch (e) {}
-  return { v: 4, user, route: { p: 'start', id: null }, af: { q: '', st: '', kd: '', an: '' }, layers: { orders: true, reports: true, trassen: true, marker: true }, pf: 'offen',
+  return { v: 5, user, route: { p: 'start', id: null }, af: { q: '', st: '', kd: '', an: '' }, layers: { orders: true, reports: true, trassen: true, marker: true }, pf: 'offen',
     people, kunden, firmen, geraete, orders, reports, trassen, marker, docs, rechnungen, notes, matlog };
 }
 
 /* ---------- Zustand ---------- */
 let S;
 function load() {
-  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4 && Array.isArray(s.orders)) return s; } } catch (e) {}
+  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 5 && Array.isArray(s.orders)) return s; } } catch (e) {}
   return seed();
 }
 function save() {
@@ -1993,7 +1991,7 @@ function kml(oids, title) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${x(title)}</name>${styles}${fold}</Document></kml>`;
 }
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
-async function needPdf() { if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('shared-files/jspdf.umd.min.js'); return window.jspdf.jsPDF; }
+async function needPdf() { if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); return window.jspdf.jsPDF; }
 const pdfTxt = s => String(s ?? '').replace(/[–—]/g, '-').replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/…/g, '...').replace(/ /g, ' ').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF€]/g, '');
 const RGB = { ink: [26, 30, 41], gray: [91, 98, 116], line: [226, 230, 238], acc: [110, 74, 242], land: [238, 241, 234], road: [255, 255, 255], roadc: [205, 210, 220], bld: [218, 221, 230], green: [211, 231, 203], water: [185, 215, 242], park: [227, 230, 238], cable: [232, 89, 12], ok: [31, 138, 85], rand: [244, 178, 63], ungenau: [244, 178, 63], weit: [217, 54, 68], manuell: [224, 112, 31], soft: [244, 246, 250] };
 function clipSeg(x0, y0, x1, y1, b) {
